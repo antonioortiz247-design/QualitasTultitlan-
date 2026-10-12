@@ -174,6 +174,7 @@ export function QuoteForm() {
   }
 
   const messageDetails = [
+    data.folio ? 'Folio de seguimiento: ' + data.folio : '',
     'Vehículo: ' + data.brand + ' ' + data.model + '; tipo/versión: ' + data.version + '; año: ' + data.year,
     manual ? 'Tipo de vehículo capturado manualmente: ' + data.vehicleType : 'CATE: ' + data.cate + '; CVE (CLAVE AMIS): ' + data.cve + '; clave de marca: ' + data.brandCode,
     'Código postal: ' + data.zip + '; edad del conductor: ' + data.age + '; uso: ' + data.usage,
