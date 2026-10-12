@@ -7,7 +7,6 @@ export const dynamic = 'force-dynamic';
 async function getRows(table: string, supabaseUrl: string, serviceKey: string) {
   const url = new URL('/rest/v1/' + table, supabaseUrl);
   url.searchParams.set('select', '*');
-  url.searchParams.set('order', 'created_at.desc');
   url.searchParams.set('limit', '100');
   const response = await fetch(url, {
     headers: { apikey: serviceKey, Authorization: 'Bearer ' + serviceKey },
@@ -29,10 +28,22 @@ export async function GET(request: NextRequest) {
   if (!supabaseUrl || !serviceKey) return NextResponse.json({ error: 'La conexión a la base de datos no está configurada.' }, { status: 503 });
 
   try {
-    const [contacts, quotes] = await Promise.all([
+    // No ordenar en PostgREST: algunas versiones de las tablas pueden no tener
+    // created_at o tener otro nombre de fecha. Ordenamos después de normalizar.
+    const results = await Promise.allSettled([
       getRows('solicitudes_contacto', supabaseUrl, serviceKey),
       getRows('solicitudes_cotizacion', supabaseUrl, serviceKey),
     ]);
+    const [contactsResult, quotesResult] = results;
+    const contacts = contactsResult.status === 'fulfilled' ? contactsResult.value : [];
+    const quotes = quotesResult.status === 'fulfilled' ? quotesResult.value : [];
+    if (contactsResult.status === 'rejected') console.error('Admin query solicitudes_contacto failed:', contactsResult.reason);
+    if (quotesResult.status === 'rejected') console.error('Admin query solicitudes_cotizacion failed:', quotesResult.reason);
+    if (contactsResult.status === 'rejected' && quotesResult.status === 'rejected') {
+      return NextResponse.json({
+        error: 'No se pudieron consultar las tablas. Revisa los registros de funciones (Functions Logs) de Vercel para ver el error de Supabase.',
+      }, { status: 502 });
+    }
     const normalize = (row: Record<string, unknown>, tipo: string) => ({
       folio: typeof row.folio === 'string' ? row.folio : '',
       nombre: typeof row.nombre === 'string' ? row.nombre : '',
@@ -46,7 +57,10 @@ export async function GET(request: NextRequest) {
     const requests = [...contacts.map(row => normalize(row, 'Contacto')), ...quotes.map(row => normalize(row, 'Cotización'))]
       .sort((a,b) => (Date.parse(b.created_at) || 0) - (Date.parse(a.created_at) || 0))
       .slice(0, 100);
-    return NextResponse.json({ requests }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
+    const warnings = [];
+    if (contactsResult.status === 'rejected') warnings.push('No se pudieron cargar los formularios de contacto.');
+    if (quotesResult.status === 'rejected') warnings.push('No se pudieron cargar las cotizaciones.');
+    return NextResponse.json({ requests, warnings }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
   } catch (error) {
     console.error('Admin requests query failed:', error);
     return NextResponse.json({ error: 'No se pudieron consultar las solicitudes. Verifica las tablas y sus permisos.' }, { status: 502 });
