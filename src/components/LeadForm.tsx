@@ -10,7 +10,6 @@ export function LeadForm() {
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setNotice(true);
-    trackEvent('footer_lead_completed');
   }
   return (
     <section id="contacto" className="bg-qualitas-surface px-4 py-14">
