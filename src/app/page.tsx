@@ -175,11 +175,11 @@ export default function Home() {
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {coverages.map((coverage) => (
               <article className="rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-shadow hover:shadow-soft" key={coverage.name}>
-                <h3 className="rounded-xl bg-[#941B80] py-3 text-center text-white">{coverage.name}</h3>
+                <h3 className="rounded-xl bg-[qualitas-purple] py-3 text-center text-white">{coverage.name}</h3>
                 <ul className="mt-5 space-y-3">
                   {coverage.items.map((item) => (
                     <li className="flex gap-2" key={item}>
-                      <Check className="shrink-0 text-[#0096AE]" size={18} />
+                      <Check className="shrink-0 text-qualitas-aqua" size={18} />
                       {item}
                     </li>
                   ))}
@@ -203,7 +203,7 @@ export default function Home() {
             <div className="mt-8 grid gap-5 md:grid-cols-4">
               {benefits.map(({ icon: Icon, title }) => (
                 <article key={title} className="rounded-2xl border border-qualitas-border bg-white p-6">
-                  <Icon className="mb-4 text-[#941B80]" />
+                  <Icon className="mb-4 text-qualitas-purple" />
                   <h3 className="font-black">{title}</h3>
                   <p className="mt-2 text-sm text-slate-600">
                     Orientación clara para revisar alternativas según tu vehículo y necesidades.
@@ -223,7 +223,7 @@ export default function Home() {
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {siteConfig.serviceAreas.map((area) => (
                 <span className="flex gap-2" key={area}>
-                  <MapPin className="text-[#0096AE]" size={18} />
+                  <MapPin className="text-qualitas-aqua" size={18} />
                   {area}
                 </span>
               ))}
@@ -237,7 +237,7 @@ export default function Home() {
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {processSteps.map((step, index) => (
                 <article key={step} className="rounded-2xl border border-qualitas-border p-5">
-                  <strong className="text-[#941B80]">0{index + 1}</strong>
+                  <strong className="text-qualitas-purple">0{index + 1}</strong>
                   <h3 className="mt-2 font-black">{step}</h3>
                 </article>
               ))}
@@ -259,7 +259,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-[#941B80] px-4 py-12 text-white">
+        <section className="bg-[qualitas-purple] px-4 py-12 text-white">
           <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <Car size={48} />
