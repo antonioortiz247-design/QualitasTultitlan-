@@ -1,19 +1,60 @@
 'use client';
-import { CheckCircle, MessageCircle } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+
+import { CheckCircle, MessageCircle, Search, CarFront } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
 import { whatsappMessages } from '@/config/site';
 import { trackEvent } from '@/lib/analytics';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
-const fields = [
-  ['brand', 'Marca'], ['model', 'Modelo'], ['year', 'Año'], ['version', 'Versión'],
-] as const;
+type Vehicle = {
+  cate: string;
+  cve: string;
+  brandCode: string;
+  brand: string;
+  type: string;
+  description: string;
+  years: string[];
+};
 
 export function QuoteForm() {
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<string, string>>({ usage: 'Particular' });
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState<Vehicle[]>([]);
+  const [selected, setSelected] = useState<Vehicle | null>(null);
+  const [manual, setManual] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState(false);
+
+  useEffect(() => {
+    const term = search.trim();
+    if (manual || selected || term.length < 2) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      setLoading(true);
+      setCatalogError(false);
+      try {
+        const response = await fetch('/api/vehicle-catalog?q=' + encodeURIComponent(term), { signal: controller.signal });
+        if (!response.ok) throw new Error('No se pudo consultar el catálogo');
+        const payload = await response.json();
+        setResults(payload.vehicles ?? []);
+      } catch (error) {
+        if (!(error instanceof Error && error.name === 'AbortError')) setCatalogError(true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }, 220);
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [search, manual, selected]);
 
   function validate(keys: string[]) {
     const nextErrors: Record<string, string> = {};
@@ -26,29 +67,49 @@ export function QuoteForm() {
         nextErrors.year = 'Ingresa un año válido del vehículo.';
       }
     }
-    if (keys.includes('zip') && data.zip && !/^\d{5}$/.test(data.zip)) {
-      nextErrors.zip = 'Ingresa un código postal de 5 dígitos.';
-    }
-    if (keys.includes('age') && data.age && (Number(data.age) < 16 || Number(data.age) > 100)) {
-      nextErrors.age = 'Ingresa una edad entre 16 y 100 años.';
-    }
-    if (keys.includes('phone') && data.phone && data.phone.replace(/\D/g, '').length < 10) {
-      nextErrors.phone = 'Ingresa un teléfono de al menos 10 dígitos.';
-    }
-    if (keys.includes('email') && data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
-      nextErrors.email = 'Ingresa un correo válido.';
-    }
-    if (keys.includes('privacy') && data.privacy !== 'yes') {
-      nextErrors.privacy = 'Debes aceptar el aviso de privacidad.';
-    }
+    if (keys.includes('zip') && data.zip && !/^\d{5}$/.test(data.zip)) nextErrors.zip = 'Ingresa un código postal de 5 dígitos.';
+    if (keys.includes('age') && data.age && (Number(data.age) < 16 || Number(data.age) > 100)) nextErrors.age = 'Ingresa una edad entre 16 y 100 años.';
+    if (keys.includes('phone') && data.phone && data.phone.replace(/\D/g, '').length < 10) nextErrors.phone = 'Ingresa un teléfono de al menos 10 dígitos.';
+    if (keys.includes('email') && data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) nextErrors.email = 'Ingresa un correo válido.';
+    if (keys.includes('privacy') && data.privacy !== 'yes') nextErrors.privacy = 'Debes aceptar el aviso de privacidad.';
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
+  function chooseVehicle(vehicle: Vehicle) {
+    setSelected(vehicle);
+    setManual(false);
+    setSearch('');
+    setResults([]);
+    setData((current) => ({
+      ...current,
+      brand: vehicle.brand,
+      model: vehicle.description || vehicle.type,
+      version: vehicle.type,
+      year: vehicle.years[vehicle.years.length - 1] || '',
+      cate: vehicle.cate,
+      cve: vehicle.cve,
+      brandCode: vehicle.brandCode,
+    }));
+    setErrors({});
+  }
+
+  function startManual() {
+    setSelected(null);
+    setManual(true);
+    setSearch('');
+    setResults([]);
+    setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', vehicleType: '', cate: '', cve: '', brandCode: '' }));
+    setErrors({});
+  }
+
   function next() {
-    if (step === 1 && validate(['brand', 'model', 'year', 'version'])) {
-      trackEvent('quote_step_1_completed');
-      setStep(2);
+    if (step === 1) {
+      const keys = manual ? ['brand', 'model', 'version', 'year', 'vehicleType'] : ['brand', 'model', 'version', 'year'];
+      if (validate(keys)) {
+        trackEvent('quote_step_1_completed');
+        setStep(2);
+      }
     } else if (step === 2 && validate(['zip', 'age'])) {
       trackEvent('quote_step_2_completed');
       setStep(3);
@@ -62,7 +123,7 @@ export function QuoteForm() {
   }
 
   function input(key: string, label: string, type = 'text') {
-    const errorId = `${key}-error`;
+    const errorId = key + '-error';
     return (
       <div key={key}>
         <label className="mb-1 block text-sm font-semibold" htmlFor={key}>{label}</label>
@@ -72,7 +133,7 @@ export function QuoteForm() {
           type={type}
           min={key === 'year' ? 1980 : key === 'age' ? 16 : undefined}
           max={key === 'year' ? new Date().getFullYear() + 1 : key === 'age' ? 100 : undefined}
-          inputMode={key === 'zip' || key === 'phone' ? 'numeric' : key === 'year' || key === 'age' ? 'numeric' : undefined}
+          inputMode={key === 'zip' || key === 'phone' || key === 'year' || key === 'age' ? 'numeric' : undefined}
           autoComplete={key === 'name' ? 'name' : key === 'phone' ? 'tel' : key === 'email' ? 'email' : undefined}
           value={data[key] ?? ''}
           onChange={(e) => setData((current) => ({ ...current, [key]: e.target.value }))}
@@ -86,10 +147,11 @@ export function QuoteForm() {
   }
 
   const messageDetails = [
-    `Vehículo: ${data.brand} ${data.model}, año ${data.year}, versión ${data.version}`,
-    `Código postal: ${data.zip}; edad del conductor: ${data.age}; uso: ${data.usage}`,
-    `Nombre: ${data.name}; teléfono: ${data.phone}; correo: ${data.email}`,
-  ].join('\n');
+    'Vehículo: ' + data.brand + ' ' + data.model + '; tipo/versión: ' + data.version + '; año: ' + data.year,
+    manual ? 'Tipo de vehículo capturado manualmente: ' + data.vehicleType : 'CATE: ' + data.cate + '; CVE (CLAVE AMIS): ' + data.cve + '; clave de marca: ' + data.brandCode,
+    'Código postal: ' + data.zip + '; edad del conductor: ' + data.age + '; uso: ' + data.usage,
+    'Nombre: ' + data.name + '; teléfono: ' + data.phone + '; correo: ' + data.email,
+  ].filter(Boolean).join('\n');
 
   if (done) {
     return (
@@ -97,7 +159,7 @@ export function QuoteForm() {
         <div className="rounded-3xl border border-qualitas-border bg-white p-6 text-center shadow-soft md:p-10">
           <CheckCircle className="mx-auto mb-4 text-qualitas-aqua" size={56} aria-hidden="true" />
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Tus datos están listos para compartir</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-slate-600">Esta página no envía ni guarda tu solicitud y no ha generado una cotización oficial. Abre WhatsApp para revisar y enviar el mensaje al asesor.</p>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-600">Esta página no guarda tu solicitud ni genera una cotización oficial. Abre WhatsApp para revisar y enviar los datos al asesor.</p>
           <a onClick={() => trackEvent('whatsapp_click', { placement: 'quote_success' })} className="focus-ring mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" href={buildWhatsAppUrl(whatsappMessages.quote(messageDetails))}><MessageCircle size={18} aria-hidden="true" />Continuar por WhatsApp</a>
           <button type="button" onClick={() => { setDone(false); setStep(1); }} className="focus-ring ml-3 mt-6 min-h-12 rounded-xl border border-qualitas-border px-5 py-3 font-bold">Editar datos</button>
         </div>
@@ -112,20 +174,74 @@ export function QuoteForm() {
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Cotizador orientativo</p>
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
-            <p className="mt-2 max-w-xl text-slate-600">Comparte los datos básicos para preparar una consulta con el asesor.</p>
+            <p className="mt-2 max-w-xl text-slate-600">Busca tu vehículo en el catálogo o captura sus datos manualmente.</p>
           </div>
           <ol aria-label="Progreso del formulario" className="grid grid-cols-3 gap-2 text-center text-xs font-bold sm:text-sm">
             {['Vehículo', 'Conductor', 'Contacto'].map((label, index) => (
-              <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={`rounded-xl px-3 py-3 ${step === index + 1 ? 'bg-qualitas-purple text-white' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600'}`}>
-                <span className="mb-1 block text-xs">{step > index + 1 ? '✓' : `0${index + 1}`}</span>{label}
+              <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-3 py-3 ' + (step === index + 1 ? 'bg-qualitas-purple text-white' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
+                <span className="mb-1 block text-xs">{step > index + 1 ? '✓' : '0' + (index + 1)}</span>{label}
               </li>
             ))}
           </ol>
         </div>
-        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: `${(step / 3) * 100}%` }} /></div>
+        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 3) * 100) + '%' }} /></div>
         <form onSubmit={submit} className="mt-7">
           <div className="grid gap-4 md:grid-cols-2">
-            {step === 1 && fields.map(([key, label]) => input(key, label, key === 'year' ? 'number' : 'text'))}
+            {step === 1 && (
+              <div className="md:col-span-2">
+                {!manual && !selected && (
+                  <>
+                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">Busca por marca, tipo o versión</label>
+                    <div className="relative">
+                      <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+                      <input id="vehicle-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ej. Nissan Versa, Toyota Corolla…" autoComplete="off" className="focus-ring min-h-12 w-full rounded-xl border border-qualitas-border bg-white pl-10 pr-3" aria-describedby="vehicle-search-help" />
+                    </div>
+                    <p id="vehicle-search-help" className="mt-2 text-sm text-slate-500">Escribe al menos dos caracteres. El catálogo incluye distintas categorías de vehículos.</p>
+                    {loading && <p className="mt-3 text-sm text-slate-600" role="status">Buscando vehículos…</p>}
+                    {catalogError && <p className="mt-3 text-sm text-red-700" role="alert">No se pudo consultar el catálogo. Puedes capturar los datos manualmente.</p>}
+                    {results.length > 0 && (
+                      <ul className="mt-3 max-h-72 space-y-2 overflow-y-auto rounded-xl border border-qualitas-border p-2" aria-label="Resultados de vehículos">
+                        {results.map((vehicle, index) => (
+                          <li key={vehicle.cve + '-' + vehicle.cate + '-' + index}>
+                            <button type="button" onClick={() => chooseVehicle(vehicle)} className="focus-ring w-full rounded-lg px-3 py-3 text-left transition-colors hover:bg-slate-50">
+                              <span className="block font-semibold">{vehicle.brand} · {vehicle.type}</span>
+                              <span className="mt-1 block text-sm text-slate-600">{vehicle.description}</span>
+                              <span className="mt-1 block text-xs text-slate-500">Años disponibles: {vehicle.years.join(', ')}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {!loading && search.trim().length >= 2 && results.length === 0 && !catalogError && <p className="mt-3 text-sm text-slate-600">No encontramos coincidencias. Intenta otra búsqueda o captura los datos manualmente.</p>}
+                    <button type="button" onClick={startManual} className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Mi vehículo no aparece</button>
+                  </>
+                )}
+                {selected && (
+                  <div className="rounded-xl border border-qualitas-aqua/40 bg-cyan-50 p-4">
+                    <p className="text-sm font-bold text-qualitas-aqua">Vehículo seleccionado del catálogo</p>
+                    <p className="mt-1 font-semibold">{selected.brand} · {selected.type}</p>
+                    <p className="mt-1 text-sm text-slate-700">{selected.description}</p>
+                    <label className="mt-3 block text-sm font-semibold" htmlFor="year">Año del vehículo</label>
+                    <select id="year" value={data.year ?? ''} onChange={(e) => setData((current) => ({ ...current, year: e.target.value }))} className="focus-ring mt-1 min-h-12 w-full rounded-lg border border-qualitas-border bg-white px-3">
+                      {selected.years.map((year) => <option key={year} value={year}>{year}</option>)}
+                    </select>
+                    {errors.year && <p className="mt-1 text-sm text-red-700">{errors.year}</p>}
+                    <button type="button" onClick={() => { setSelected(null); setSearch(''); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', cate: '', cve: '', brandCode: '' })); }} className="mt-3 text-sm font-semibold underline">Elegir otro vehículo</button>
+                  </div>
+                )}
+                {manual && (
+                  <div className="grid gap-4 rounded-xl border border-qualitas-border bg-slate-50 p-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2"><p className="font-bold">Captura manual del vehículo</p><p className="mt-1 text-sm text-slate-600">Escribe los datos para que el asesor pueda identificar el vehículo.</p></div>
+                    {input('brand', 'Marca')}
+                    {input('model', 'Modelo / descripción')}
+                    {input('version', 'Versión')}
+                    {input('year', 'Año del vehículo', 'number')}
+                    {input('vehicleType', 'Tipo de vehículo (auto, pickup, moto, etc.)')}
+                    <button type="button" onClick={() => { setManual(false); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', vehicleType: '' })); }} className="focus-ring min-h-11 text-sm font-semibold underline sm:col-span-2">Volver a buscar en el catálogo</button>
+                  </div>
+                )}
+              </div>
+            )}
             {step === 2 && <>
               {input('zip', 'Código postal', 'text')}
               {input('age', 'Edad del conductor', 'number')}
