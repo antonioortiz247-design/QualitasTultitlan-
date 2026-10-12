@@ -4,5 +4,37 @@ import { useState } from 'react';
 import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { trackEvent } from '@/lib/analytics';
-const nav=[['Inicio','#inicio'],['Coberturas','#coberturas'],['¿Por qué Quálitas?','#beneficios'],['Preguntas frecuentes','#faq'],['Contacto','#contacto']];
-export function Header(){const[open,setOpen]=useState(false);return <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur"><div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8"><a href="#inicio" className="focus-ring flex items-center gap-3 rounded-xl"><span className="grid size-11 place-items-center border-2 border-[#b0007a] text-2xl font-black text-[#b0007a]">Q</span><span><strong className="block leading-tight">{siteConfig.businessName}</strong><small className="text-slate-600">{siteConfig.relationshipLabel}</small></span></a><nav aria-label="Principal" className="hidden items-center gap-7 text-sm font-semibold lg:flex">{nav.map(([l,h])=><a className="focus-ring rounded-md hover:text-[#b0007a]" key={h} href={h}>{l}</a>)}</nav><div className="hidden gap-3 lg:flex"><a onClick={()=>trackEvent('whatsapp_click',{placement:'header'})} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#008f8b] px-4 text-sm font-bold text-[#008f8b]" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18}/>WhatsApp</a><a className="focus-ring inline-flex min-h-11 items-center rounded-xl bg-[#b0007a] px-6 text-sm font-bold text-white" href="#cotizador">Cotiza ahora</a></div><div className="flex items-center gap-2 lg:hidden"><a className="focus-ring rounded-xl bg-[#b0007a] px-4 py-3 text-sm font-bold text-white" href="#cotizador">Cotizar</a><button aria-label="Abrir menú" className="focus-ring rounded-xl border p-3" onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></div></div>{open&&<nav aria-label="Móvil" className="border-t bg-white px-4 py-4 lg:hidden">{nav.map(([l,h])=><a onClick={()=>setOpen(false)} className="block rounded-xl px-3 py-3 font-semibold" key={h} href={h}>{l}</a>)}</nav>}</header>}
+
+const nav = [['Inicio', '#inicio'], ['Coberturas', '#coberturas'], ['Beneficios', '#beneficios'], ['Preguntas frecuentes', '#faq'], ['Contacto', '#contacto']];
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const closeMenu = () => setOpen(false);
+  return (
+    <header className="sticky top-0 z-50 border-b border-qualitas-border bg-white/95 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 lg:px-8">
+        <a href="#inicio" onClick={closeMenu} aria-label={siteConfig.businessName + ' — inicio'} className="focus-ring flex min-w-0 items-center gap-3 rounded-lg">
+          <span className="min-w-0">
+            <strong className="block truncate text-base font-extrabold leading-tight text-qualitas-purple sm:text-lg">{siteConfig.businessName}</strong>
+            <small className="mt-1 block text-xs text-slate-600">{siteConfig.relationshipLabel}</small>
+          </span>
+        </a>
+        <nav aria-label="Principal" className="hidden items-center gap-5 text-sm font-semibold xl:flex">
+          {nav.map(([label, href]) => <a className="focus-ring rounded-md py-2 hover:text-qualitas-purple" key={href} href={href}>{label}</a>)}
+        </nav>
+        <div className="hidden items-center gap-2 lg:flex">
+          <a onClick={() => trackEvent('whatsapp_click', { placement: 'header' })} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 text-sm font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />WhatsApp</a>
+          <a className="focus-ring inline-flex min-h-11 items-center rounded-xl bg-qualitas-purple px-5 text-sm font-bold text-white transition-colors hover:brightness-90" href="#cotizador">Cotizar mi auto</a>
+        </div>
+        <div className="flex shrink-0 items-center gap-2 lg:hidden">
+          <a className="focus-ring rounded-xl bg-qualitas-purple px-3 py-3 text-sm font-bold text-white" href="#cotizador">Cotizar</a>
+          <button type="button" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} aria-controls="mobile-navigation" className="focus-ring rounded-xl border border-qualitas-border p-3" onClick={() => setOpen(!open)}>{open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}</button>
+        </div>
+      </div>
+      {open && <nav id="mobile-navigation" aria-label="Navegación móvil" className="border-t border-qualitas-border bg-white px-4 py-3 lg:hidden">
+        {nav.map(([label, href]) => <a onClick={closeMenu} className="focus-ring block rounded-lg px-3 py-3 font-semibold hover:bg-slate-50" key={href} href={href}>{label}</a>)}
+        <a onClick={() => { trackEvent('whatsapp_click', { placement: 'mobile_menu' }); closeMenu(); }} className="mt-2 flex min-h-12 items-center justify-center gap-2 rounded-xl border border-qualitas-aqua font-bold text-qualitas-aqua" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />Hablar por WhatsApp</a>
+      </nav>}
+    </header>
+  );
+}

@@ -1,3 +1,3 @@
 import type { Config } from 'tailwindcss';
-const config: Config = { content: ['./src/**/*.{ts,tsx}'], theme: { extend: { colors: { qualitas: { magenta: '#b0007a', purple: '#351044', teal: '#008f8b', ink: '#2f2635' } }, boxShadow: { soft: '0 18px 60px rgba(47,38,53,.10)' } } }, plugins: [] };
+const config: Config = { content: ['./src/**/*.{ts,tsx}'], theme: { extend: { colors: { qualitas: { purple: '#941B80', aqua: '#0096AE', ink: '#25232A', muted: '#62616A', surface: '#F7F8FA', border: '#E4E5E9' } }, boxShadow: { soft: '0 18px 60px rgba(47,38,53,.10)' } } }, plugins: [] };
 export default config;
