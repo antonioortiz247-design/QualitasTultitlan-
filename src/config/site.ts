@@ -1,5 +1,5 @@
 export const siteConfig = {
-  businessName: 'Quálitas Cuautitlán',
+  businessName: 'Quálitas Cuautitlán Romero Rubio',
   relationshipLabel: 'Agente autorizado',
   agentName: 'DEMO - Nombre del agente por confirmar',
   agentLicense: 'DEMO - Cédula o clave de agente por confirmar',
@@ -9,7 +9,7 @@ export const siteConfig = {
   email: 'romerorubio@qualitas.com.mx',
   address: '',
   businessHours: '',
-  serviceAreas: ['Cuautitlán','Cuautitlán Izcalli','Tultitlán','Tultepec','Tepotzotlán','Melchor Ocampo'],
+  serviceAreas: ['Cuautitlán','Cuautitlán Izcalli','Cuautitlán Romero Rubio','Tultepec','Tepotzotlán','Melchor Ocampo'],
   socialLinks: { facebook: '#', instagram: '#', whatsapp: '#' },
   officialQualitasUrl: 'https://www.qualitas.com.mx/',
   url: 'https://qualitas-tultitlan-lemon.vercel.app',
@@ -18,5 +18,5 @@ export const whatsappMessages = {
   hero: 'Hola, quiero información sobre un seguro Quálitas.',
   quote: (details: string) => `Hola, quiero solicitar seguimiento para una cotización de seguro de auto.\n${details}`,
   coverage: 'Hola, quiero conocer las opciones de cobertura.',
-  general: 'Hola, quiero asesoría sobre un seguro Quálitas en Cuautitlán.',
+  general: 'Hola, quiero asesoría sobre un seguro Quálitas en Cuautitlán Romero Rubio.',
 };
