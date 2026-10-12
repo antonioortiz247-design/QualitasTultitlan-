@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { Menu, MessageCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import { siteConfig, whatsappMessages } from '@/config/site';
@@ -14,6 +15,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-qualitas-border bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 lg:px-8">
         <a href="#inicio" onClick={closeMenu} aria-label={siteConfig.businessName + ' — inicio'} className="focus-ring flex min-w-0 items-center gap-3 rounded-lg">
+          <Image src="/qualitas-logo.png" alt="Quálitas Seguros" width={170} height={58} priority className="h-auto max-h-12 w-auto max-w-[170px] object-contain" />
           <span className="min-w-0">
             <strong className="block truncate text-base font-extrabold leading-tight text-qualitas-purple sm:text-lg">{siteConfig.businessName}</strong>
             <small className="mt-1 block text-xs text-slate-600">{siteConfig.relationshipLabel}</small>
