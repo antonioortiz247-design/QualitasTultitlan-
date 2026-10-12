@@ -132,7 +132,7 @@ export function QuoteForm() {
               <fieldset className="md:col-span-2">
                 <legend className="mb-2 font-semibold">Uso del vehículo</legend>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {['Particular', 'Comercial'].map((usage) => <label className="flex min-h-12 items-center gap-3 rounded-xl border border-qualitas-border p-4" key={usage}><input name="usage" type="radio" checked={data.usage === usage} onChange={() => setData((current) => ({ ...current, usage }))} className="size-4 accent-[#941B80]" />{usage}</label>)}
+                  {['Particular', 'Comercial'].map((usage) => <label className="flex min-h-12 items-center gap-3 rounded-xl border border-qualitas-border p-4" key={usage}><input name="usage" type="radio" checked={data.usage === usage} onChange={() => setData((current) => ({ ...current, usage }))} className="size-4 accent-qualitas-purple" />{usage}</label>)}
                 </div>
               </fieldset>
             </>}
@@ -141,14 +141,14 @@ export function QuoteForm() {
               {input('phone', 'Teléfono / WhatsApp', 'tel')}
               {input('email', 'Correo electrónico', 'email')}
               <div className="md:col-span-2">
-                <label className="flex items-start gap-2 text-sm text-slate-700"><input type="checkbox" checked={data.privacy === 'yes'} onChange={(e) => setData((current) => ({ ...current, privacy: e.target.checked ? 'yes' : '' }))} className="mt-1 size-4 accent-[#941B80]" />He leído y acepto el <a className="underline" href="/aviso-privacidad">Aviso de Privacidad</a>.</label>
+                <label className="flex items-start gap-2 text-sm text-slate-700"><input type="checkbox" checked={data.privacy === 'yes'} onChange={(e) => setData((current) => ({ ...current, privacy: e.target.checked ? 'yes' : '' }))} className="mt-1 size-4 accent-qualitas-purple" />He leído y acepto el <a className="underline" href="/aviso-privacidad">Aviso de Privacidad</a>.</label>
                 {errors.privacy && <p className="mt-1 text-sm text-red-700">{errors.privacy}</p>}
               </div>
             </>}
           </div>
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
-            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:bg-[#7d176b] sm:min-w-44">Continuar</button> : <button type="submit" className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:bg-[#7d176b] sm:min-w-52">Preparar solicitud</button>}
+            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-52">Preparar solicitud</button>}
           </div>
           <p className="mt-4 text-xs leading-relaxed text-slate-500">Los datos se mantienen en esta sesión del navegador hasta que salgas de la página. No se guardan en un sistema de cotización. La cotización y las condiciones finales deben confirmarse con el asesor.</p>
         </form>
