@@ -154,8 +154,8 @@ export default function Home() {
             <div className="relative">
               <Image
                 priority
-                src="/car-protection.svg"
-                alt="Ilustración conceptual de protección para automóvil"
+                src="/hero-seguro-auto.png"
+                alt="Seguro de auto Quálitas"
                 width={900}
                 height={620}
                 className="w-full rounded-3xl"
