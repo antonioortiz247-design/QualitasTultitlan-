@@ -154,7 +154,7 @@ export default function Home() {
             <div className="relative">
               <Image
                 priority
-                src="/hero-seguro-auto.png"
+                src="/images/hero-seguro-auto.png"
                 alt="Seguro de auto Quálitas"
                 width={900}
                 height={620}
