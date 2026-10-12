@@ -67,7 +67,14 @@ export async function GET(request: NextRequest) {
     if (quotesResult.status === 'rejected') warnings.push('No se pudieron cargar las cotizaciones.');
     return NextResponse.json({ requests, warnings }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
   } catch (error) {
-    console.error('Admin requests query failed:', error);
-    return NextResponse.json({ error: 'No se pudieron consultar las solicitudes. Verifica las tablas y sus permisos.' }, { status: 502 });
+    const errorId = crypto.randomUUID();
+    const details = error instanceof Error ? error.message.slice(0, 800) : String(error).slice(0, 800);
+    console.error('[admin-requests][' + errorId + '] Unexpected query failure:', details);
+    return NextResponse.json({
+      error: 'No se pudieron consultar las solicitudes.',
+      details,
+      errorId,
+      hint: 'Comparte el identificador con soporte. No compartas claves de acceso.',
+    }, { status: 502 });
   }
 }
