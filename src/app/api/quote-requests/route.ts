@@ -22,9 +22,9 @@ export async function POST(request: NextRequest) {
     const usage = text(body.usage, 30);
     const privacyAccepted = body.privacyAccepted === true;
 
-    if (!name || phone.replace(/\\D/g, '').length < 10 ||
-        !/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email) ||
-        !/^\\d{5}$/.test(zip) || !Number.isInteger(age) || age < 16 || age > 100 ||
+    if (!name || phone.replace(/\D/g, '').length < 10 ||
+        !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ||
+        !/^\d{5}$/.test(zip) || !Number.isInteger(age) || age < 16 || age > 100 ||
         !brand || !model || !version || !Number.isInteger(year) || year < 1980 ||
         year > new Date().getFullYear() + 1 || !privacyAccepted ||
         !['Particular', 'Comercial'].includes(usage)) {
