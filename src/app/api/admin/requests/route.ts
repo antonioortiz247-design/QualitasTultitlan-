@@ -40,13 +40,18 @@ export async function GET(request: NextRequest) {
     if (contactsResult.status === 'rejected') console.error('Admin query solicitudes_contacto failed:', contactsResult.reason);
     if (quotesResult.status === 'rejected') console.error('Admin query solicitudes_cotizacion failed:', quotesResult.reason);
     if (contactsResult.status === 'rejected' && quotesResult.status === 'rejected') {
-      const describe = (reason: unknown) => reason instanceof Error ? reason.message.slice(0, 500) : String(reason).slice(0, 500);
+      const describe = (reason: unknown) => reason instanceof Error ? reason.message.slice(0, 800) : String(reason).slice(0, 800);
+      const errorId = crypto.randomUUID();
+      const details = {
+        contactos: describe(contactsResult.reason),
+        cotizaciones: describe(quotesResult.reason),
+      };
+      console.error('[admin-requests][' + errorId + '] Both Supabase table queries failed:', details);
       return NextResponse.json({
         error: 'Falló la consulta a Supabase.',
-        details: {
-          contactos: describe(contactsResult.reason),
-          cotizaciones: describe(quotesResult.reason),
-        },
+        details,
+        errorId,
+        hint: 'Abre la respuesta de /api/admin/requests en la pestaña Network o busca este código en los logs de funciones.',
       }, { status: 502 });
     }
     const normalize = (row: Record<string, unknown>, tipo: string) => ({
