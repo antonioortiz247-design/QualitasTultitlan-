@@ -19,7 +19,14 @@ export default function AdminPage() {
       const response = await fetch('/api/admin/requests', { cache: 'no-store' });
       if (response.status === 401) { router.replace('/admin/login'); return; }
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'No se pudieron cargar las solicitudes.');
+      if (!response.ok) {
+        const details = data.details && typeof data.details === 'object'
+          ? Object.entries(data.details as Record<string, unknown>)
+              .map(([table, message]) => table + ': ' + String(message))
+              .join(' | ')
+          : '';
+        throw new Error([data.error || 'No se pudieron cargar las solicitudes.', details].filter(Boolean).join(' '));
+      }
       setLeads(data.requests || []);
       setWarnings(Array.isArray(data.warnings) ? data.warnings : []);
     } catch (e) {
