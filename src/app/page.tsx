@@ -122,7 +122,7 @@ export default function Home() {
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:px-8">
             <div>
               <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención en Cuautitlán y municipios cercanos</p>
-              <h1 className="mt-3 text-5xl font-black tracking-tight text-qualitas-purple md:text-6xl">
+              <h1 className="mt-3 text-4xl font-black tracking-tight text-qualitas-purple sm:text-5xl md:text-6xl">
                 Seguro de auto Quálitas en Cuautitlán
               </h1>
               <p className="mt-5 max-w-xl text-lg text-slate-700">
@@ -293,7 +293,7 @@ export default function Home() {
 function Footer() {
   return (
     <footer className="bg-[#27232B] px-4 py-10 text-white">
-      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <strong>{siteConfig.businessName}</strong>
           <p>{siteConfig.relationshipLabel}</p>
