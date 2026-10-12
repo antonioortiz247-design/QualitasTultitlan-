@@ -27,6 +27,8 @@ export function QuoteForm() {
   const [manual, setManual] = useState(false);
   const [loading, setLoading] = useState(false);
   const [catalogError, setCatalogError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     const term = search.trim();
@@ -116,10 +118,35 @@ export function QuoteForm() {
     }
   }
 
-  function submit(e: FormEvent<HTMLFormElement>) {
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!validate(['name', 'phone', 'email', 'privacy'])) return;
-    setDone(true);
+    setSaving(true);
+    setSubmitError('');
+    try {
+      const response = await fetch('/api/quote-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name, phone: data.phone, email: data.email,
+          zip: data.zip, age: data.age, usage: data.usage,
+          brand: data.brand, model: data.model, version: data.version,
+          year: data.year, vehicleType: data.vehicleType || '',
+          cate: data.cate || '', cve: data.cve || '', brandCode: data.brandCode || '',
+          manual, privacyAccepted: data.privacy === 'yes',
+          source: typeof window !== 'undefined' ? window.location.search : '',
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'No pudimos guardar tu solicitud. Inténtalo de nuevo.');
+      setData((current) => ({ ...current, folio: result.folio || '' }));
+      trackEvent('quote_request_saved', { method: 'supabase' });
+      setDone(true);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'No pudimos guardar tu solicitud. Inténtalo de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   function input(key: string, label: string, type = 'text') {
@@ -158,8 +185,8 @@ export function QuoteForm() {
       <section id="cotizador" className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
         <div className="rounded-3xl border border-qualitas-border bg-white p-6 text-center shadow-soft md:p-10">
           <CheckCircle className="mx-auto mb-4 text-qualitas-aqua" size={56} aria-hidden="true" />
-          <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Tus datos están listos para compartir</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-slate-600">Esta página no guarda tu solicitud ni genera una cotización oficial. Abre WhatsApp para revisar y enviar los datos al asesor.</p>
+          <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Tu solicitud está registrada</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-600">{data.folio ? 'Tu folio de seguimiento es ' + data.folio + '. ' : ''}Ahora puedes abrir WhatsApp para enviar los datos al asesor. Esto no representa una cotización oficial.</p>
           <a onClick={() => trackEvent('whatsapp_click', { placement: 'quote_success' })} className="focus-ring mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" href={buildWhatsAppUrl(whatsappMessages.quote(messageDetails))}><MessageCircle size={18} aria-hidden="true" />Continuar por WhatsApp</a>
           <button type="button" onClick={() => { setDone(false); setStep(1); }} className="focus-ring ml-3 mt-6 min-h-12 rounded-xl border border-qualitas-border px-5 py-3 font-bold">Editar datos</button>
         </div>
@@ -262,11 +289,12 @@ export function QuoteForm() {
               </div>
             </>}
           </div>
+          {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
-            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-52">Preparar solicitud</button>}
+            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Guardando solicitud…' : 'Guardar y preparar solicitud'}</button>}
           </div>
-          <p className="mt-4 text-xs leading-relaxed text-slate-500">Los datos se mantienen en esta sesión del navegador hasta que salgas de la página. No se guardan en un sistema de cotización. La cotización y las condiciones finales deben confirmarse con el asesor.</p>
+          <p className="mt-4 text-xs leading-relaxed text-slate-500">Los datos de contacto y del vehículo se guardan para dar seguimiento a tu solicitud. La cotización y las condiciones finales deben confirmarse con el asesor. La cotización y las condiciones finales deben confirmarse con el asesor.</p>
         </form>
       </div>
     </section>
