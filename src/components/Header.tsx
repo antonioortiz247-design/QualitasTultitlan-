@@ -14,12 +14,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-qualitas-border bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 lg:px-8">
-        <a href="#inicio" onClick={closeMenu} aria-label={siteConfig.businessName + ' — inicio'} className="focus-ring flex min-w-0 items-center gap-3 rounded-lg">
+        <a href="#inicio" onClick={closeMenu} aria-label="Quálitas — inicio" className="focus-ring flex min-w-0 items-center gap-3 rounded-lg">
           <Image src="/qualitas-logo.png" alt="Quálitas Seguros" width={170} height={58} priority className="h-auto max-h-12 w-auto max-w-[170px] object-contain" />
-          <span className="min-w-0">
-            <strong className="block truncate text-base font-extrabold leading-tight text-qualitas-purple sm:text-lg">{siteConfig.businessName}</strong>
-            <small className="mt-1 block text-xs text-slate-600">{siteConfig.relationshipLabel}</small>
-          </span>
         </a>
         <nav aria-label="Principal" className="hidden items-center gap-5 text-sm font-semibold xl:flex">
           {nav.map(([label, href]) => <a className="focus-ring rounded-md py-2 hover:text-qualitas-purple" key={href} href={href}>{label}</a>)}
