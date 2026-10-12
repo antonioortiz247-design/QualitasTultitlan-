@@ -13,6 +13,7 @@ export function LeadForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [folio, setFolio] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
 
   function update<K extends keyof Lead>(key: K, value: Lead[K]) {
     setLead((current) => ({ ...current, [key]: value }));
@@ -34,6 +35,7 @@ export function LeadForm() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'No pudimos guardar tus datos. Inténtalo de nuevo.');
       setFolio(result.folio || '');
+      setEmailSent(result.emailSent === true);
       trackEvent('footer_lead_completed');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No pudimos guardar tus datos. Inténtalo de nuevo.');
@@ -67,8 +69,9 @@ export function LeadForm() {
               <CheckCircle className="mb-3 text-qualitas-aqua" size={36} aria-hidden="true" />
               <h3 className="text-xl font-bold">¡Tus datos se guardaron!</h3>
               <p className="mt-2 text-slate-600">Tu folio de seguimiento es <strong>{folio}</strong>. Conserva este número para futuras consultas.</p>
+              <p className="mt-2 text-sm text-slate-600">{emailSent ? 'También enviamos los datos al correo de atención.' : 'La solicitud quedó guardada. La notificación por correo aún no está configurada o no pudo enviarse.'}</p>
               <a onClick={() => trackEvent('whatsapp_click', { placement: 'footer_lead_success' })} className="focus-ring mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" href={buildWhatsAppUrl(whatsappMessage)}><MessageCircle size={18} aria-hidden="true" />Continuar por WhatsApp</a>
-              <button type="button" onClick={() => { setFolio(''); setLead({ name: '', phone: '', email: '', product: 'Auto', privacyAccepted: false }); }} className="ml-3 mt-5 min-h-12 rounded-xl border border-qualitas-border px-4 font-semibold">Nueva solicitud</button>
+              <button type="button" onClick={() => { setFolio(''); setEmailSent(false); setLead({ name: '', phone: '', email: '', product: 'Auto', privacyAccepted: false }); }} className="ml-3 mt-5 min-h-12 rounded-xl border border-qualitas-border px-4 font-semibold">Nueva solicitud</button>
             </div>
           ) : (
             <form onSubmit={submit} onFocus={() => trackEvent('footer_lead_started')} className="grid gap-4 sm:grid-cols-2">
