@@ -121,46 +121,46 @@ export default function Home() {
         <section className="overflow-hidden bg-gradient-to-br from-white to-slate-50">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:px-8">
             <div>
-              <p className="font-black text-[#b0007a]">Seguro de Auto en Cuautitlán</p>
-              <h1 className="mt-3 text-5xl font-black tracking-tight text-[#351044] md:text-6xl">
-                Protege tu auto con Quálitas
+              <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención en Cuautitlán y municipios cercanos</p>
+              <h1 className="mt-3 text-4xl font-black tracking-tight text-qualitas-purple sm:text-5xl md:text-6xl">
+                Seguro de auto Quálitas en Cuautitlán
               </h1>
               <p className="mt-5 max-w-xl text-lg text-slate-700">
-                Cotiza tu seguro de auto y recibe atención personalizada de un agente autorizado Quálitas en Cuautitlán.
+                Conoce opciones de cobertura para tu vehículo y recibe orientación personalizada en Cuautitlán y municipios cercanos.
               </p>
               <ul className="mt-7 grid gap-3 sm:grid-cols-2">
                 {heroBenefits.map((benefit) => (
                   <li className="flex items-center gap-2" key={benefit}>
-                    <Check className="text-[#008f8b]" /> {benefit}
+                    <Check className="text-qualitas-aqua" /> {benefit}
                   </li>
                 ))}
               </ul>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  className="focus-ring min-h-12 rounded-xl bg-[#b0007a] px-6 py-3 text-center font-bold text-white"
+                  className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 text-center font-bold text-white transition-colors hover:brightness-90"
                   href="#cotizador"
                 >
                   Cotizar mi auto
                 </a>
                 <a
-                  className="focus-ring min-h-12 rounded-xl border border-[#008f8b] px-6 py-3 text-center font-bold text-[#008f8b]"
+                  className="focus-ring min-h-12 rounded-xl border border-qualitas-aqua px-6 py-3 text-center font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50"
                   href={buildWhatsAppUrl(whatsappMessages.hero)}
                 >
                   Hablar por WhatsApp
                 </a>
               </div>
-              <p className="mt-4 text-sm text-slate-600">Cotizar no genera ningún compromiso.</p>
+              <p className="mt-4 text-sm text-slate-600">La cotización formal depende de los datos del vehículo y las condiciones vigentes.</p>
             </div>
             <div className="relative">
               <Image
                 priority
                 src="/car-protection.svg"
-                alt="Ilustración demo de auto protegido"
+                alt="Ilustración conceptual de protección para automóvil"
                 width={900}
                 height={620}
                 className="w-full rounded-3xl"
               />
-              <p className="mt-2 text-center text-xs text-slate-500">Imagen DEMO sustituible por material autorizado.</p>
+              <p className="mt-2 text-center text-xs text-slate-500">Imagen ilustrativa; las condiciones se confirman en la cotización formal.</p>
             </div>
           </div>
         </section>
@@ -174,12 +174,12 @@ export default function Home() {
           </p>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {coverages.map((coverage) => (
-              <article className="rounded-2xl border bg-white p-6 shadow-sm" key={coverage.name}>
-                <h3 className="rounded-xl bg-[#b0007a] py-3 text-center text-white">{coverage.name}</h3>
+              <article className="rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-shadow hover:shadow-soft" key={coverage.name}>
+                <h3 className="rounded-xl bg-qualitas-purple py-3 text-center text-white">{coverage.name}</h3>
                 <ul className="mt-5 space-y-3">
                   {coverage.items.map((item) => (
                     <li className="flex gap-2" key={item}>
-                      <Check className="shrink-0 text-[#008f8b]" size={18} />
+                      <Check className="shrink-0 text-qualitas-aqua" size={18} />
                       {item}
                     </li>
                   ))}
@@ -189,7 +189,7 @@ export default function Home() {
           </div>
           <p className="mt-8 text-center">
             <a
-              className="focus-ring rounded-xl border border-[#b0007a] px-6 py-3 font-bold text-[#b0007a]"
+              className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-slate-50"
               href={buildWhatsAppUrl(whatsappMessages.coverage)}
             >
               Quiero comparar coberturas
@@ -202,8 +202,8 @@ export default function Home() {
             <h2 className="text-center text-3xl font-black">¿Por qué asegurar tu auto con Quálitas?</h2>
             <div className="mt-8 grid gap-5 md:grid-cols-4">
               {benefits.map(({ icon: Icon, title }) => (
-                <article key={title} className="rounded-2xl bg-white p-6">
-                  <Icon className="mb-4 text-[#b0007a]" />
+                <article key={title} className="rounded-2xl border border-qualitas-border bg-white p-6">
+                  <Icon className="mb-4 text-qualitas-purple" />
                   <h3 className="font-black">{title}</h3>
                   <p className="mt-2 text-sm text-slate-600">
                     Orientación clara para revisar alternativas según tu vehículo y necesidades.
@@ -223,21 +223,21 @@ export default function Home() {
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {siteConfig.serviceAreas.map((area) => (
                 <span className="flex gap-2" key={area}>
-                  <MapPin className="text-[#008f8b]" size={18} />
+                  <MapPin className="text-qualitas-aqua" size={18} />
                   {area}
                 </span>
               ))}
             </div>
-            <a className="focus-ring mt-6 inline-block rounded-xl bg-[#008f8b] px-5 py-3 font-bold text-white" href="#contacto">
+            <a className="focus-ring mt-6 inline-block rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" href="#contacto">
               Solicitar asesoría
             </a>
           </div>
           <div>
-            <h2 className="text-3xl font-black">Cotizar tu seguro es muy sencillo</h2>
+            <h2 className="text-3xl font-black">Cómo solicitar atención</h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {processSteps.map((step, index) => (
-                <article key={step} className="rounded-2xl border p-5">
-                  <strong className="text-[#b0007a]">0{index + 1}</strong>
+                <article key={step} className="rounded-2xl border border-qualitas-border p-5">
+                  <strong className="text-qualitas-purple">0{index + 1}</strong>
                   <h3 className="mt-2 font-black">{step}</h3>
                 </article>
               ))}
@@ -245,21 +245,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-slate-50 px-4 py-14">
-          <div className="mx-auto max-w-7xl">
-            <h2 className="text-center text-3xl font-black">Lo que dicen nuestros clientes</h2>
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {[1, 2, 3].map((testimonialSlot) => (
-                <article key={testimonialSlot} className="rounded-2xl border bg-white p-6">
-                  <p className="font-bold text-slate-500">Espacio reservado para testimonio verificado</p>
-                  <p className="mt-5 text-sm text-slate-500">
-                    Nombre, ubicación, texto y fecha se agregarán cuando exista autorización y verificación.
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        
 
         <section id="faq" className="mx-auto max-w-7xl px-4 py-14 lg:px-8">
           <h2 className="text-center text-3xl font-black">Preguntas frecuentes</h2>
@@ -273,7 +259,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-[#b0007a] px-4 py-12 text-white">
+        <section className="bg-qualitas-purple px-4 py-12 text-white">
           <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <Car size={48} />
@@ -283,7 +269,7 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a className="focus-ring rounded-xl bg-white px-6 py-3 font-bold text-[#b0007a]" href="#cotizador">
+              <a className="focus-ring rounded-xl bg-white px-6 py-3 font-bold text-qualitas-purple" href="#cotizador">
                 Cotizar mi seguro
               </a>
               <a
@@ -306,8 +292,8 @@ export default function Home() {
 
 function Footer() {
   return (
-    <footer className="bg-[#351044] px-4 py-10 text-white">
-      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-4">
+    <footer className="bg-[#27232B] px-4 py-10 text-white">
+      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <strong>{siteConfig.businessName}</strong>
           <p>{siteConfig.relationshipLabel}</p>
@@ -325,16 +311,15 @@ function Footer() {
         </div>
         <div>
           <h2 className="font-bold">CONTACTO</h2>
-          <p className="mt-3">{siteConfig.phone}</p>
-          <p>{siteConfig.whatsapp.display}</p>
-          <p>{siteConfig.email}</p>
-          <p>{siteConfig.businessHours}</p>
+          <a className="focus-ring mt-3 inline-block rounded-sm" href={siteConfig.phoneHref}>{siteConfig.phone}</a>
+
+          <a className="focus-ring inline-block rounded-sm" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+          {siteConfig.businessHours && <p>{siteConfig.businessHours}</p>}
         </div>
         <div>
           <h2 className="font-bold">LEGAL</h2>
           <a className="mt-3 block" href="/aviso-privacidad">Aviso de privacidad</a>
           <a className="block" href="/terminos">Términos y condiciones</a>
-          <a className="block" href="#">Política de cookies</a>
           <a className="mt-5 block text-white/80" href={siteConfig.officialQualitasUrl}>Sitio oficial Quálitas</a>
         </div>
       </div>
