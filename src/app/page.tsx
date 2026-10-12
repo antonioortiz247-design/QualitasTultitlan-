@@ -175,7 +175,7 @@ export default function Home() {
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {coverages.map((coverage) => (
               <article className="rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-shadow hover:shadow-soft" key={coverage.name}>
-                <h3 className="rounded-xl bg-[qualitas-purple] py-3 text-center text-white">{coverage.name}</h3>
+                <h3 className="rounded-xl bg-qualitas-purple py-3 text-center text-white">{coverage.name}</h3>
                 <ul className="mt-5 space-y-3">
                   {coverage.items.map((item) => (
                     <li className="flex gap-2" key={item}>
@@ -189,7 +189,7 @@ export default function Home() {
           </div>
           <p className="mt-8 text-center">
             <a
-              className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-fuchsia-50"
+              className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-slate-50"
               href={buildWhatsAppUrl(whatsappMessages.coverage)}
             >
               Quiero comparar coberturas
@@ -259,7 +259,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-[qualitas-purple] px-4 py-12 text-white">
+        <section className="bg-qualitas-purple px-4 py-12 text-white">
           <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <Car size={48} />
