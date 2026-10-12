@@ -40,8 +40,13 @@ export async function GET(request: NextRequest) {
     if (contactsResult.status === 'rejected') console.error('Admin query solicitudes_contacto failed:', contactsResult.reason);
     if (quotesResult.status === 'rejected') console.error('Admin query solicitudes_cotizacion failed:', quotesResult.reason);
     if (contactsResult.status === 'rejected' && quotesResult.status === 'rejected') {
+      const describe = (reason: unknown) => reason instanceof Error ? reason.message.slice(0, 500) : String(reason).slice(0, 500);
       return NextResponse.json({
-        error: 'No se pudieron consultar las tablas. Revisa los registros de funciones (Functions Logs) de Vercel para ver el error de Supabase.',
+        error: 'Falló la consulta a Supabase.',
+        details: {
+          contactos: describe(contactsResult.reason),
+          cotizaciones: describe(quotesResult.reason),
+        },
       }, { status: 502 });
     }
     const normalize = (row: Record<string, unknown>, tipo: string) => ({
