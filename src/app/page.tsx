@@ -137,13 +137,13 @@ export default function Home() {
               </ul>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 text-center font-bold text-white"
+                  className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 text-center font-bold text-white transition-colors hover:bg-[#7d176b]"
                   href="#cotizador"
                 >
                   Cotizar mi auto
                 </a>
                 <a
-                  className="focus-ring min-h-12 rounded-xl border border-qualitas-aqua px-6 py-3 text-center font-bold text-[#008f8b]"
+                  className="focus-ring min-h-12 rounded-xl border border-qualitas-aqua px-6 py-3 text-center font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50"
                   href={buildWhatsAppUrl(whatsappMessages.hero)}
                 >
                   Hablar por WhatsApp
@@ -175,11 +175,11 @@ export default function Home() {
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {coverages.map((coverage) => (
               <article className="rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-shadow hover:shadow-soft" key={coverage.name}>
-                <h3 className="rounded-xl bg-[#b0007a] py-3 text-center text-white">{coverage.name}</h3>
+                <h3 className="rounded-xl bg-[#941B80] py-3 text-center text-white">{coverage.name}</h3>
                 <ul className="mt-5 space-y-3">
                   {coverage.items.map((item) => (
                     <li className="flex gap-2" key={item}>
-                      <Check className="shrink-0 text-[#008f8b]" size={18} />
+                      <Check className="shrink-0 text-[#0096AE]" size={18} />
                       {item}
                     </li>
                   ))}
@@ -189,7 +189,7 @@ export default function Home() {
           </div>
           <p className="mt-8 text-center">
             <a
-              className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-[#b0007a]"
+              className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-fuchsia-50"
               href={buildWhatsAppUrl(whatsappMessages.coverage)}
             >
               Quiero comparar coberturas
@@ -203,7 +203,7 @@ export default function Home() {
             <div className="mt-8 grid gap-5 md:grid-cols-4">
               {benefits.map(({ icon: Icon, title }) => (
                 <article key={title} className="rounded-2xl border border-qualitas-border bg-white p-6">
-                  <Icon className="mb-4 text-[#b0007a]" />
+                  <Icon className="mb-4 text-[#941B80]" />
                   <h3 className="font-black">{title}</h3>
                   <p className="mt-2 text-sm text-slate-600">
                     Orientación clara para revisar alternativas según tu vehículo y necesidades.
@@ -223,7 +223,7 @@ export default function Home() {
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {siteConfig.serviceAreas.map((area) => (
                 <span className="flex gap-2" key={area}>
-                  <MapPin className="text-[#008f8b]" size={18} />
+                  <MapPin className="text-[#0096AE]" size={18} />
                   {area}
                 </span>
               ))}
@@ -237,7 +237,7 @@ export default function Home() {
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {processSteps.map((step, index) => (
                 <article key={step} className="rounded-2xl border border-qualitas-border p-5">
-                  <strong className="text-[#b0007a]">0{index + 1}</strong>
+                  <strong className="text-[#941B80]">0{index + 1}</strong>
                   <h3 className="mt-2 font-black">{step}</h3>
                 </article>
               ))}
@@ -245,21 +245,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-slate-50 px-4 py-14">
-          <div className="mx-auto max-w-7xl">
-            <h2 className="text-center text-3xl font-black">Lo que dicen nuestros clientes</h2>
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {[1, 2, 3].map((testimonialSlot) => (
-                <article key={testimonialSlot} className="rounded-2xl border bg-white p-6">
-                  <p className="font-bold text-slate-500">Espacio reservado para testimonio verificado</p>
-                  <p className="mt-5 text-sm text-slate-500">
-                    Nombre, ubicación, texto y fecha se agregarán cuando exista autorización y verificación.
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        
 
         <section id="faq" className="mx-auto max-w-7xl px-4 py-14 lg:px-8">
           <h2 className="text-center text-3xl font-black">Preguntas frecuentes</h2>
@@ -273,7 +259,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-[#b0007a] px-4 py-12 text-white">
+        <section className="bg-[#941B80] px-4 py-12 text-white">
           <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <Car size={48} />
@@ -283,7 +269,7 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a className="focus-ring rounded-xl bg-white px-6 py-3 font-bold text-[#b0007a]" href="#cotizador">
+              <a className="focus-ring rounded-xl bg-white px-6 py-3 font-bold text-qualitas-purple" href="#cotizador">
                 Cotizar mi seguro
               </a>
               <a
@@ -325,8 +311,8 @@ function Footer() {
         </div>
         <div>
           <h2 className="font-bold">CONTACTO</h2>
-          <p className="mt-3">{siteConfig.phone}</p>
-          <p>{siteConfig.whatsapp.display}</p>
+          <a className="focus-ring mt-3 inline-block rounded-sm" href={siteConfig.phoneHref}>{siteConfig.phone}</a>
+
           <a className="focus-ring inline-block rounded-sm" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
           {siteConfig.businessHours && <p>{siteConfig.businessHours}</p>}
         </div>
