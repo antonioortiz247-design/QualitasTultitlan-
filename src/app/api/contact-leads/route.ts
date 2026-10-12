@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
             to: ['romerorubio2@qualitas.com.mx'],
             subject: 'Nueva solicitud de atención ' + folio,
             text: [
-              'Nueva solicitud desde el sitio de Quálitas Cuautitlán.', '',
+              'Nueva solicitud desde el sitio de Quálitas Cuautitlán Romero Rubio.', '',
               'Folio: ' + folio, 'Fecha de registro: ' + createdAt,
               'Nombre: ' + name, 'Teléfono / WhatsApp: ' + phone,
               'Correo: ' + email, 'Producto que desea asegurar: ' + product,
