@@ -69,13 +69,33 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('Supabase insert failed:', response.status, (await response.text()).slice(0, 500));
-      return NextResponse.json({ error: 'No se pudo guardar la solicitud. Inténtalo de nuevo en unos minutos.' }, { status: 502 });
+      const raw = (await response.text()).slice(0, 800);
+      let detail = raw;
+      try {
+        const parsed = JSON.parse(raw);
+        detail = [parsed.code, parsed.message, parsed.details, parsed.hint].filter(Boolean).join(' | ').slice(0, 800) || raw;
+      } catch { /* conservar el texto original de Supabase */ }
+      const errorId = crypto.randomUUID();
+      console.error('[quote-requests][' + errorId + '] Supabase insert failed', { status: response.status, detail });
+      return NextResponse.json({
+        error: 'No se pudo guardar la cotización.',
+        details: detail,
+        errorId,
+        hint: 'Comparte el código de error con soporte. No compartas contraseñas ni claves.',
+      }, { status: 502 });
     }
 
     const inserted = await response.json();
     return NextResponse.json({ ok: true, folio: inserted?.[0]?.folio || null }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: 'No se pudo procesar la solicitud. Revisa los datos e inténtalo de nuevo.' }, { status: 400 });
+  } catch (error) {
+    const errorId = crypto.randomUUID();
+    const detail = error instanceof Error ? error.message.slice(0, 500) : 'Error desconocido al procesar la solicitud.';
+    console.error('[quote-requests][' + errorId + '] Request failed:', detail);
+    return NextResponse.json({
+      error: 'No se pudo procesar la solicitud.',
+      details: detail,
+      errorId,
+      hint: 'Verifica los datos e inténtalo de nuevo. Si persiste, comparte el código de error con soporte.',
+    }, { status: 400 });
   }
 }
