@@ -10,16 +10,18 @@ export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [warnings, setWarnings] = useState<string[]>([]);
   const router = useRouter();
 
   async function load() {
-    setLoading(true); setError('');
+    setLoading(true); setError(''); setWarnings([]);
     try {
       const response = await fetch('/api/admin/requests', { cache: 'no-store' });
       if (response.status === 401) { router.replace('/admin/login'); return; }
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'No se pudieron cargar las solicitudes.');
       setLeads(data.requests || []);
+      setWarnings(Array.isArray(data.warnings) ? data.warnings : []);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error al consultar solicitudes.');
     } finally { setLoading(false); }
@@ -53,6 +55,7 @@ export default function AdminPage() {
       <section className="mt-6 overflow-hidden rounded-2xl border border-[#e4e5e9] bg-white">
         <div className="flex items-center gap-2 border-b border-[#e4e5e9] px-5 py-4"><ClipboardList size={19} className="text-[#941b80]"/><h3 className="font-bold">Registros recientes</h3></div>
         {error && <div role="alert" className="m-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+        {warnings.map((warning) => <div key={warning} role="status" className="mx-4 mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">{warning}</div>)}
         {loading ? <p className="p-6 text-sm text-[#62616a]">Cargando solicitudes…</p> : !error && leads.length === 0 ? <div className="p-10 text-center"><ClipboardList size={30} className="mx-auto text-[#a5a5ae]"/><p className="mt-3 font-semibold">Todavía no hay solicitudes</p><p className="mt-1 text-sm text-[#62616a]">Cuando lleguen formularios, aparecerán aquí.</p></div> : !error && <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-[#f7f8fa] text-xs uppercase tracking-wide text-[#62616a]"><tr><th className="px-5 py-3">Folio</th><th className="px-5 py-3">Cliente</th><th className="px-5 py-3">Contacto</th><th className="px-5 py-3">Producto</th><th className="px-5 py-3">Origen</th><th className="px-5 py-3">Fecha</th></tr></thead><tbody>{leads.map((lead,i)=><tr key={(lead.folio || '')+i} className="border-t border-[#eeeef1] align-top"><td className="whitespace-nowrap px-5 py-4 font-semibold text-[#941b80]">{lead.folio || '—'}</td><td className="px-5 py-4 font-medium">{lead.nombre || '—'}</td><td className="px-5 py-4"><a className="block text-[#0096ae] hover:underline" href={lead.telefono ? 'https://wa.me/52'+lead.telefono.replace(/\D/g,'') : undefined} target="_blank" rel="noreferrer">{lead.telefono || '—'}</a><span className="mt-1 block text-xs text-[#62616a]">{lead.correo || ''}</span></td><td className="px-5 py-4">{lead.producto || lead.tipo || '—'}</td><td className="px-5 py-4 max-w-[180px] truncate">{lead.origen || 'Sitio web'}</td><td className="whitespace-nowrap px-5 py-4">{lead.created_at ? new Date(lead.created_at).toLocaleString('es-MX') : '—'}</td></tr>)}</tbody></table></div>}
       </section>
       <p className="mt-4 text-xs leading-5 text-[#62616a]">Acceso restringido al administrador. Las solicitudes se consultan desde la base de datos y no se exponen en páginas públicas.</p>
