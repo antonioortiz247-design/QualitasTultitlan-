@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, RefreshCw, ShieldCheck, ClipboardList } from 'lucide-react';
+import { LogOut, RefreshCw, ShieldCheck, ClipboardList, PackageOpen, ExternalLink } from 'lucide-react';
 
 type Lead = { folio?: string; nombre?: string; telefono?: string; correo?: string; producto?: string; created_at?: string; origen?: string; tipo?: string };
 
@@ -53,7 +53,12 @@ export default function AdminPage() {
     <header className="border-b border-[#e4e5e9] bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#941b80]/10 text-[#941b80]"><ShieldCheck/></div><div><p className="text-xs font-semibold uppercase tracking-wider text-[#0096ae]">Quálitas Cuautitlán Romero Rubio</p><h1 className="text-lg font-bold sm:text-xl">Panel privado</h1></div></div>
-        <button onClick={logout} className="inline-flex items-center gap-2 rounded-lg border border-[#e4e5e9] px-3 py-2 text-sm font-medium hover:bg-gray-50"><LogOut size={16}/> Salir</button>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <a href="https://inventario-six-pi.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#941b80] px-3 py-2 text-sm font-semibold text-white hover:bg-[#7e176d]">
+            <PackageOpen size={16}/> Inventario <ExternalLink size={14}/>
+          </a>
+          <button onClick={logout} className="inline-flex items-center gap-2 rounded-lg border border-[#e4e5e9] px-3 py-2 text-sm font-medium hover:bg-gray-50"><LogOut size={16}/> Salir</button>
+        </div>
       </div>
     </header>
     <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
