@@ -20,12 +20,16 @@ export default function AdminPage() {
       if (response.status === 401) { router.replace('/admin/login'); return; }
       const data = await response.json();
       if (!response.ok) {
-        const details = data.details && typeof data.details === 'object'
-          ? Object.entries(data.details as Record<string, unknown>)
-              .map(([table, message]) => table + ': ' + String(message))
-              .join(' | ')
-          : '';
-        throw new Error([data.error || 'No se pudieron cargar las solicitudes.', details].filter(Boolean).join(' '));
+        const details = typeof data.details === 'string'
+          ? data.details
+          : data.details && typeof data.details === 'object'
+            ? Object.entries(data.details as Record<string, unknown>)
+                .map(([table, message]) => table + ': ' + String(message))
+                .join(' | ')
+            : '';
+        const errorId = typeof data.errorId === 'string' ? ' Código: ' + data.errorId : '';
+        const hint = typeof data.hint === 'string' ? ' ' + data.hint : '';
+        throw new Error([data.error || 'No se pudieron cargar las solicitudes.', details, errorId, hint].filter(Boolean).join(' '));
       }
       setLeads(data.requests || []);
       setWarnings(Array.isArray(data.warnings) ? data.warnings : []);
