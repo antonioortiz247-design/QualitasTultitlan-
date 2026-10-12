@@ -121,7 +121,7 @@ export default function Home() {
         <section className="overflow-hidden bg-gradient-to-br from-white to-slate-50">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:px-8">
             <div>
-              <p className="font-black text-qualitas-purple">Seguro de auto Quálitas en Cuautitlán</p>
+              <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención en Cuautitlán y municipios cercanos</p>
               <h1 className="mt-3 text-5xl font-black tracking-tight text-qualitas-purple md:text-6xl">
                 Seguro de auto Quálitas en Cuautitlán
               </h1>
@@ -137,7 +137,7 @@ export default function Home() {
               </ul>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 text-center font-bold text-white transition-colors hover:bg-[#7d176b]"
+                  className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 text-center font-bold text-white transition-colors hover:brightness-90"
                   href="#cotizador"
                 >
                   Cotizar mi auto
@@ -320,7 +320,6 @@ function Footer() {
           <h2 className="font-bold">LEGAL</h2>
           <a className="mt-3 block" href="/aviso-privacidad">Aviso de privacidad</a>
           <a className="block" href="/terminos">Términos y condiciones</a>
-          <a className="block" href="#">Política de cookies</a>
           <a className="mt-5 block text-white/80" href={siteConfig.officialQualitasUrl}>Sitio oficial Quálitas</a>
         </div>
       </div>
