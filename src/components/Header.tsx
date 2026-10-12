@@ -24,7 +24,7 @@ export function Header() {
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
           <a onClick={() => trackEvent('whatsapp_click', { placement: 'header' })} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 text-sm font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />WhatsApp</a>
-          <a className="focus-ring inline-flex min-h-11 items-center rounded-xl bg-qualitas-purple px-5 text-sm font-bold text-white transition-colors hover:bg-[#7d176b]" href="#cotizador">Cotizar mi auto</a>
+          <a className="focus-ring inline-flex min-h-11 items-center rounded-xl bg-qualitas-purple px-5 text-sm font-bold text-white transition-colors hover:brightness-90" href="#cotizador">Cotizar mi auto</a>
         </div>
         <div className="flex shrink-0 items-center gap-2 lg:hidden">
           <a className="focus-ring rounded-xl bg-qualitas-purple px-3 py-3 text-sm font-bold text-white" href="#cotizador">Cotizar</a>
