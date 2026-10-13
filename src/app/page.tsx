@@ -180,98 +180,10 @@ const faqs: Faq[] = [
 ];
 
 export default function Home() {
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const officeMarkerRef = useRef<any>(null);
-  const selectedLocalityMarkerRef = useRef<any>(null);
   const [selectedMapArea, setSelectedMapArea] = useState('Cuautitlán');
   const [selectedMapDistance, setSelectedMapDistance] = useState(0);
-  useEffect(() => {
-    let cancelled = false;
-    const initializeMap = () => {
-      if (cancelled || !mapContainerRef.current || !(window as any).L) return;
-      const L = (window as any).L;
-      const map = L.map(mapContainerRef.current, { scrollWheelZoom: false, zoomControl: true }).setView([19.69, -99.16], 11);
-      mapInstanceRef.current = map;
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(map);
-      const serviceArea = [
-        [19.635, -99.235], [19.675, -99.255], [19.725, -99.235],
-        [19.775, -99.205], [19.805, -99.145], [19.775, -99.075],
-        [19.725, -99.055], [19.675, -99.085], [19.625, -99.105],
-        [19.615, -99.165], [19.635, -99.235],
-      ];
-      L.polygon(serviceArea, {
-        color: '#941B80',
-        weight: 3,
-        opacity: 0.95,
-        fillColor: '#941B80',
-        fillOpacity: 0.16,
-      }).addTo(map).bindPopup('<strong>Zona de atención</strong><br>Cuautitlán y municipios cercanos<br><small>Delimitación orientativa</small>');
-      const localities = [
-        { name: 'Cuautitlán', coords: [19.673, -99.18] },
-        { name: 'Cuautitlán Izcalli', coords: [19.65, -99.21] },
-        { name: 'Tultepec', coords: [19.685, -99.13] },
-        { name: 'Tultitlán', coords: [19.65, -99.17] },
-        { name: 'Tepotzotlán', coords: [19.72, -99.22] },
-        { name: 'Teoloyucan', coords: [19.745, -99.18] },
-        { name: 'Melchor Ocampo', coords: [19.70, -99.14] },
-        { name: 'Zumpango', coords: [19.80, -99.10] },
-        { name: 'Nextlalpan', coords: [19.74, -99.07] },
-        { name: 'Coacalco de Berriozábal', coords: [19.63, -99.11] },
-      ];
-      localities.forEach((locality) => {
-        L.circleMarker(locality.coords, {
-          radius: 6,
-          color: '#ffffff',
-          weight: 2,
-          fillColor: '#0096AE',
-          fillOpacity: 1,
-        }).addTo(map).bindTooltip(locality.name, { direction: 'top', offset: [0, -5] });
-      });
-      const officeCoords = [19.671, -99.181];
-      officeMarkerRef.current = L.marker(officeCoords, { zIndexOffset: 1000 }).addTo(map).bindPopup('<strong>Oficina Quálitas Romero Rubio</strong><br><a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Cómo llegar a la oficina</a>');
-      selectedLocalityMarkerRef.current = L.circleMarker(localities[0].coords, { radius: 8, color: '#ffffff', weight: 3, fillColor: '#941B80', fillOpacity: 1 }).addTo(map).bindPopup('<strong>Cuautitlán</strong><br>Municipio de referencia');
-      map.fitBounds(L.latLngBounds(serviceArea).pad(0.08));
-    };
-    const existingLeaflet = (window as any).L;
-    if (existingLeaflet) {
-      initializeMap();
-    } else {
-      if (!document.querySelector('link[data-qualitas-leaflet]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.dataset.qualitasLeaflet = 'true';
-        document.head.appendChild(link);
-      }
-      let script = document.querySelector<HTMLScriptElement>('script[data-qualitas-leaflet]');
-      if (!script) {
-        script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.dataset.qualitasLeaflet = 'true';
-        script.onload = initializeMap;
-        document.body.appendChild(script);
-      } else {
-        script.addEventListener('load', initializeMap, { once: true });
-      }
-    }
-    return () => {
-      cancelled = true;
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-        officeMarkerRef.current = null;
-        selectedLocalityMarkerRef.current = null;
-      }
-    };
-  }, []);
 
   useEffect(() => {
-    const L = (window as any).L;
-    if (!L || !mapInstanceRef.current) return;
     const coordinates: Record<string, [number, number]> = {
       'Cuautitlán': [19.673, -99.18],
       'Cuautitlán Izcalli': [19.65, -99.21],
@@ -286,8 +198,6 @@ export default function Home() {
     };
     const coords = coordinates[selectedMapArea];
     if (!coords) return;
-    mapInstanceRef.current.setView(coords, 13, { animate: true });
-    if (selectedLocalityMarkerRef.current) selectedLocalityMarkerRef.current.setLatLng(coords).setPopupContent(`<strong>${selectedMapArea}</strong><br>Localidad seleccionada`).openPopup();
     const office = [19.671, -99.181];
     const radians = (value: number) => value * Math.PI / 180;
     const dLat = radians(office[0] - coords[0]);
@@ -548,14 +458,21 @@ export default function Home() {
             <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
                 <div className="relative h-[390px] bg-slate-100 sm:h-[500px]">
-                  <div ref={mapContainerRef} className="absolute inset-0 z-0" role="img" aria-label="Mapa interactivo con zona de atención aproximada y localidades cercanas a Cuautitlán" />
+                  <iframe
+                    title="Mapa de Google con marcador fijo de la oficina Quálitas Romero Rubio"
+                    src="https://www.google.com/maps?q=19.671,-99.181&z=13&output=embed"
+                    className="absolute inset-0 h-full w-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                  />
                   <div className="pointer-events-none absolute left-4 top-4 z-[400] rounded-2xl border border-white/70 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-md">
                     <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#0096AE]">Zona de atención</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{selectedMapArea}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 border-t border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                  <span className="text-xs text-slate-500">Mapa de Google · Selecciona una localidad para explorarla</span>
+                  <span className="text-xs text-slate-500">Google Maps · Marcador fijo de la oficina</span>
                   <a className="inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}`} target="_blank" rel="noopener noreferrer">
                     Abrir indicaciones <ExternalLink size={15} aria-hidden="true" />
                   </a>
@@ -597,7 +514,7 @@ export default function Home() {
                 <div className="mt-4 rounded-2xl border border-[#0096AE]/20 bg-cyan-50 p-4">
                   <p className="text-xs font-bold uppercase tracking-wide text-[#087d91]">Distancia aproximada a la oficina</p>
                   <p className="mt-1 text-2xl font-black text-slate-900">{selectedMapDistance.toFixed(1)} km</p>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">Distancia en línea recta desde el centro aproximado de {selectedMapArea}. La distancia por carretera puede ser mayor. La ubicación del marcador de la oficina debe confirmarse con sus coordenadas exactas.</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">Distancia en línea recta desde el centro aproximado de {selectedMapArea}. La distancia por carretera puede ser mayor. El marcador mostrado usa una ubicación aproximada; el enlace de abajo abre la ficha de Google Maps de la oficina.</p>
                 </div>
                 <div className="mt-6 rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm font-bold text-slate-900">¿Quieres visitarnos?</p>
