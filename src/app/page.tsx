@@ -513,7 +513,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <p className="text-sm leading-relaxed text-slate-600">Aquí compartiremos fotografías de nuestras actividades en puntos de encuentro, eventos locales y acciones de orientación para automovilistas.</p>
+                  <p className="text-sm leading-relaxed text-slate-600">Primera actividad documentada: 13 de octubre, en la oficina de Romero Rubio. En este espacio compartiremos fotografías de jornadas promocionales, eventos locales y acciones de orientación para automovilistas.</p>
                   <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-qualitas-purple"><MapPin size={16} aria-hidden="true" /> Cuautitlán y municipios cercanos</span>
                 </div>
               </article>
