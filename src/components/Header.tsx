@@ -6,7 +6,7 @@ import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { trackEvent } from '@/lib/analytics';
 
-const nav = [['Inicio', '#inicio'], ['Coberturas', '#coberturas'], ['Beneficios', '#beneficios'], ['Preguntas frecuentes', '#faq'], ['Contacto', '#contacto']];
+const nav = [['Inicio', '#inicio'], ['Nuestros seguros', '#nuestros-seguros'], ['Coberturas', '#coberturas'], ['Confianza', '#confianza'], ['Zona de atención', '#zona-atencion'], ['Activaciones', '#activaciones'], ['Preguntas frecuentes', '#faq'], ['Contacto', '#contacto']];
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -17,7 +17,7 @@ export function Header() {
         <a href="#inicio" onClick={closeMenu} aria-label="Quálitas — inicio" className="focus-ring flex min-w-0 items-center gap-3 rounded-lg">
           <Image src="/qualitas-logo.png" alt="Quálitas Seguros" width={170} height={58} priority className="h-auto max-h-12 w-auto max-w-[170px] object-contain" />
         </a>
-        <nav aria-label="Principal" className="hidden items-center gap-5 text-sm font-semibold xl:flex">
+        <nav aria-label="Principal" className="hidden items-center gap-4 text-xs font-semibold 2xl:gap-5 2xl:text-sm xl:flex">
           {nav.map(([label, href]) => <a className="focus-ring rounded-md py-2 hover:text-qualitas-purple" key={href} href={href}>{label}</a>)}
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
