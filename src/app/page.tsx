@@ -16,6 +16,7 @@ import {
   KeyRound,
   Headphones,
   MapPin,
+  ExternalLink,
   Shield,
   UserRound,
   Wrench,
