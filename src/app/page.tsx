@@ -32,7 +32,7 @@ import { useEffect, useState } from 'react';
 
 const galleryImages = [
   { src: '/images/activacion-romero.jpg', alt: 'Activación de Quálitas en la oficina de Romero Rubio', title: 'Activación en Romero Rubio', detail: '13 de octubre de 2026' },
-  { src: '/images/socios-comerciales.jpg', alt: 'Logotipos de los socios comerciales de Quálitas Romero Rubio', title: 'Socios comerciales', detail: 'Alianzas locales' },
+  { src: '/images/socios_comerciales.jpeg', alt: 'Logotipos de los socios comerciales de Quálitas Romero Rubio', title: 'Socios comerciales', detail: 'Alianzas locales' },
 ];
 
 type Coverage = {
@@ -553,7 +553,7 @@ export default function Home() {
               <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <div className="relative h-64 overflow-hidden bg-slate-950">
                   <button type="button" onClick={() => setActiveGalleryIndex(1)} aria-label="Abrir imagen de socios comerciales" className="group/image absolute inset-0 h-full w-full cursor-zoom-in focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#0096AE]">
-                    <img src="/images/socios-comerciales.jpg" alt="Socios comerciales de Quálitas Romero Rubio y sus marcas" className="h-full w-full object-contain transition-transform duration-500 group-hover/image:scale-[1.02]" loading="lazy" />
+                    <img src="/images/socios_comerciales.jpeg" alt="Socios comerciales de Quálitas Romero Rubio y sus marcas" className="h-full w-full object-contain transition-transform duration-500 group-hover/image:scale-[1.02]" loading="lazy" />
                     <span className="absolute right-4 top-4 rounded-full bg-black/45 px-3 py-2 text-xs font-semibold text-white opacity-0 backdrop-blur-sm transition group-hover/image:opacity-100 group-focus-visible/image:opacity-100">Ampliar imagen ↗</span>
                   </button>
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 pt-12 text-white">
