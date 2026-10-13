@@ -286,44 +286,75 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="mt-9 grid gap-6 lg:grid-cols-[1.35fr_0.85fr]">
+            <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.2fr_0.8fr]">
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <iframe
-                  title="Mapa de Cuautitlán y municipios cercanos en el Estado de México"
-                  src="https://www.openstreetmap.org/export/embed.html?bbox=-99.29%2C19.59%2C-98.98%2C19.84&layer=mapnik&marker=19.673%2C-99.181"
-                  className="h-[360px] w-full sm:h-[440px]"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+                <div className="relative min-h-[460px] overflow-hidden bg-[#f2f7f6] p-4 sm:min-h-[540px] sm:p-6">
+                  <div className="absolute inset-0 opacity-70" aria-hidden="true">
+                    <svg viewBox="0 0 700 600" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
+                      <defs>
+                        <pattern id="map-grid" width="34" height="34" patternUnits="userSpaceOnUse">
+                          <path d="M 34 0 L 0 0 0 34" fill="none" stroke="#d7e5e1" strokeWidth="1" />
+                        </pattern>
+                      </defs>
+                      <rect width="700" height="600" fill="url(#map-grid)" />
+                      <path d="M-20 150 C100 110 140 210 240 180 S400 90 520 160 S640 230 740 180" fill="none" stroke="#b7d9e8" strokeWidth="18" />
+                      <path d="M-20 150 C100 110 140 210 240 180 S400 90 520 160 S640 230 740 180" fill="none" stroke="#fff" strokeWidth="9" />
+                      <path d="M40 -20 C100 120 180 190 150 300 S210 450 160 640 M320 -20 C290 110 390 210 360 310 S410 470 390 640 M560 -20 C500 100 560 260 530 360 S590 500 570 640" fill="none" stroke="#d9c7ce" strokeWidth="13" />
+                      <path d="M40 -20 C100 120 180 190 150 300 S210 450 160 640 M320 -20 C290 110 390 210 360 310 S410 470 390 640 M560 -20 C500 100 560 260 530 360 S590 500 570 640" fill="none" stroke="#fff" strokeWidth="6" />
+                      <path d="M-20 400 C120 360 240 420 330 390 S530 340 720 410 M-20 500 C120 460 240 520 330 490 S530 440 720 510" fill="none" stroke="#d9c7ce" strokeWidth="10" />
+                      <path d="M-20 400 C120 360 240 420 330 390 S530 340 720 410 M-20 500 C120 460 240 520 330 490 S530 440 720 510" fill="none" stroke="#fff" strokeWidth="4" />
+                      <path d="M250 110 L420 70 L510 180 L470 300 L350 350 L250 280 L190 190 Z" fill="#0096AE" fillOpacity=".12" stroke="#0096AE" strokeWidth="3" strokeDasharray="7 6" />
+                      <path d="M280 145 L385 115 L455 190 L425 270 L350 305 L270 250 L230 190 Z" fill="#941B80" fillOpacity=".16" stroke="#941B80" strokeWidth="4" />
+                    </svg>
+                  </div>
+                  <div className="relative z-10 flex items-center justify-between gap-3">
+                    <span className="rounded-full bg-white/95 px-3 py-2 text-xs font-bold text-qualitas-purple shadow-sm">ZONA DE ATENCIÓN</span>
+                    <span className="rounded-full bg-[#0096AE] px-3 py-2 text-xs font-bold text-white shadow-sm">Valle de México</span>
+                  </div>
+                  <div className="relative z-10 mx-auto mt-8 grid max-w-xl grid-cols-2 gap-3 sm:mt-12 sm:grid-cols-3">
+                    {[
+                      { name: 'Cuautitlán', featured: true },
+                      { name: 'Cuautitlán Izcalli', featured: true },
+                      { name: 'Tepotzotlán', featured: false },
+                      { name: 'Teoloyucan', featured: false },
+                      { name: 'Melchor Ocampo', featured: false },
+                      { name: 'Tultepec', featured: false },
+                      { name: 'Tultitlán', featured: false },
+                      { name: 'Zumpango', featured: false },
+                      { name: 'Coacalco', featured: false },
+                      { name: 'Nextlalpan', featured: false },
+                    ].map((area) => (
+                      <a key={area.name} href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(area.name + ', Estado de México, México')}`} target="_blank" rel="noreferrer" className={area.featured ? 'flex min-h-[68px] items-center gap-2 rounded-2xl border border-[#941B80]/20 bg-[#941B80] px-3 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5' : 'flex min-h-[68px] items-center gap-2 rounded-2xl border border-white/90 bg-white/95 px-3 py-3 text-sm font-semibold text-slate-700 shadow-md transition hover:-translate-y-0.5 hover:border-[#0096AE]'}>
+                        <MapPin size={18} className={area.featured ? 'shrink-0 text-white' : 'shrink-0 text-qualitas-aqua'} aria-hidden="true" />
+                        <span>{area.name}</span>
+                      </a>
+                    ))}
+                  </div>
+                  <div className="relative z-10 mt-6 rounded-2xl border border-white bg-white/90 p-4 text-center shadow-sm backdrop-blur-sm">
+                    <p className="text-sm font-bold text-slate-900">Municipios destacados para atención local</p>
+                    <p className="mt-1 text-xs text-slate-600">Selecciona cualquier municipio para localizarlo en el mapa.</p>
+                  </div>
+                </div>
                 <div className="flex flex-col gap-2 border-t border-slate-100 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-slate-500">Mapa interactivo · OpenStreetMap</span>
-                  <a className="font-bold text-qualitas-purple underline underline-offset-4" href="https://www.openstreetmap.org/#map=12/19.673/-99.181" target="_blank" rel="noreferrer">
-                    Abrir mapa completo
-                  </a>
+                  <span className="text-slate-500">Mapa ilustrativo de cobertura territorial</span>
+                  <a className="font-bold text-qualitas-purple underline underline-offset-4" href="https://www.openstreetmap.org/#map=12/19.673/-99.181" target="_blank" rel="noreferrer">Abrir mapa geográfico</a>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                 <div className="flex items-center gap-3">
                   <div className="flex size-12 items-center justify-center rounded-2xl bg-[#941B80]/10 text-qualitas-purple">
                     <MapPin size={25} aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-qualitas-purple">Municipios de la zona</h3>
-                    <p className="mt-1 text-sm text-slate-500">Alrededores y localidades cercanas</p>
+                    <h3 className="text-xl font-black text-qualitas-purple">Atención en tu municipio</h3>
+                    <p className="mt-1 text-sm text-slate-500">Zona norte del Valle de México</p>
                   </div>
                 </div>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {['Cuautitlán', 'Cuautitlán Izcalli', 'Tepotzotlán', 'Teoloyucan', 'Zumpango', 'Melchor Ocampo', 'Tultepec', 'Tultitlán', 'Nextlalpan', 'Coacalco de Berriozábal'].map((area) => (
-                    <span key={area} className={area === 'Cuautitlán' ? 'rounded-full bg-qualitas-purple px-3 py-2 text-sm font-bold text-white' : 'rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700'}>
-                      {area}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-6 text-sm leading-relaxed text-slate-600">
-                  La lista combina municipios colindantes y localidades cercanas donde podemos orientar solicitudes. La atención y disponibilidad del servicio se confirman de acuerdo con cada solicitud.
+                <p className="mt-5 text-sm leading-relaxed text-slate-600">
+                  Estamos impulsando la presencia local para acercar orientación sobre seguros de auto a personas y negocios de la región. La disponibilidad se confirma para cada solicitud.
                 </p>
-                <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#0096AE]/10 text-qualitas-aqua">
                       <MapPin size={21} aria-hidden="true" />
@@ -337,12 +368,13 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <a className="focus-ring mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
-                  <MapPin size={18} aria-hidden="true" /> Consultar por WhatsApp
-                </a>
+                <div className="mt-auto pt-6">
+                  <a className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
+                    <MapPin size={18} aria-hidden="true" /> Consultar por WhatsApp
+                  </a>
+                </div>
               </div>
-            </div>
-          </div>
+            </div>          </div>
         </section>
 
         <section id="activaciones" className="bg-white px-4 py-16 lg:px-8">
