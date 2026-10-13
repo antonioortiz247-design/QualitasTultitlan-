@@ -6,7 +6,7 @@ import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { trackEvent } from '@/lib/analytics';
 
-const nav = [['Inicio', '#inicio'], ['Nuestros seguros', '#nuestros-seguros'], ['Coberturas', '#coberturas'], ['Confianza', '#confianza'], ['Zona de atención', '#zona-atencion'], ['Activaciones', '#activaciones'], ['Preguntas frecuentes', '#faq'], ['Contacto', '#contacto']];
+const nav = [['Inicio', '#inicio'], ['Nuestros seguros', '#nuestros-seguros'], ['Coberturas', '#coberturas'], ['Confianza', '#confianza'], ['Zona de atención', 'https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7'], ['Activaciones', '#activaciones'], ['Preguntas frecuentes', '#faq'], ['Contacto', '#contacto']];
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -18,7 +18,7 @@ export function Header() {
           <Image src="/qualitas-logo.png" alt="Quálitas Seguros" width={170} height={58} priority className="h-auto max-h-12 w-auto max-w-[170px] object-contain" />
         </a>
         <nav aria-label="Principal" className="hidden items-center gap-4 text-xs font-semibold 2xl:gap-5 2xl:text-sm xl:flex">
-          {nav.map(([label, href]) => <a className="focus-ring rounded-md py-2 hover:text-qualitas-purple" key={href} href={href}>{label}</a>)}
+          {nav.map(([label, href]) => <a className="focus-ring rounded-md py-2 hover:text-qualitas-purple" key={href} href={href} target={label === 'Zona de atención' ? '_blank' : undefined} rel={label === 'Zona de atención' ? 'noopener noreferrer' : undefined}>{label}</a>)}
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
           <a onClick={() => trackEvent('whatsapp_click', { placement: 'header' })} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 text-sm font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />WhatsApp</a>
