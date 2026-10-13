@@ -2,6 +2,10 @@ import Image from 'next/image';
 import {
   Car,
   Check,
+  CircleDollarSign,
+  FileText,
+  HeartPulse,
+  KeyRound,
   Headphones,
   MapPin,
   Shield,
@@ -20,6 +24,7 @@ import { buildWhatsAppUrl } from '@/lib/whatsapp';
 type Coverage = {
   name: string;
   summary: string;
+  icon: LucideIcon;
   items: string[];
 };
 
@@ -43,6 +48,7 @@ const heroBenefits = [
 const coverages: Coverage[] = [
   {
     name: 'Daños materiales',
+    icon: Car,
     summary: 'Protección para daños al vehículo derivados de determinados eventos cubiertos.',
     items: [
       'Puede incluir colisión y vuelco',
@@ -52,6 +58,7 @@ const coverages: Coverage[] = [
   },
   {
     name: 'Robo total',
+    icon: KeyRound,
     summary: 'Ampara el robo total del vehículo y ciertos daños relacionados, según la póliza.',
     items: [
       'Requiere que la cobertura esté contratada',
@@ -61,12 +68,31 @@ const coverages: Coverage[] = [
   },
   {
     name: 'Responsabilidad civil',
+    icon: Shield,
     summary: 'Puede cubrir la responsabilidad por daños a bienes de terceros y lesiones o fallecimiento, conforme al contrato.',
     items: [
       'Opera hasta el límite contratado',
       'La cobertura a ocupantes tiene condiciones específicas',
       'No sustituye las coberturas para daños al propio vehículo',
     ],
+  },
+  {
+    name: 'Gastos médicos a ocupantes',
+    icon: HeartPulse,
+    summary: 'Puede cubrir gastos médicos de ocupantes del vehículo asegurado por lesiones derivadas de un accidente, conforme a las condiciones.',
+    items: ['Límite y personas cubiertas sujetos a póliza', 'No equivale a un seguro médico general', 'Aplican definiciones y exclusiones contractuales'],
+  },
+  {
+    name: 'Asistencia vial',
+    icon: Wrench,
+    summary: 'Servicios de asistencia específicos cuando la cobertura correspondiente esté contratada y se cumplan sus requisitos.',
+    items: ['Los servicios y eventos tienen alcances definidos', 'Pueden existir límites por evento o vigencia', 'Consulta las condiciones antes de solicitar el servicio'],
+  },
+  {
+    name: 'Gastos legales',
+    icon: FileText,
+    summary: 'Puede contemplar defensa y conceptos legales derivados de un accidente vial, dentro de los términos del contrato.',
+    items: ['Aplica en los supuestos descritos en las condiciones', 'No cubre automáticamente cualquier asunto legal', 'Sujeto a límites, requisitos y exclusiones'],
   },
 ];
 
@@ -86,6 +112,22 @@ const processSteps = [
 
 const faqs: Faq[] = [
   {
+    question: '¿Todas las coberturas que aparecen en el sitio vienen incluidas?',
+    answer: 'No. Las descripciones son informativas. Solo aplican las coberturas señaladas como contratadas en la carátula de la póliza. Confirma por escrito cuáles se incluyen en tu propuesta.',
+  },
+  {
+    question: '¿Siempre se paga el total de los daños?',
+    answer: 'No puede garantizarse. La indemnización depende del riesgo cubierto, suma asegurada, deducible, valuación, condiciones, exclusiones y procedencia del siniestro.',
+  },
+  {
+    question: '¿El robo parcial está incluido con robo total?',
+    answer: 'No debe asumirse. El robo parcial se maneja como cobertura específica en las condiciones generales y requiere confirmar que esté contratada en la póliza.',
+  },
+  {
+    question: '¿Qué son el deducible y la suma asegurada?',
+    answer: 'El deducible es la participación económica a cargo del asegurado en los casos previstos; la suma asegurada es el límite contratado aplicable según la cobertura. Consulta la carátula y las condiciones de tu póliza.',
+  },
+  {
     question: '¿Cuánto cuesta un seguro de auto Quálitas?',
     answer:
       'El costo depende del vehículo, perfil del conductor, zona, uso, coberturas, deducibles y condiciones vigentes de la póliza.',
@@ -96,9 +138,9 @@ const faqs: Faq[] = [
       'Normalmente se solicitan datos del auto, código postal, uso del vehículo y datos de contacto para dar seguimiento.',
   },
   {
-    question: '¿Qué diferencia hay entre cobertura amplia y limitada?',
+    question: '¿Qué diferencia hay entre los paquetes de cobertura?',
     answer:
-      'Pueden variar los riesgos cubiertos. Las condiciones, coberturas y costos dependen de la póliza contratada.',
+      'Los nombres comerciales no sustituyen el detalle contractual. Los riesgos amparados dependen de las coberturas que se indiquen como contratadas en la carátula, junto con sus límites, deducibles y exclusiones. Solicita el desglose de la cotización antes de contratar.',
   },
   {
     question: '¿Puedo asegurar un auto usado?',
@@ -183,9 +225,10 @@ export default function Home() {
             Descripción general e informativa de algunas coberturas previstas en las Condiciones Generales. La disponibilidad, alcance, suma asegurada, deducible, requisitos y exclusiones dependen de la póliza y de las coberturas señaladas como contratadas en su carátula.
           </p>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {coverages.map((coverage) => (
-              <article className="rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-shadow hover:shadow-soft" key={coverage.name}>
-                <h3 className="rounded-xl bg-qualitas-purple py-3 text-center text-white">{coverage.name}</h3>
+            {coverages.map(({ icon: Icon, ...coverage }) => (
+              <article className="group rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-soft" key={coverage.name}>
+                <div className="mb-4 flex size-12 items-center justify-center rounded-2xl bg-[#941B80]/10 text-qualitas-purple"><Icon size={26} aria-hidden="true" /></div>
+                <h3 className="text-lg font-black text-qualitas-purple">{coverage.name}</h3>
                 <p className="mt-4 text-sm text-slate-700">{coverage.summary}</p>
                 <ul className="mt-5 space-y-3">
                   {coverage.items.map((item) => (
@@ -198,9 +241,14 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <p className="mt-6 rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">
+          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-qualitas-aqua/30 bg-cyan-50/60 p-5 text-sm leading-relaxed text-slate-700">
+            <CircleDollarSign className="mt-0.5 shrink-0 text-qualitas-aqua" size={22} aria-hidden="true" />
+            <div><strong className="block text-slate-900">Antes de contratar, revisa el detalle de tu póliza</strong>
+          <p className="mt-2">
             Esta información no constituye una oferta de cobertura ni garantiza que un riesgo esté amparado. Solo serán aplicables las coberturas indicadas como contratadas en la carátula de la póliza, con sus límites, deducibles, condiciones y exclusiones. Consulta las Condiciones Generales y la documentación de tu cotización antes de contratar.
           </p>
+            </div>
+          </div>
           <p className="mt-8 text-center">
             <a
               className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-slate-50"
