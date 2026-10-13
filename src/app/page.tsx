@@ -770,7 +770,7 @@ function Footer() {
           <a className="block" href="#coberturas">Coberturas</a>
           <a className="block" href="#beneficios">Beneficios</a>
           <a className="block" href="#confianza">Confianza</a>
-          <a className="block" href="#zona-atencion">Zona de atención</a>
+          <a className="block" href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Zona de atención</a>
           <a className="block" href="#activaciones">Activaciones y socios</a>
           <a className="block" href="#faq">Preguntas frecuentes</a>
           <a className="block" href="#cotizador">Cotizar</a>
