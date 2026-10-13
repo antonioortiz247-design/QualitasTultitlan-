@@ -188,7 +188,7 @@ export function QuoteForm() {
           <CheckCircle className="mx-auto mb-4 text-qualitas-aqua" size={56} aria-hidden="true" />
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Tu solicitud está registrada</h2>
           <p className="mx-auto mt-3 max-w-2xl text-slate-600">{data.folio ? 'Tu folio de seguimiento es ' + data.folio + '. ' : ''}Ahora puedes abrir WhatsApp para enviar los datos al asesor. Esto no representa una cotización oficial.</p>
-          <a onClick={() => trackEvent('whatsapp_click', { placement: 'quote_success' })} className="focus-ring mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" href={buildWhatsAppUrl(whatsappMessages.quote(messageDetails))}><MessageCircle size={18} aria-hidden="true" />Continuar por WhatsApp</a>
+          <a onClick={() => trackEvent('whatsapp_click', { placement: 'quote_success' })} className="focus-ring mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.quote(messageDetails))}><MessageCircle size={18} aria-hidden="true" />Continuar por WhatsApp</a>
           <button type="button" onClick={() => { setDone(false); setStep(1); }} className="focus-ring ml-3 mt-6 min-h-12 rounded-xl border border-qualitas-border px-5 py-3 font-bold">Editar datos</button>
         </div>
       </section>
