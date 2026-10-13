@@ -427,8 +427,9 @@ export default function Home() {
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Estamos cerca de ti</p>
               <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Nuestra zona de atención</h2>
-              <p className="mt-4 text-slate-600">
-                Atención para Cuautitlán Romero Rubio y municipios de la zona norte del Valle de México. Expl            <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
+              <p className="mt-4 text-slate-600">Atención para Cuautitlán Romero Rubio y municipios de la zona norte del Valle de México. Explora las localidades cercanas en un mapa real.</p>
+            </div>
+            <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
                 <div className="relative h-[390px] bg-slate-100 sm:h-[500px]">
                   <iframe
@@ -452,19 +453,15 @@ export default function Home() {
                   </a>
                 </div>
               </div>
-
               <div className="flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-900/5 sm:p-7">
                 <div className="flex items-start gap-3">
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#941B80]/10 text-[#941B80]">
-                    <MapPin size={25} aria-hidden="true" />
-                  </div>
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#941B80]/10 text-[#941B80]"><MapPin size={25} aria-hidden="true" /></div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#0096AE]">Atención regional</p>
                     <h3 className="mt-1 text-xl font-black text-slate-900">Explora los municipios</h3>
                     <p className="mt-2 text-sm leading-relaxed text-slate-600">Selecciona una localidad para verla en el mapa y abrir la ruta en Google Maps.</p>
                   </div>
                 </div>
-
                 <div className="mt-6 grid grid-cols-2 gap-2">
                   {[
                     { name: 'Cuautitlán Romero Rubio', main: true },
@@ -479,38 +476,26 @@ export default function Home() {
                     { name: 'Nextlalpan', main: false },
                     { name: 'Coacalco de Berriozábal', main: false },
                   ].map((area) => (
-                    <button
-                      key={area.name}
-                      type="button"
-                      onClick={() => setSelectedMapArea(area.name)}
-                      aria-pressed={selectedMapArea === area.name}
+                    <button key={area.name} type="button" onClick={() => setSelectedMapArea(area.name)} aria-pressed={selectedMapArea === area.name}
                       className={selectedMapArea === area.name
                         ? 'flex min-h-11 items-center gap-2 rounded-xl border border-[#941B80] bg-[#941B80] px-3 py-2 text-left text-xs font-bold text-white shadow-md transition sm:text-sm'
                         : area.main
                           ? 'flex min-h-11 items-center gap-2 rounded-xl border border-[#941B80]/20 bg-[#941B80]/5 px-3 py-2 text-left text-xs font-semibold text-[#941B80] transition hover:border-[#941B80] hover:bg-[#941B80]/10 sm:text-sm'
-                          : 'flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-[#0096AE] hover:bg-cyan-50 sm:text-sm'}
-                    >
+                          : 'flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-[#0096AE] hover:bg-cyan-50 sm:text-sm'}>
                       <MapPin size={15} className={selectedMapArea === area.name ? 'shrink-0 text-white' : 'shrink-0 text-[#0096AE]'} aria-hidden="true" />
                       <span>{area.name}</span>
                     </button>
                   ))}
                 </div>
-
                 <div className="mt-6 rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm font-bold text-slate-900">¿Quieres visitarnos?</p>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600">Consulta la ubicación exacta de la oficina antes de acudir.</p>
-                  <a href={siteConfig.officeMapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4">
-                    Ubicación de la oficina <ExternalLink size={15} aria-hidden="true" />
-                  </a>
+                  <a href={siteConfig.officeMapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4">Ubicación de la oficina <ExternalLink size={15} aria-hidden="true" /></a>
                 </div>
-
-                <a className="focus-ring mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#941B80] px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro de auto para mi municipio.')}>
-                  Consultar por WhatsApp
-                </a>
+                <a className="focus-ring mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#941B80] px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro de auto para mi municipio.')}>Consultar por WhatsApp</a>
               </div>
-            </div>              </div>
-              </div>
-            </div>          </div>
+            </div>
+          </div>
         </section>
 
         <section id="activaciones" className="bg-white px-4 py-16 lg:px-8">
