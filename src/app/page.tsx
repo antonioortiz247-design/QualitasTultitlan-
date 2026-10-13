@@ -459,7 +459,7 @@ export default function Home() {
             </div>
             <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
-                <div className="relative h-[390px] bg-slate-100 sm:h-[500px]">
+                <div className="relative aspect-[4/3] max-h-[500px] min-h-[320px] bg-slate-100">
                   <iframe
                     title="Mapa de Google con marcador fijo de la oficina Quálitas Romero Rubio"
                     src={googleMapEmbedUrl}
