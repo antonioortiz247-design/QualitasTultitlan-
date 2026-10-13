@@ -202,7 +202,7 @@ export function QuoteForm() {
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Cotizador orientativo</p>
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
-            <p className="mt-2 max-w-xl text-slate-600">Busca tu vehículo en el catálogo o captura sus datos manualmente.</p>
+            <p className="mt-2 max-w-xl text-slate-600">Completa los tres pasos. Guardaremos tus datos para que un asesor pueda dar seguimiento a tu solicitud.</p>
           </div>
           <ol aria-label="Progreso del formulario" className="grid grid-cols-3 gap-2 text-center text-xs font-bold sm:text-sm">
             {['Vehículo', 'Conductor', 'Contacto'].map((label, index) => (
@@ -293,9 +293,13 @@ export function QuoteForm() {
           {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
-            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Guardando solicitud…' : 'Guardar y preparar solicitud'}</button>}
+            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
           </div>
-          <p className="mt-4 text-xs leading-relaxed text-slate-500">Los datos de contacto y del vehículo se guardan para dar seguimiento a tu solicitud. La cotización y las condiciones finales deben confirmarse con el asesor. La cotización y las condiciones finales deben confirmarse con el asesor.</p>
+          <div className="mt-5 rounded-xl border border-[#0096AE]/20 bg-cyan-50/60 p-4">
+            <p className="text-sm font-bold text-slate-800">¿Qué pasa después?</p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">Registraremos tu solicitud para dar seguimiento. El asesor revisará los datos y podrá orientarte sobre las opciones disponibles. Este formulario no genera una póliza ni una cotización oficial.</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">Tus datos se utilizarán conforme al <a className="font-semibold underline underline-offset-2" href="/aviso-privacidad">Aviso de Privacidad</a>.</p>
+          </div>
         </form>
       </div>
     </section>
