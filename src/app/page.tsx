@@ -501,15 +501,11 @@ export default function Home() {
 
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-gradient-to-br from-[#941B80] via-[#76206f] to-[#0096AE] p-8 text-center text-white">
-                  <div className="absolute -right-10 -top-10 size-48 rounded-full border border-white/20" />
-                  <div className="absolute -bottom-16 -left-8 size-56 rounded-full border border-white/20" />
-                  <div className="relative">
-                    <div className="mx-auto flex size-16 items-center justify-center rounded-2xl border border-white/30 bg-white/15 backdrop-blur-sm">
-                      <Car size={32} aria-hidden="true" />
-                    </div>
-                    <h3 className="mt-4 text-2xl font-black">Activaciones y eventos</h3>
-                    <p className="mt-2 text-sm text-white/90">Galería de jornadas, dinámicas y presencia de marca</p>
+                <div className="relative h-64 overflow-hidden bg-slate-100">
+                  <img src="/images/activacion-romero.jpg" alt="Activación de Quálitas en la oficina de Romero Rubio el 13 de octubre de 2026" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 pt-12 text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider">13 de octubre de 2026</span>
+                    <h3 className="mt-1 text-2xl font-black">Activación en Romero Rubio</h3>
                   </div>
                 </div>
                 <div className="p-6">
@@ -519,15 +515,11 @@ export default function Home() {
               </article>
 
               <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-                <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-gradient-to-br from-[#0096AE] via-[#087d91] to-[#941B80] p-8 text-center text-white">
-                  <div className="absolute -right-10 -top-10 size-48 rounded-full border border-white/20" />
-                  <div className="absolute -bottom-16 -left-8 size-56 rounded-full border border-white/20" />
-                  <div className="relative">
-                    <div className="mx-auto flex size-16 items-center justify-center rounded-2xl border border-white/30 bg-white/15 backdrop-blur-sm">
-                      <UserRound size={32} aria-hidden="true" />
-                    </div>
-                    <h3 className="mt-4 text-2xl font-black">Socios comerciales</h3>
-                    <p className="mt-2 text-sm text-white/90">Negocios, colaboradores y alianzas locales</p>
+                <div className="relative h-64 overflow-hidden bg-slate-950">
+                  <img src="/images/socios-comerciales.jpg" alt="Socios comerciales de Quálitas Romero Rubio y sus marcas" className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 pt-12 text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider">Alianzas locales</span>
+                    <h3 className="mt-1 text-2xl font-black">Socios comerciales</h3>
                   </div>
                 </div>
                 <div className="p-6">
