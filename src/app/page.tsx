@@ -199,7 +199,7 @@ export default function Home() {
                 </a>
                 <a
                   className="focus-ring min-h-12 rounded-xl border border-qualitas-aqua px-6 py-3 text-center font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50"
-                  href={buildWhatsAppUrl(whatsappMessages.hero)}
+                  target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.hero)}
                 >
                   Hablar por WhatsApp
                 </a>
@@ -257,8 +257,8 @@ export default function Home() {
                   <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Pickups de carga</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">Solicita una revisión para una pickup destinada al trabajo o traslado de carga. El uso declarado y las características del vehículo determinan las opciones disponibles.</p>
                   <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <a href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro para una pickup de carga. ¿Qué datos necesitan para revisar mi caso?')} className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Consultar</a>
-                    <a href={buildWhatsAppUrl('Hola, quiero conocer los requisitos y opciones para asegurar una pickup de carga.')} className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
+                    <a target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro para una pickup de carga. ¿Qué datos necesitan para revisar mi caso?')} className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Consultar</a>
+                    <a target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero conocer los requisitos y opciones para asegurar una pickup de carga.')} className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
                   </div>
                 </div>
               </article>
@@ -274,8 +274,8 @@ export default function Home() {
                   <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Equipo pesado</h3>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">Si necesitas asegurar maquinaria o equipo pesado, contáctanos para revisar si existe una alternativa aplicable a la unidad y su actividad.</p>
                   <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <a href={buildWhatsAppUrl('Hola, quiero consultar si hay opciones de seguro para equipo pesado. Puedo compartir tipo de unidad, marca, modelo, año y uso.')} className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Consultar</a>
-                    <a href={buildWhatsAppUrl('Hola, quiero conocer qué información necesitan para revisar un seguro de equipo pesado.')} className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
+                    <a target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar si hay opciones de seguro para equipo pesado. Puedo compartir tipo de unidad, marca, modelo, año y uso.')} className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Consultar</a>
+                    <a target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero conocer qué información necesitan para revisar un seguro de equipo pesado.')} className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
                   </div>
                 </div>
               </article>
@@ -319,7 +319,7 @@ export default function Home() {
           <p className="mt-8 text-center">
             <a
               className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-slate-50"
-              href={buildWhatsAppUrl(whatsappMessages.coverage)}
+              target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.coverage)}
             >
               Quiero comparar coberturas
             </a>
@@ -353,7 +353,7 @@ export default function Home() {
                   Queremos que tomes una decisión informada. Te orientamos para revisar alternativas de seguro de auto y entender qué estás contratando antes de tomar una decisión.
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <a className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, quiero recibir asesoría y revisar una cotización de seguro de auto con sus coberturas, sumas aseguradas, deducibles y exclusiones.')}>
+                  <a className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero recibir asesoría y revisar una cotización de seguro de auto con sus coberturas, sumas aseguradas, deducibles y exclusiones.')}>
                     <Headphones size={18} aria-hidden="true" /> Solicitar asesoría
                   </a>
                   <a className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl border border-qualitas-purple px-5 py-3 font-bold text-qualitas-purple transition hover:bg-slate-50" href={siteConfig.officeMapUrl} target="_blank" rel="noreferrer">
@@ -481,7 +481,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="mt-auto pt-6">
-                  <a className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
+                  <a className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
                     <MapPin size={18} aria-hidden="true" /> Consultar por WhatsApp
                   </a>
                 </div>
@@ -540,7 +540,7 @@ export default function Home() {
             <div className="mt-8 rounded-2xl border border-qualitas-aqua/30 bg-cyan-50/60 p-5 text-center">
               <p className="font-bold text-slate-900">¿Participaste en una activación con nosotros?</p>
               <p className="mt-1 text-sm text-slate-600">Escríbenos para compartir información del evento o conocer cómo colaborar en próximas actividades.</p>
-              <a className="focus-ring mt-4 inline-flex rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, me interesa conocer las próximas activaciones y las opciones para colaborar como socio comercial.')}>
+              <a className="focus-ring mt-4 inline-flex rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, me interesa conocer las próximas activaciones y las opciones para colaborar como socio comercial.')}>
                 Contactar por WhatsApp
               </a>
             </div>
@@ -607,7 +607,7 @@ export default function Home() {
               </a>
               <a
                 className="focus-ring rounded-xl border border-white px-6 py-3 font-bold"
-                href={buildWhatsAppUrl(whatsappMessages.general)}
+                target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.general)}
               >
                 Hablar por WhatsApp
               </a>
