@@ -182,8 +182,10 @@ const faqs: Faq[] = [
 export default function Home() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
-  const areaMarkerRef = useRef<any>(null);
-  const [selectedMapArea, setSelectedMapArea] = useState('Cuautitlán Romero Rubio');
+  const officeMarkerRef = useRef<any>(null);
+  const selectedLocalityMarkerRef = useRef<any>(null);
+  const [selectedMapArea, setSelectedMapArea] = useState('Cuautitlán');
+  const [selectedMapDistance, setSelectedMapDistance] = useState(0);
   useEffect(() => {
     let cancelled = false;
     const initializeMap = () => {
@@ -209,7 +211,6 @@ export default function Home() {
         fillOpacity: 0.16,
       }).addTo(map).bindPopup('<strong>Zona de atención</strong><br>Cuautitlán y municipios cercanos<br><small>Delimitación orientativa</small>');
       const localities = [
-        { name: 'Cuautitlán Romero Rubio', coords: [19.671, -99.181] },
         { name: 'Cuautitlán', coords: [19.673, -99.18] },
         { name: 'Cuautitlán Izcalli', coords: [19.65, -99.21] },
         { name: 'Tultepec', coords: [19.685, -99.13] },
@@ -230,7 +231,9 @@ export default function Home() {
           fillOpacity: 1,
         }).addTo(map).bindTooltip(locality.name, { direction: 'top', offset: [0, -5] });
       });
-      areaMarkerRef.current = L.marker(localities[0].coords).addTo(map).bindPopup('<strong>Quálitas Romero Rubio</strong><br><a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Cómo llegar a la oficina</a>');
+      const officeCoords = [19.671, -99.181];
+      officeMarkerRef.current = L.marker(officeCoords, { zIndexOffset: 1000 }).addTo(map).bindPopup('<strong>Oficina Quálitas Romero Rubio</strong><br><a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Cómo llegar a la oficina</a>');
+      selectedLocalityMarkerRef.current = L.circleMarker(localities[0].coords, { radius: 8, color: '#ffffff', weight: 3, fillColor: '#941B80', fillOpacity: 1 }).addTo(map).bindPopup('<strong>Cuautitlán</strong><br>Municipio de referencia');
       map.fitBounds(L.latLngBounds(serviceArea).pad(0.08));
     };
     const existingLeaflet = (window as any).L;
@@ -260,7 +263,8 @@ export default function Home() {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
-        areaMarkerRef.current = null;
+        officeMarkerRef.current = null;
+        selectedLocalityMarkerRef.current = null;
       }
     };
   }, []);
@@ -269,7 +273,6 @@ export default function Home() {
     const L = (window as any).L;
     if (!L || !mapInstanceRef.current) return;
     const coordinates: Record<string, [number, number]> = {
-      'Cuautitlán Romero Rubio': [19.671, -99.181],
       'Cuautitlán': [19.673, -99.18],
       'Cuautitlán Izcalli': [19.65, -99.21],
       'Tultepec': [19.685, -99.13],
@@ -284,7 +287,13 @@ export default function Home() {
     const coords = coordinates[selectedMapArea];
     if (!coords) return;
     mapInstanceRef.current.setView(coords, 13, { animate: true });
-    if (areaMarkerRef.current) areaMarkerRef.current.setLatLng(coords).setPopupContent(`<strong>${selectedMapArea}</strong><br><a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Cómo llegar a la oficina</a>`).openPopup();
+    if (selectedLocalityMarkerRef.current) selectedLocalityMarkerRef.current.setLatLng(coords).setPopupContent(`<strong>${selectedMapArea}</strong><br>Localidad seleccionada`).openPopup();
+    const office = [19.671, -99.181];
+    const radians = (value: number) => value * Math.PI / 180;
+    const dLat = radians(office[0] - coords[0]);
+    const dLng = radians(office[1] - coords[1]);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(radians(coords[0])) * Math.cos(radians(office[0])) * Math.sin(dLng / 2) ** 2;
+    setSelectedMapDistance(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }, [selectedMapArea]);
 
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(null);
@@ -563,7 +572,6 @@ export default function Home() {
                 </div>
                 <div className="mt-6 grid grid-cols-2 gap-2">
                   {[
-                    { name: 'Cuautitlán Romero Rubio', main: true },
                     { name: 'Cuautitlán', main: true },
                     { name: 'Cuautitlán Izcalli', main: true },
                     { name: 'Tultepec', main: false },
@@ -585,6 +593,11 @@ export default function Home() {
                       <span>{area.name}</span>
                     </button>
                   ))}
+                </div>
+                <div className="mt-4 rounded-2xl border border-[#0096AE]/20 bg-cyan-50 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#087d91]">Distancia aproximada a la oficina</p>
+                  <p className="mt-1 text-2xl font-black text-slate-900">{selectedMapDistance.toFixed(1)} km</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">Distancia en línea recta desde el centro aproximado de {selectedMapArea}. La distancia por carretera puede ser mayor. La ubicación del marcador de la oficina debe confirmarse con sus coordenadas exactas.</p>
                 </div>
                 <div className="mt-6 rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm font-bold text-slate-900">¿Quieres visitarnos?</p>
