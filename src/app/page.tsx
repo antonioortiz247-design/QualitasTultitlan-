@@ -276,6 +276,51 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="confianza" className="bg-white px-4 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Atención transparente</p>
+                <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Tu seguro empieza con información clara</h2>
+                <p className="mt-4 leading-relaxed text-slate-600">
+                  Queremos que tomes una decisión informada. Te orientamos para revisar alternativas de seguro de auto y entender qué estás contratando antes de tomar una decisión.
+                </p>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <a className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, quiero recibir asesoría y revisar una cotización de seguro de auto con sus coberturas, sumas aseguradas, deducibles y exclusiones.')}>
+                    <Headphones size={18} aria-hidden="true" /> Solicitar asesoría
+                  </a>
+                  <a className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl border border-qualitas-purple px-5 py-3 font-bold text-qualitas-purple transition hover:bg-slate-50" href={siteConfig.officeMapUrl} target="_blank" rel="noreferrer">
+                    <MapPin size={18} aria-hidden="true" /> Ubicación de oficina
+                  </a>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-[#0096AE]/50">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-[#0096AE]/10 text-qualitas-aqua"><FileText size={23} aria-hidden="true" /></div>
+                  <h3 className="mt-4 font-black text-slate-900">Condiciones por escrito</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">Revisa la propuesta y confirma las coberturas contratadas, sus límites, deducibles, requisitos y exclusiones.</p>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-[#0096AE]/50">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-[#941B80]/10 text-qualitas-purple"><Shield size={23} aria-hidden="true" /></div>
+                  <h3 className="mt-4 font-black text-slate-900">Sin promesas ambiguas</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">La información del sitio es orientativa. La póliza y sus condiciones son las que determinan el alcance de la protección.</p>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-[#0096AE]/50">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-[#0096AE]/10 text-qualitas-aqua"><Headphones size={23} aria-hidden="true" /></div>
+                  <h3 className="mt-4 font-black text-slate-900">Seguimiento cercano</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">Puedes iniciar tu solicitud por WhatsApp y resolver dudas sobre el proceso de cotización.</p>
+                </article>
+                <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-[#0096AE]/50">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-[#941B80]/10 text-qualitas-purple"><MapPin size={23} aria-hidden="true" /></div>
+                  <h3 className="mt-4 font-black text-slate-900">Presencia local</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">Consulta la ubicación de la oficina y pregunta por la atención disponible en tu municipio.</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="zona-atencion" className="overflow-hidden bg-slate-50 px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="mx-auto max-w-3xl text-center">
