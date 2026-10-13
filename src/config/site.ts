@@ -17,6 +17,6 @@ export const siteConfig = {
 export const whatsappMessages = {
   hero: 'Hola, quiero información sobre un seguro Quálitas.',
   quote: (details: string) => `Hola, quiero solicitar seguimiento para una cotización de seguro de auto.\n${details}`,
-  coverage: 'Hola, quiero conocer las opciones de cobertura.',
-  general: 'Hola, quiero asesoría sobre un seguro Quálitas en Cuautitlán Romero Rubio.',
+  coverage: 'Hola, quiero conocer las opciones de cobertura y confirmar por escrito qué riesgos están incluidos, sumas aseguradas, deducibles, requisitos y exclusiones aplicables a mi vehículo.',
+  general: 'Hola, quiero asesoría sobre un seguro de auto Quálitas en Cuautitlán Romero Rubio. Me gustaría revisar las coberturas disponibles, sus límites, deducibles y exclusiones antes de contratar.',
 };
