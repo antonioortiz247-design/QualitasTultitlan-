@@ -323,6 +323,20 @@ export default function Home() {
                 <p className="mt-6 text-sm leading-relaxed text-slate-600">
                   La lista combina municipios colindantes y localidades cercanas donde podemos orientar solicitudes. La atención y disponibilidad del servicio se confirman de acuerdo con cada solicitud.
                 </p>
+                <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#0096AE]/10 text-qualitas-aqua">
+                      <MapPin size={21} aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900">Visítanos en nuestra oficina</h4>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">Consulta la ubicación exacta y abre la ruta en Google Maps antes de acudir.</p>
+                      <a className="mt-3 inline-flex items-center gap-2 font-bold text-qualitas-purple underline underline-offset-4" href={siteConfig.officeMapUrl} target="_blank" rel="noreferrer">
+                        Ver ubicación y cómo llegar <MapPin size={16} aria-hidden="true" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
                 <a className="focus-ring mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
                   <MapPin size={18} aria-hidden="true" /> Consultar por WhatsApp
                 </a>
