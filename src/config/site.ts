@@ -12,6 +12,7 @@ export const siteConfig = {
   serviceAreas: ['Cuautitlán','Cuautitlán Izcalli','Cuautitlán Romero Rubio','Tultepec','Tepotzotlán','Melchor Ocampo'],
   socialLinks: { facebook: '#', instagram: '#', whatsapp: '#' },
   officialQualitasUrl: 'https://www.qualitas.com.mx/',
+  officeMapUrl: ['https://maps.app.goo.gl', 'nhkbJM6dAtJofCuh6'].join('/'),
   url: 'https://qualitas-tultitlan-lemon.vercel.app',
 };
 export const whatsappMessages = {
