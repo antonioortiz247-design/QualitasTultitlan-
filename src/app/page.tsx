@@ -183,21 +183,23 @@ export default function Home() {
   const [selectedMapArea, setSelectedMapArea] = useState('Cuautitlán');
   const [selectedMapDistance, setSelectedMapDistance] = useState(0);
 
+  const localityCoordinates: Record<string, [number, number]> = {
+    'Cuautitlán': [19.673, -99.18],
+    'Cuautitlán Izcalli': [19.65, -99.21],
+    'Tultepec': [19.685, -99.13],
+    'Tultitlán': [19.65, -99.17],
+    'Tepotzotlán': [19.72, -99.22],
+    'Teoloyucan': [19.745, -99.18],
+    'Melchor Ocampo': [19.70, -99.14],
+    'Zumpango': [19.80, -99.10],
+    'Nextlalpan': [19.74, -99.07],
+    'Coacalco de Berriozábal': [19.63, -99.11],
+  };
+  const selectedLocalityCoords = localityCoordinates[selectedMapArea] ?? localityCoordinates['Cuautitlán'];
+  const googleMapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}&z=14&output=embed`;
+
   useEffect(() => {
-    const coordinates: Record<string, [number, number]> = {
-      'Cuautitlán': [19.673, -99.18],
-      'Cuautitlán Izcalli': [19.65, -99.21],
-      'Tultepec': [19.685, -99.13],
-      'Tultitlán': [19.65, -99.17],
-      'Tepotzotlán': [19.72, -99.22],
-      'Teoloyucan': [19.745, -99.18],
-      'Melchor Ocampo': [19.70, -99.14],
-      'Zumpango': [19.80, -99.10],
-      'Nextlalpan': [19.74, -99.07],
-      'Coacalco de Berriozábal': [19.63, -99.11],
-    };
-    const coords = coordinates[selectedMapArea];
-    if (!coords) return;
+    const coords = selectedLocalityCoords;
     const office = [19.671, -99.181];
     const radians = (value: number) => value * Math.PI / 180;
     const dLat = radians(office[0] - coords[0]);
@@ -460,7 +462,7 @@ export default function Home() {
                 <div className="relative h-[390px] bg-slate-100 sm:h-[500px]">
                   <iframe
                     title="Mapa de Google con marcador fijo de la oficina Quálitas Romero Rubio"
-                    src="https://www.google.com/maps?q=19.671,-99.181&z=13&output=embed"
+                    src={googleMapEmbedUrl}
                     className="absolute inset-0 h-full w-full border-0"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
@@ -472,7 +474,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 border-t border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                  <span className="text-xs text-slate-500">Google Maps · Marcador fijo de la oficina</span>
+                  <span className="text-xs text-slate-500">Google Maps · Municipio seleccionado</span>
                   <a className="inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}`} target="_blank" rel="noopener noreferrer">
                     Abrir indicaciones <ExternalLink size={15} aria-hidden="true" />
                   </a>
@@ -484,7 +486,7 @@ export default function Home() {
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#0096AE]">Atención regional</p>
                     <h3 className="mt-1 text-xl font-black text-slate-900">Explora los municipios</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Selecciona una localidad para verla en el mapa y abrir la ruta en Google Maps.</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Al seleccionar un municipio, el mapa de Google se actualiza para mostrar esa localidad. Usa el enlace para abrir su ubicación en Google Maps.</p>
                   </div>
                 </div>
                 <div className="mt-6 grid grid-cols-2 gap-2">
