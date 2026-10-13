@@ -293,7 +293,7 @@ export default function Home() {
     const dLat = radians(office[0] - coords[0]);
     const dLng = radians(office[1] - coords[1]);
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(radians(coords[0])) * Math.cos(radians(office[0])) * Math.sin(dLng / 2) ** 2;
-    setSelectedMapDistance(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    setSelectedMapDistance(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   }, [selectedMapArea]);
 
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(null);
