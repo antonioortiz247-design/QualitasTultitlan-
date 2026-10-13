@@ -18,7 +18,8 @@ import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 
 type Coverage = {
-  name: 'AMPLIA' | 'LIMITADA' | 'BÁSICA';
+  name: string;
+  summary: string;
   items: string[];
 };
 
@@ -41,22 +42,31 @@ const heroBenefits = [
 
 const coverages: Coverage[] = [
   {
-    name: 'AMPLIA',
+    name: 'Daños materiales',
+    summary: 'Protección para daños al vehículo derivados de determinados eventos cubiertos.',
     items: [
-      'Daños materiales',
-      'Robo total',
-      'Responsabilidad civil',
-      'Gastos médicos',
-      'Asistencia vial',
+      'Puede incluir colisión y vuelco',
+      'Cristales, incendio y fenómenos naturales, conforme a condiciones',
+      'Pueden aplicar deducibles y exclusiones',
     ],
   },
   {
-    name: 'LIMITADA',
-    items: ['Robo total', 'Responsabilidad civil', 'Gastos médicos', 'Asistencia vial'],
+    name: 'Robo total',
+    summary: 'Ampara el robo total del vehículo y ciertos daños relacionados, según la póliza.',
+    items: [
+      'Requiere que la cobertura esté contratada',
+      'El límite y deducible se indican en la carátula',
+      'El robo parcial no se considera incluido automáticamente',
+    ],
   },
   {
-    name: 'BÁSICA',
-    items: ['Responsabilidad civil', 'Asistencia', 'Protección esencial'],
+    name: 'Responsabilidad civil',
+    summary: 'Puede cubrir la responsabilidad por daños a bienes de terceros y lesiones o fallecimiento, conforme al contrato.',
+    items: [
+      'Opera hasta el límite contratado',
+      'La cobertura a ocupantes tiene condiciones específicas',
+      'No sustituye las coberturas para daños al propio vehículo',
+    ],
   },
 ];
 
@@ -168,14 +178,15 @@ export default function Home() {
         <QuoteForm />
 
         <section id="coberturas" className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-          <h2 className="text-center text-3xl font-black">Encuentra una cobertura para cada necesidad</h2>
+          <h2 className="text-center text-3xl font-black">Conoce algunas coberturas disponibles</h2>
           <p className="mx-auto mt-3 max-w-3xl text-center text-slate-600">
-            Información demostrativa. Las coberturas finales dependen de las condiciones de la póliza contratada.
+            Descripción general e informativa de algunas coberturas previstas en las Condiciones Generales. La disponibilidad, alcance, suma asegurada, deducible, requisitos y exclusiones dependen de la póliza y de las coberturas señaladas como contratadas en su carátula.
           </p>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {coverages.map((coverage) => (
               <article className="rounded-2xl border border-qualitas-border bg-white p-6 shadow-sm transition-shadow hover:shadow-soft" key={coverage.name}>
                 <h3 className="rounded-xl bg-qualitas-purple py-3 text-center text-white">{coverage.name}</h3>
+                <p className="mt-4 text-sm text-slate-700">{coverage.summary}</p>
                 <ul className="mt-5 space-y-3">
                   {coverage.items.map((item) => (
                     <li className="flex gap-2" key={item}>
@@ -187,6 +198,9 @@ export default function Home() {
               </article>
             ))}
           </div>
+          <p className="mt-6 rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">
+            Esta información no constituye una oferta de cobertura ni garantiza que un riesgo esté amparado. Solo serán aplicables las coberturas indicadas como contratadas en la carátula de la póliza, con sus límites, deducibles, condiciones y exclusiones. Consulta las Condiciones Generales y la documentación de tu cotización antes de contratar.
+          </p>
           <p className="mt-8 text-center">
             <a
               className="focus-ring rounded-xl border border-qualitas-purple px-6 py-3 font-bold text-qualitas-purple transition-colors hover:bg-slate-50"
