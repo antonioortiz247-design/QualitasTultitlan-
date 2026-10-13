@@ -637,7 +637,12 @@ function Footer() {
         <div>
           <h2 className="font-bold">NAVEGACIÓN</h2>
           <a className="mt-3 block" href="#inicio">Inicio</a>
+          <a className="block" href="#nuestros-seguros">Nuestros seguros</a>
           <a className="block" href="#coberturas">Coberturas</a>
+          <a className="block" href="#beneficios">Beneficios</a>
+          <a className="block" href="#confianza">Confianza</a>
+          <a className="block" href="#zona-atencion">Zona de atención</a>
+          <a className="block" href="#activaciones">Activaciones y socios</a>
           <a className="block" href="#faq">Preguntas frecuentes</a>
           <a className="block" href="#cotizador">Cotizar</a>
           <a className="block" href="#contacto">Contacto</a>
