@@ -179,6 +179,7 @@ const faqs: Faq[] = [
 ];
 
 export default function Home() {
+  const [selectedMapArea, setSelectedMapArea] = useState('Cuautitlán Romero Rubio');
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(null);
   const closeGallery = () => setActiveGalleryIndex(null);
   const showPreviousImage = () => setActiveGalleryIndex((current) => current === null ? 0 : (current + galleryImages.length - 1) % galleryImages.length);
@@ -427,97 +428,87 @@ export default function Home() {
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Estamos cerca de ti</p>
               <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Nuestra zona de atención</h2>
               <p className="mt-4 text-slate-600">
-                Atención para Cuautitlán Romero Rubio y municipios de la zona norte del Valle de México. Explora el mapa y ubica las localidades cercanas.
-              </p>
-            </div>
-
-            <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div className="relative min-h-[460px] overflow-hidden bg-[#f2f7f6] p-4 sm:min-h-[540px] sm:p-6">
-                  <div className="absolute inset-0 opacity-70" aria-hidden="true">
-                    <svg viewBox="0 0 700 600" className="h-full w-full" preserveAspectRatio="xMidYMid slice">
-                      <defs>
-                        <pattern id="map-grid" width="34" height="34" patternUnits="userSpaceOnUse">
-                          <path d="M 34 0 L 0 0 0 34" fill="none" stroke="#d7e5e1" strokeWidth="1" />
-                        </pattern>
-                      </defs>
-                      <rect width="700" height="600" fill="url(#map-grid)" />
-                      <path d="M-20 150 C100 110 140 210 240 180 S400 90 520 160 S640 230 740 180" fill="none" stroke="#b7d9e8" strokeWidth="18" />
-                      <path d="M-20 150 C100 110 140 210 240 180 S400 90 520 160 S640 230 740 180" fill="none" stroke="#fff" strokeWidth="9" />
-                      <path d="M40 -20 C100 120 180 190 150 300 S210 450 160 640 M320 -20 C290 110 390 210 360 310 S410 470 390 640 M560 -20 C500 100 560 260 530 360 S590 500 570 640" fill="none" stroke="#d9c7ce" strokeWidth="13" />
-                      <path d="M40 -20 C100 120 180 190 150 300 S210 450 160 640 M320 -20 C290 110 390 210 360 310 S410 470 390 640 M560 -20 C500 100 560 260 530 360 S590 500 570 640" fill="none" stroke="#fff" strokeWidth="6" />
-                      <path d="M-20 400 C120 360 240 420 330 390 S530 340 720 410 M-20 500 C120 460 240 520 330 490 S530 440 720 510" fill="none" stroke="#d9c7ce" strokeWidth="10" />
-                      <path d="M-20 400 C120 360 240 420 330 390 S530 340 720 410 M-20 500 C120 460 240 520 330 490 S530 440 720 510" fill="none" stroke="#fff" strokeWidth="4" />
-                      <path d="M250 110 L420 70 L510 180 L470 300 L350 350 L250 280 L190 190 Z" fill="#0096AE" fillOpacity=".12" stroke="#0096AE" strokeWidth="3" strokeDasharray="7 6" />
-                      <path d="M280 145 L385 115 L455 190 L425 270 L350 305 L270 250 L230 190 Z" fill="#941B80" fillOpacity=".16" stroke="#941B80" strokeWidth="4" />
-                    </svg>
-                  </div>
-                  <div className="relative z-10 flex items-center justify-between gap-3">
-                    <span className="rounded-full bg-white/95 px-3 py-2 text-xs font-bold text-qualitas-purple shadow-sm">ZONA DE ATENCIÓN</span>
-                    <span className="rounded-full bg-[#0096AE] px-3 py-2 text-xs font-bold text-white shadow-sm">Valle de México</span>
-                  </div>
-                  <div className="relative z-10 mx-auto mt-8 grid max-w-xl grid-cols-2 gap-3 sm:mt-12 sm:grid-cols-3">
-                    {[
-                      { name: 'Cuautitlán', featured: true },
-                      { name: 'Cuautitlán Izcalli', featured: true },
-                      { name: 'Tepotzotlán', featured: false },
-                      { name: 'Teoloyucan', featured: false },
-                      { name: 'Melchor Ocampo', featured: false },
-                      { name: 'Tultepec', featured: false },
-                      { name: 'Tultitlán', featured: false },
-                      { name: 'Zumpango', featured: false },
-                      { name: 'Coacalco', featured: false },
-                      { name: 'Nextlalpan', featured: false },
-                    ].map((area) => (
-                      <a key={area.name} href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(area.name + ', Estado de México, México')}`} target="_blank" rel="noreferrer" className={area.featured ? 'flex min-h-[68px] items-center gap-2 rounded-2xl border border-[#941B80]/20 bg-[#941B80] px-3 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5' : 'flex min-h-[68px] items-center gap-2 rounded-2xl border border-white/90 bg-white/95 px-3 py-3 text-sm font-semibold text-slate-700 shadow-md transition hover:-translate-y-0.5 hover:border-[#0096AE]'}>
-                        <MapPin size={18} className={area.featured ? 'shrink-0 text-white' : 'shrink-0 text-qualitas-aqua'} aria-hidden="true" />
-                        <span>{area.name}</span>
-                      </a>
-                    ))}
-                  </div>
-                  <div className="relative z-10 mt-6 rounded-2xl border border-white bg-white/90 p-4 text-center shadow-sm backdrop-blur-sm">
-                    <p className="text-sm font-bold text-slate-900">Municipios destacados para atención local</p>
-                    <p className="mt-1 text-xs text-slate-600">Selecciona cualquier municipio para localizarlo en el mapa.</p>
+                Atención para Cuautitlán Romero Rubio y municipios de la zona norte del Valle de México. Expl            <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
+                <div className="relative h-[390px] bg-slate-100 sm:h-[500px]">
+                  <iframe
+                    key={selectedMapArea}
+                    title={`Mapa de ${selectedMapArea}`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}&z=12&output=embed`}
+                    className="absolute inset-0 h-full w-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                  />
+                  <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/70 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-md">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#0096AE]">Zona de atención</p>
+                    <p className="mt-1 text-sm font-black text-slate-900">{selectedMapArea}</p>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 border-t border-slate-100 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-slate-500">Mapa ilustrativo de cobertura territorial</span>
-                  <a className="font-bold text-qualitas-purple underline underline-offset-4" href="https://www.openstreetmap.org/#map=12/19.673/-99.181" target="_blank" rel="noreferrer">Abrir mapa geográfico</a>
+                <div className="flex flex-col gap-2 border-t border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                  <span className="text-xs text-slate-500">Mapa de Google · Selecciona una localidad para explorarla</span>
+                  <a className="inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}`} target="_blank" rel="noopener noreferrer">
+                    Abrir indicaciones <ExternalLink size={15} aria-hidden="true" />
+                  </a>
                 </div>
               </div>
 
-              <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-12 items-center justify-center rounded-2xl bg-[#941B80]/10 text-qualitas-purple">
+              <div className="flex flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-900/5 sm:p-7">
+                <div className="flex items-start gap-3">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#941B80]/10 text-[#941B80]">
                     <MapPin size={25} aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-qualitas-purple">Atención en tu municipio</h3>
-                    <p className="mt-1 text-sm text-slate-500">Zona norte del Valle de México</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#0096AE]">Atención regional</p>
+                    <h3 className="mt-1 text-xl font-black text-slate-900">Explora los municipios</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Selecciona una localidad para verla en el mapa y abrir la ruta en Google Maps.</p>
                   </div>
                 </div>
-                <p className="mt-5 text-sm leading-relaxed text-slate-600">
-                  Estamos impulsando la presencia local para acercar orientación sobre seguros de auto a personas y negocios de la región. La disponibilidad se confirma para cada solicitud.
-                </p>
-                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#0096AE]/10 text-qualitas-aqua">
-                      <MapPin size={21} aria-hidden="true" />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-slate-900">Visítanos en nuestra oficina</h4>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-600">Consulta la ubicación exacta y abre la ruta en Google Maps antes de acudir.</p>
-                      <a className="mt-3 inline-flex items-center gap-2 font-bold text-qualitas-purple underline underline-offset-4" href={siteConfig.officeMapUrl} target="_blank" rel="noreferrer">
-                        Ver ubicación y cómo llegar <MapPin size={16} aria-hidden="true" />
-                      </a>
-                    </div>
-                  </div>
+
+                <div className="mt-6 grid grid-cols-2 gap-2">
+                  {[
+                    { name: 'Cuautitlán Romero Rubio', main: true },
+                    { name: 'Cuautitlán', main: true },
+                    { name: 'Cuautitlán Izcalli', main: true },
+                    { name: 'Tultepec', main: false },
+                    { name: 'Tultitlán', main: false },
+                    { name: 'Tepotzotlán', main: false },
+                    { name: 'Teoloyucan', main: false },
+                    { name: 'Melchor Ocampo', main: false },
+                    { name: 'Zumpango', main: false },
+                    { name: 'Nextlalpan', main: false },
+                    { name: 'Coacalco de Berriozábal', main: false },
+                  ].map((area) => (
+                    <button
+                      key={area.name}
+                      type="button"
+                      onClick={() => setSelectedMapArea(area.name)}
+                      aria-pressed={selectedMapArea === area.name}
+                      className={selectedMapArea === area.name
+                        ? 'flex min-h-11 items-center gap-2 rounded-xl border border-[#941B80] bg-[#941B80] px-3 py-2 text-left text-xs font-bold text-white shadow-md transition sm:text-sm'
+                        : area.main
+                          ? 'flex min-h-11 items-center gap-2 rounded-xl border border-[#941B80]/20 bg-[#941B80]/5 px-3 py-2 text-left text-xs font-semibold text-[#941B80] transition hover:border-[#941B80] hover:bg-[#941B80]/10 sm:text-sm'
+                          : 'flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-[#0096AE] hover:bg-cyan-50 sm:text-sm'}
+                    >
+                      <MapPin size={15} className={selectedMapArea === area.name ? 'shrink-0 text-white' : 'shrink-0 text-[#0096AE]'} aria-hidden="true" />
+                      <span>{area.name}</span>
+                    </button>
+                  ))}
                 </div>
-                <div className="mt-auto pt-6">
-                  <a className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
-                    <MapPin size={18} aria-hidden="true" /> Consultar por WhatsApp
+
+                <div className="mt-6 rounded-2xl bg-slate-50 p-4">
+                  <p className="text-sm font-bold text-slate-900">¿Quieres visitarnos?</p>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">Consulta la ubicación exacta de la oficina antes de acudir.</p>
+                  <a href={siteConfig.officeMapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4">
+                    Ubicación de la oficina <ExternalLink size={15} aria-hidden="true" />
                   </a>
                 </div>
+
+                <a className="focus-ring mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#941B80] px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro de auto para mi municipio.')}>
+                  Consultar por WhatsApp
+                </a>
+              </div>
+            </div>              </div>
               </div>
             </div>          </div>
         </section>
