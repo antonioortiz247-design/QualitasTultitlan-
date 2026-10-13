@@ -1,6 +1,9 @@
 import Image from 'next/image';
 import {
   Car,
+  CarFront,
+  Truck,
+  Construction,
   Check,
   CircleDollarSign,
   FileText,
@@ -214,6 +217,70 @@ export default function Home() {
               />
               <p className="mt-2 text-center text-xs text-slate-500">Imagen ilustrativa; las condiciones se confirman en la cotización formal.</p>
             </div>
+          </div>
+        </section>
+
+        <section id="nuestros-seguros" className="bg-white px-4 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Encuentra una opción para ti</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Nuestros seguros</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-slate-600">Conoce algunas categorías de vehículos para las que puedes consultar opciones. La disponibilidad y las coberturas se confirman de acuerdo con las características de cada unidad y la cotización.</p>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              <article className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#941B80]/30 hover:shadow-xl">
+                <div className="relative flex h-56 items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-[#941B80]/10">
+                  <div className="absolute -right-12 -top-12 size-48 rounded-full border border-[#941B80]/10 transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute bottom-0 left-0 h-1 w-full bg-[#941B80]" />
+                  <CarFront size={132} strokeWidth={1.1} className="relative text-[#941B80] transition-transform duration-300 group-hover:scale-105" aria-hidden="true" />
+                  <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#941B80] shadow-sm">Uso personal</span>
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Autos y pickups personales</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">Consulta opciones de protección para tu automóvil o pickup de uso personal, conforme a los criterios de aceptación y las condiciones aplicables.</p>
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <a href="#cotizador" className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Cotizar</a>
+                    <a href="#coberturas" className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
+                  </div>
+                </div>
+              </article>
+
+              <article className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#0096AE]/40 hover:shadow-xl">
+                <div className="relative flex h-56 items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-[#0096AE]/10">
+                  <div className="absolute -right-12 -top-12 size-48 rounded-full border border-[#0096AE]/15 transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute bottom-0 left-0 h-1 w-full bg-[#0096AE]" />
+                  <Truck size={132} strokeWidth={1.1} className="relative text-[#0096AE] transition-transform duration-300 group-hover:scale-105" aria-hidden="true" />
+                  <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#087d91] shadow-sm">Uso comercial</span>
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Pickups de carga</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">Solicita una revisión para una pickup destinada al trabajo o traslado de carga. El uso declarado y las características del vehículo determinan las opciones disponibles.</p>
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <a href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro para una pickup de carga. ¿Qué datos necesitan para revisar mi caso?')} className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Consultar</a>
+                    <a href={buildWhatsAppUrl('Hola, quiero conocer los requisitos y opciones para asegurar una pickup de carga.')} className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
+                  </div>
+                </div>
+              </article>
+
+              <article className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#941B80]/30 hover:shadow-xl">
+                <div className="relative flex h-56 items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-200">
+                  <div className="absolute -right-12 -top-12 size-48 rounded-full border border-slate-300 transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute bottom-0 left-0 h-1 w-full bg-[#941B80]" />
+                  <Construction size={132} strokeWidth={1.1} className="relative text-slate-700 transition-transform duration-300 group-hover:scale-105" aria-hidden="true" />
+                  <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-700 shadow-sm">Trabajo especializado</span>
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Equipo pesado</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">Si necesitas asegurar maquinaria o equipo pesado, contáctanos para revisar si existe una alternativa aplicable a la unidad y su actividad.</p>
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <a href={buildWhatsAppUrl('Hola, quiero consultar si hay opciones de seguro para equipo pesado. Puedo compartir tipo de unidad, marca, modelo, año y uso.')} className="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-[#941B80] px-6 py-2.5 text-sm font-bold text-white transition hover:brightness-90">Consultar</a>
+                    <a href={buildWhatsAppUrl('Hola, quiero conocer qué información necesitan para revisar un seguro de equipo pesado.')} className="focus-ring inline-flex min-h-11 items-center gap-2 px-2 text-sm font-bold text-[#941B80] transition hover:gap-3">Conocer más <span aria-hidden="true">→</span></a>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">Las categorías se muestran como orientación general y no garantizan aceptación, cobertura ni emisión. Las opciones se confirman mediante cotización y documentación aplicable.</p>
           </div>
         </section>
 
