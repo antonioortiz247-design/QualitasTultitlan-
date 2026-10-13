@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, RefreshCw, ShieldCheck, ClipboardList, PackageOpen, ExternalLink } from 'lucide-react';
+import { LogOut, RefreshCw, ShieldCheck, ClipboardList, PackageOpen, ExternalLink, Search } from 'lucide-react';
 
 type Lead = { folio?: string; nombre?: string; telefono?: string; correo?: string; producto?: string; created_at?: string; origen?: string; tipo?: string };
 
@@ -11,6 +11,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState('Todas');
   const router = useRouter();
 
   async function load() {
@@ -48,6 +50,13 @@ export default function AdminPage() {
 
   const countContact = leads.filter(x => x.tipo === 'Contacto').length;
   const countQuote = leads.filter(x => x.tipo === 'Cotización').length;
+  const filteredLeads = leads.filter((lead) => {
+    const matchesType = typeFilter === 'Todas' || lead.tipo === typeFilter;
+    const term = searchTerm.trim().toLocaleLowerCase('es-MX');
+    const matchesSearch = !term || [lead.folio, lead.nombre, lead.telefono, lead.correo, lead.producto, lead.origen]
+      .some((value) => String(value || '').toLocaleLowerCase('es-MX').includes(term));
+    return matchesType && matchesSearch;
+  });
 
   return <main className="min-h-screen bg-[#f7f8fa] text-[#25232a]">
     <header className="border-b border-[#e4e5e9] bg-white">
@@ -72,7 +81,22 @@ export default function AdminPage() {
         <div className="flex items-center gap-2 border-b border-[#e4e5e9] px-5 py-4"><ClipboardList size={19} className="text-[#941b80]"/><h3 className="font-bold">Registros recientes</h3></div>
         {error && <div role="alert" className="m-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</div>}
         {warnings.map((warning) => <div key={warning} role="status" className="mx-4 mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">{warning}</div>)}
-        {loading ? <p className="p-6 text-sm text-[#62616a]">Cargando solicitudes…</p> : !error && leads.length === 0 ? <div className="p-10 text-center"><ClipboardList size={30} className="mx-auto text-[#a5a5ae]"/><p className="mt-3 font-semibold">Todavía no hay solicitudes</p><p className="mt-1 text-sm text-[#62616a]">Cuando lleguen formularios, aparecerán aquí.</p></div> : !error && <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-[#f7f8fa] text-xs uppercase tracking-wide text-[#62616a]"><tr><th className="px-5 py-3">Folio</th><th className="px-5 py-3">Cliente</th><th className="px-5 py-3">Contacto</th><th className="px-5 py-3">Producto</th><th className="px-5 py-3">Origen</th><th className="px-5 py-3">Fecha</th></tr></thead><tbody>{leads.map((lead,i)=><tr key={(lead.folio || '')+i} className="border-t border-[#eeeef1] align-top"><td className="whitespace-nowrap px-5 py-4 font-semibold text-[#941b80]">{lead.folio || '—'}</td><td className="px-5 py-4 font-medium">{lead.nombre || '—'}</td><td className="px-5 py-4"><a className="block text-[#0096ae] hover:underline" href={lead.telefono ? 'https://wa.me/52'+lead.telefono.replace(/\D/g,'') : undefined} target="_blank" rel="noreferrer">{lead.telefono || '—'}</a><span className="mt-1 block text-xs text-[#62616a]">{lead.correo || ''}</span></td><td className="px-5 py-4">{lead.producto || lead.tipo || '—'}</td><td className="px-5 py-4 max-w-[180px] truncate">{lead.origen || 'Sitio web'}</td><td className="whitespace-nowrap px-5 py-4">{lead.created_at ? new Date(lead.created_at).toLocaleString('es-MX') : '—'}</td></tr>)}</tbody></table></div>}
+        <div className="grid gap-3 border-b border-[#e4e5e9] bg-white p-4 sm:grid-cols-[1fr_220px]">
+          <label className="relative block">
+            <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#858590]" aria-hidden="true" />
+            <span className="sr-only">Buscar solicitudes</span>
+            <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Buscar por folio, cliente, teléfono o correo" className="min-h-11 w-full rounded-lg border border-[#d8d9df] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#0096ae] focus:ring-2 focus:ring-[#0096ae]/15" />
+          </label>
+          <label className="block">
+            <span className="sr-only">Filtrar por tipo de solicitud</span>
+            <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} className="min-h-11 w-full rounded-lg border border-[#d8d9df] bg-white px-3 text-sm outline-none focus:border-[#0096ae]">
+              <option value="Todas">Todos los registros</option>
+              <option value="Contacto">Formularios de contacto</option>
+              <option value="Cotización">Solicitudes de cotización</option>
+            </select>
+          </label>
+        </div>
+        {loading ? <p className="p-6 text-sm text-[#62616a]">Cargando solicitudes…</p> : !error && leads.length === 0 ? <div className="p-10 text-center"><ClipboardList size={30} className="mx-auto text-[#a5a5ae]"/><p className="mt-3 font-semibold">Todavía no hay solicitudes</p><p className="mt-1 text-sm text-[#62616a]">Cuando lleguen formularios, aparecerán aquí.</p></div> : !error && filteredLeads.length === 0 ? <p className="p-6 text-sm text-[#62616a]">No hay solicitudes que coincidan con la búsqueda o el filtro.</p> : !error && <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-[#f7f8fa] text-xs uppercase tracking-wide text-[#62616a]"><tr><th className="px-5 py-3">Folio</th><th className="px-5 py-3">Cliente</th><th className="px-5 py-3">Contacto</th><th className="px-5 py-3">Producto</th><th className="px-5 py-3">Origen</th><th className="px-5 py-3">Fecha</th></tr></thead><tbody>{filteredLeads.map((lead,i)=><tr key={(lead.folio || '')+i} className="border-t border-[#eeeef1] align-top"><td className="whitespace-nowrap px-5 py-4 font-semibold text-[#941b80]">{lead.folio || '—'}</td><td className="px-5 py-4 font-medium">{lead.nombre || '—'}</td><td className="px-5 py-4"><a className="block text-[#0096ae] hover:underline" href={lead.telefono ? 'https://wa.me/52'+lead.telefono.replace(/\D/g,'') : undefined} target="_blank" rel="noreferrer">{lead.telefono || '—'}</a><span className="mt-1 block text-xs text-[#62616a]">{lead.correo || ''}</span></td><td className="px-5 py-4">{lead.producto || lead.tipo || '—'}</td><td className="px-5 py-4 max-w-[180px] truncate">{lead.origen || 'Sitio web'}</td><td className="whitespace-nowrap px-5 py-4">{lead.created_at ? new Date(lead.created_at).toLocaleString('es-MX') : '—'}</td></tr>)}</tbody></table></div>}
       </section>
       <p className="mt-4 text-xs leading-5 text-[#62616a]">Acceso restringido al administrador. Las solicitudes se consultan desde la base de datos y no se exponen en páginas públicas.</p>
     </div>
