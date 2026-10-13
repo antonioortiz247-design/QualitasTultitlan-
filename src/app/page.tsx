@@ -276,6 +276,64 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="activaciones" className="bg-white px-4 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">En comunidad</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Activaciones y socios comerciales</h2>
+              <p className="mt-4 text-slate-600">
+                Conoce las actividades que realizamos, los eventos en los que participamos y las alianzas con negocios de nuestra comunidad. Iremos compartiendo fotografías y novedades después de cada activación.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+                <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-gradient-to-br from-[#941B80] via-[#76206f] to-[#0096AE] p-8 text-center text-white">
+                  <div className="absolute -right-10 -top-10 size-48 rounded-full border border-white/20" />
+                  <div className="absolute -bottom-16 -left-8 size-56 rounded-full border border-white/20" />
+                  <div className="relative">
+                    <div className="mx-auto flex size-16 items-center justify-center rounded-2xl border border-white/30 bg-white/15 backdrop-blur-sm">
+                      <Car size={32} aria-hidden="true" />
+                    </div>
+                    <h3 className="mt-4 text-2xl font-black">Activaciones y eventos</h3>
+                    <p className="mt-2 text-sm text-white/90">Galería de jornadas, dinámicas y presencia de marca</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-sm leading-relaxed text-slate-600">Aquí compartiremos fotografías de nuestras actividades en puntos de encuentro, eventos locales y acciones de orientación para automovilistas.</p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-qualitas-purple"><MapPin size={16} aria-hidden="true" /> Cuautitlán y municipios cercanos</span>
+                </div>
+              </article>
+
+              <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+                <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-gradient-to-br from-[#0096AE] via-[#087d91] to-[#941B80] p-8 text-center text-white">
+                  <div className="absolute -right-10 -top-10 size-48 rounded-full border border-white/20" />
+                  <div className="absolute -bottom-16 -left-8 size-56 rounded-full border border-white/20" />
+                  <div className="relative">
+                    <div className="mx-auto flex size-16 items-center justify-center rounded-2xl border border-white/30 bg-white/15 backdrop-blur-sm">
+                      <UserRound size={32} aria-hidden="true" />
+                    </div>
+                    <h3 className="mt-4 text-2xl font-black">Socios comerciales</h3>
+                    <p className="mt-2 text-sm text-white/90">Negocios, colaboradores y alianzas locales</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-sm leading-relaxed text-slate-600">Un espacio para reconocer a nuestros socios comerciales, mostrar colaboraciones y dar visibilidad a las iniciativas que hacemos en conjunto.</p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-qualitas-purple"><Check size={16} aria-hidden="true" /> Alianzas de nuestra comunidad</span>
+                </div>
+              </article>
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-qualitas-aqua/30 bg-cyan-50/60 p-5 text-center">
+              <p className="font-bold text-slate-900">¿Participaste en una activación con nosotros?</p>
+              <p className="mt-1 text-sm text-slate-600">Escríbenos para compartir información del evento o conocer cómo colaborar en próximas actividades.</p>
+              <a className="focus-ring mt-4 inline-flex rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, me interesa conocer las próximas activaciones y las opciones para colaborar como socio comercial.')}>
+                Contactar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </section>
+
         <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 lg:grid-cols-2 lg:px-8">
           <div>
             <h2 className="text-3xl font-black">Seguro de Auto Quálitas en Cuautitlán</h2>
