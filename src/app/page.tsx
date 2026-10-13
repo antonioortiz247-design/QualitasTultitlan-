@@ -276,6 +276,61 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="zona-atencion" className="overflow-hidden bg-slate-50 px-4 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Estamos cerca de ti</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Nuestra zona de atención</h2>
+              <p className="mt-4 text-slate-600">
+                Atención para Cuautitlán Romero Rubio y municipios de la zona norte del Valle de México. Explora el mapa y ubica las localidades cercanas.
+              </p>
+            </div>
+
+            <div className="mt-9 grid gap-6 lg:grid-cols-[1.35fr_0.85fr]">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                <iframe
+                  title="Mapa de Cuautitlán y municipios cercanos en el Estado de México"
+                  src="https://www.openstreetmap.org/export/embed.html?bbox=-99.29%2C19.59%2C-98.98%2C19.84&layer=mapnik&marker=19.673%2C-99.181"
+                  className="h-[360px] w-full sm:h-[440px]"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+                <div className="flex flex-col gap-2 border-t border-slate-100 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+                  <span className="text-slate-500">Mapa interactivo · OpenStreetMap</span>
+                  <a className="font-bold text-qualitas-purple underline underline-offset-4" href="https://www.openstreetmap.org/#map=12/19.673/-99.181" target="_blank" rel="noreferrer">
+                    Abrir mapa completo
+                  </a>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-12 items-center justify-center rounded-2xl bg-[#941B80]/10 text-qualitas-purple">
+                    <MapPin size={25} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-qualitas-purple">Municipios de la zona</h3>
+                    <p className="mt-1 text-sm text-slate-500">Alrededores y localidades cercanas</p>
+                  </div>
+                </div>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {['Cuautitlán', 'Cuautitlán Izcalli', 'Tepotzotlán', 'Teoloyucan', 'Zumpango', 'Melchor Ocampo', 'Tultepec', 'Tultitlán', 'Nextlalpan', 'Coacalco de Berriozábal'].map((area) => (
+                    <span key={area} className={area === 'Cuautitlán' ? 'rounded-full bg-qualitas-purple px-3 py-2 text-sm font-bold text-white' : 'rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700'}>
+                      {area}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-6 text-sm leading-relaxed text-slate-600">
+                  La lista combina municipios colindantes y localidades cercanas donde podemos orientar solicitudes. La atención y disponibilidad del servicio se confirman de acuerdo con cada solicitud.
+                </p>
+                <a className="focus-ring mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white transition hover:brightness-90" href={buildWhatsAppUrl('Hola, estoy en uno de los municipios cercanos a Cuautitlán y quiero consultar opciones de seguro de auto.')}>
+                  <MapPin size={18} aria-hidden="true" /> Consultar por WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="activaciones" className="bg-white px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="mx-auto max-w-3xl text-center">
