@@ -29,7 +29,7 @@ import { LeadForm } from '@/components/LeadForm';
 import { QuoteForm } from '@/components/QuoteForm';
 import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const galleryImages = [
   { src: '/images/activacion-romero.jpg', alt: 'Activación de Quálitas en la oficina de Romero Rubio', title: 'Activación en Romero Rubio', detail: '13 de octubre de 2026' },
@@ -180,7 +180,113 @@ const faqs: Faq[] = [
 ];
 
 export default function Home() {
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const areaMarkerRef = useRef<any>(null);
   const [selectedMapArea, setSelectedMapArea] = useState('Cuautitlán Romero Rubio');
+  useEffect(() => {
+    let cancelled = false;
+    const initializeMap = () => {
+      if (cancelled || !mapContainerRef.current || !(window as any).L) return;
+      const L = (window as any).L;
+      const map = L.map(mapContainerRef.current, { scrollWheelZoom: false, zoomControl: true }).setView([19.69, -99.16], 11);
+      mapInstanceRef.current = map;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+      const serviceArea = [
+        [19.635, -99.235], [19.675, -99.255], [19.725, -99.235],
+        [19.775, -99.205], [19.805, -99.145], [19.775, -99.075],
+        [19.725, -99.055], [19.675, -99.085], [19.625, -99.105],
+        [19.615, -99.165], [19.635, -99.235],
+      ];
+      L.polygon(serviceArea, {
+        color: '#941B80',
+        weight: 3,
+        opacity: 0.95,
+        fillColor: '#941B80',
+        fillOpacity: 0.16,
+      }).addTo(map).bindPopup('<strong>Zona de atención</strong><br>Cuautitlán y municipios cercanos<br><small>Delimitación orientativa</small>');
+      const localities = [
+        { name: 'Cuautitlán Romero Rubio', coords: [19.671, -99.181] },
+        { name: 'Cuautitlán', coords: [19.673, -99.18] },
+        { name: 'Cuautitlán Izcalli', coords: [19.65, -99.21] },
+        { name: 'Tultepec', coords: [19.685, -99.13] },
+        { name: 'Tultitlán', coords: [19.65, -99.17] },
+        { name: 'Tepotzotlán', coords: [19.72, -99.22] },
+        { name: 'Teoloyucan', coords: [19.745, -99.18] },
+        { name: 'Melchor Ocampo', coords: [19.70, -99.14] },
+        { name: 'Zumpango', coords: [19.80, -99.10] },
+        { name: 'Nextlalpan', coords: [19.74, -99.07] },
+        { name: 'Coacalco de Berriozábal', coords: [19.63, -99.11] },
+      ];
+      localities.forEach((locality) => {
+        L.circleMarker(locality.coords, {
+          radius: 6,
+          color: '#ffffff',
+          weight: 2,
+          fillColor: '#0096AE',
+          fillOpacity: 1,
+        }).addTo(map).bindTooltip(locality.name, { direction: 'top', offset: [0, -5] });
+      });
+      areaMarkerRef.current = L.marker(localities[0].coords).addTo(map).bindPopup('<strong>Quálitas Romero Rubio</strong><br><a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Cómo llegar a la oficina</a>');
+      map.fitBounds(L.latLngBounds(serviceArea).pad(0.08));
+    };
+    const existingLeaflet = (window as any).L;
+    if (existingLeaflet) {
+      initializeMap();
+    } else {
+      if (!document.querySelector('link[data-qualitas-leaflet]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        link.dataset.qualitasLeaflet = 'true';
+        document.head.appendChild(link);
+      }
+      let script = document.querySelector<HTMLScriptElement>('script[data-qualitas-leaflet]');
+      if (!script) {
+        script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.dataset.qualitasLeaflet = 'true';
+        script.onload = initializeMap;
+        document.body.appendChild(script);
+      } else {
+        script.addEventListener('load', initializeMap, { once: true });
+      }
+    }
+    return () => {
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        areaMarkerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const L = (window as any).L;
+    if (!L || !mapInstanceRef.current) return;
+    const coordinates: Record<string, [number, number]> = {
+      'Cuautitlán Romero Rubio': [19.671, -99.181],
+      'Cuautitlán': [19.673, -99.18],
+      'Cuautitlán Izcalli': [19.65, -99.21],
+      'Tultepec': [19.685, -99.13],
+      'Tultitlán': [19.65, -99.17],
+      'Tepotzotlán': [19.72, -99.22],
+      'Teoloyucan': [19.745, -99.18],
+      'Melchor Ocampo': [19.70, -99.14],
+      'Zumpango': [19.80, -99.10],
+      'Nextlalpan': [19.74, -99.07],
+      'Coacalco de Berriozábal': [19.63, -99.11],
+    };
+    const coords = coordinates[selectedMapArea];
+    if (!coords) return;
+    mapInstanceRef.current.setView(coords, 13, { animate: true });
+    if (areaMarkerRef.current) areaMarkerRef.current.setLatLng(coords).setPopupContent(`<strong>${selectedMapArea}</strong><br><a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">Cómo llegar a la oficina</a>`).openPopup();
+  }, [selectedMapArea]);
+
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(null);
   const closeGallery = () => setActiveGalleryIndex(null);
   const showPreviousImage = () => setActiveGalleryIndex((current) => current === null ? 0 : (current + galleryImages.length - 1) % galleryImages.length);
@@ -428,21 +534,13 @@ export default function Home() {
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Estamos cerca de ti</p>
               <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Nuestra zona de atención</h2>
-              <p className="mt-4 text-slate-600">Atención para Cuautitlán Romero Rubio y municipios de la zona norte del Valle de México. Explora las localidades cercanas en un mapa real.</p>
+              <p className="mt-4 text-slate-600">Atención para Cuautitlán Romero Rubio y municipios cercanos. El área sombreada es una referencia regional orientativa, no una delimitación oficial de límites municipales.</p>
             </div>
             <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
                 <div className="relative h-[390px] bg-slate-100 sm:h-[500px]">
-                  <iframe
-                    key={selectedMapArea}
-                    title={`Mapa de ${selectedMapArea}`}
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}&z=12&output=embed`}
-                    className="absolute inset-0 h-full w-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    allowFullScreen
-                  />
-                  <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/70 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-md">
+                  <div ref={mapContainerRef} className="absolute inset-0 z-0" role="img" aria-label="Mapa interactivo con zona de atención aproximada y localidades cercanas a Cuautitlán" />
+                  <div className="pointer-events-none absolute left-4 top-4 z-[400] rounded-2xl border border-white/70 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-md">
                     <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#0096AE]">Zona de atención</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{selectedMapArea}</p>
                   </div>
@@ -491,7 +589,7 @@ export default function Home() {
                 <div className="mt-6 rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm font-bold text-slate-900">¿Quieres visitarnos?</p>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600">Consulta la ubicación exacta de la oficina antes de acudir.</p>
-                  <a href={siteConfig.officeMapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4">Ubicación de la oficina <ExternalLink size={15} aria-hidden="true" /></a>
+                  <a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4">Cómo llegar a la oficina <ExternalLink size={15} aria-hidden="true" /></a>
                 </div>
                 <a className="focus-ring mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#941B80] px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro de auto para mi municipio.')}>Consultar por WhatsApp</a>
               </div>
