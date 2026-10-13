@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import {
   Car,
@@ -5,6 +7,9 @@ import {
   Truck,
   Construction,
   Check,
+  X,
+  ChevronLeft,
+  ChevronRight,
   CircleDollarSign,
   FileText,
   HeartPulse,
@@ -23,6 +28,12 @@ import { LeadForm } from '@/components/LeadForm';
 import { QuoteForm } from '@/components/QuoteForm';
 import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { useEffect, useState } from 'react';
+
+const galleryImages = [
+  { src: '/images/activacion-romero.jpg', alt: 'Activación de Quálitas en la oficina de Romero Rubio', title: 'Activación en Romero Rubio', detail: '13 de octubre de 2026' },
+  { src: '/images/socios-comerciales.jpg', alt: 'Logotipos de los socios comerciales de Quálitas Romero Rubio', title: 'Socios comerciales', detail: 'Alianzas locales' },
+];
 
 type Coverage = {
   name: string;
@@ -168,6 +179,28 @@ const faqs: Faq[] = [
 ];
 
 export default function Home() {
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(null);
+  const closeGallery = () => setActiveGalleryIndex(null);
+  const showPreviousImage = () => setActiveGalleryIndex((current) => current === null ? 0 : (current + galleryImages.length - 1) % galleryImages.length);
+  const showNextImage = () => setActiveGalleryIndex((current) => current === null ? 0 : (current + 1) % galleryImages.length);
+
+  useEffect(() => {
+    if (activeGalleryIndex === null) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeGallery();
+      if (event.key === 'ArrowLeft') showPreviousImage();
+      if (event.key === 'ArrowRight') showNextImage();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [activeGalleryIndex]);
+
+
   return (
     <>
       <Header />
@@ -502,7 +535,10 @@ export default function Home() {
             <div className="mt-10 grid gap-6 md:grid-cols-2">
               <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <div className="relative h-64 overflow-hidden bg-slate-100">
-                  <img src="/images/activacion-romero.jpg" alt="Activación de Quálitas en la oficina de Romero Rubio el 13 de octubre de 2026" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                  <button type="button" onClick={() => setActiveGalleryIndex(0)} aria-label="Abrir fotografía de la activación en Romero Rubio" className="group/image absolute inset-0 h-full w-full cursor-zoom-in focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#0096AE]">
+                    <img src="/images/activacion-romero.jpg" alt="Activación de Quálitas en la oficina de Romero Rubio el 13 de octubre de 2026" className="h-full w-full object-cover transition-transform duration-500 group-hover/image:scale-105" loading="lazy" />
+                    <span className="absolute right-4 top-4 rounded-full bg-black/45 px-3 py-2 text-xs font-semibold text-white opacity-0 backdrop-blur-sm transition group-hover/image:opacity-100 group-focus-visible/image:opacity-100">Ampliar foto ↗</span>
+                  </button>
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 pt-12 text-white">
                     <span className="text-xs font-bold uppercase tracking-wider">13 de octubre de 2026</span>
                     <h3 className="mt-1 text-2xl font-black">Activación en Romero Rubio</h3>
@@ -516,7 +552,10 @@ export default function Home() {
 
               <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
                 <div className="relative h-64 overflow-hidden bg-slate-950">
-                  <img src="/images/socios-comerciales.jpg" alt="Socios comerciales de Quálitas Romero Rubio y sus marcas" className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" />
+                  <button type="button" onClick={() => setActiveGalleryIndex(1)} aria-label="Abrir imagen de socios comerciales" className="group/image absolute inset-0 h-full w-full cursor-zoom-in focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#0096AE]">
+                    <img src="/images/socios-comerciales.jpg" alt="Socios comerciales de Quálitas Romero Rubio y sus marcas" className="h-full w-full object-contain transition-transform duration-500 group-hover/image:scale-[1.02]" loading="lazy" />
+                    <span className="absolute right-4 top-4 rounded-full bg-black/45 px-3 py-2 text-xs font-semibold text-white opacity-0 backdrop-blur-sm transition group-hover/image:opacity-100 group-focus-visible/image:opacity-100">Ampliar imagen ↗</span>
+                  </button>
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 pt-12 text-white">
                     <span className="text-xs font-bold uppercase tracking-wider">Alianzas locales</span>
                     <h3 className="mt-1 text-2xl font-black">Socios comerciales</h3>
@@ -608,6 +647,29 @@ export default function Home() {
         </section>
 
         <LeadForm />
+      {activeGalleryIndex !== null && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-3 backdrop-blur-xl sm:p-8" role="dialog" aria-modal="true" aria-label="Galería de imágenes" onClick={closeGallery}>
+          <button type="button" onClick={(event) => { event.stopPropagation(); closeGallery(); }} aria-label="Cerrar galería" className="absolute right-4 top-4 z-20 flex size-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 sm:right-6 sm:top-6">
+            <X size={23} />
+          </button>
+          <button type="button" onClick={(event) => { event.stopPropagation(); showPreviousImage(); }} aria-label="Imagen anterior" className="absolute left-2 z-20 flex size-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 sm:left-6 sm:size-12">
+            <ChevronLeft size={28} />
+          </button>
+          <div className="flex h-full max-h-[92vh] w-full max-w-6xl flex-col items-center justify-center gap-4" onClick={(event) => event.stopPropagation()}>
+            <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+              <img src={galleryImages[activeGalleryIndex].src} alt={galleryImages[activeGalleryIndex].alt} className="max-h-full max-w-full rounded-lg object-contain shadow-2xl" />
+            </div>
+            <div className="text-center text-white">
+              <h3 className="text-lg font-bold sm:text-xl">{galleryImages[activeGalleryIndex].title}</h3>
+              <p className="mt-1 text-sm text-white/65">{galleryImages[activeGalleryIndex].detail}</p>
+              <p className="mt-2 text-xs text-white/45">{activeGalleryIndex + 1} de {galleryImages.length}</p>
+            </div>
+          </div>
+          <button type="button" onClick={(event) => { event.stopPropagation(); showNextImage(); }} aria-label="Imagen siguiente" className="absolute right-2 z-20 flex size-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 sm:right-6 sm:size-12">
+            <ChevronRight size={28} />
+          </button>
+        </div>
+      )}
       </main>
       <Footer />
       <FloatingWhatsApp />
