@@ -461,7 +461,7 @@ export default function Home() {
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
                 <div className="relative aspect-[4/3] max-h-[500px] min-h-[320px] bg-slate-100">
                   <iframe
-                    title="Mapa de Google con marcador fijo de la oficina Quálitas Romero Rubio"
+                    title={`Mapa de Google de ${selectedMapArea}, zona de atención de Quálitas Romero Rubio`}
                     src={googleMapEmbedUrl}
                     className="absolute inset-0 h-full w-full border-0"
                     loading="lazy"
@@ -514,13 +514,13 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="mt-4 rounded-2xl border border-[#0096AE]/20 bg-cyan-50 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wide text-[#087d91]">Distancia aproximada a la oficina</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#087d91]">Distancia aproximada desde la oficina</p>
                   <p className="mt-1 text-2xl font-black text-slate-900">{selectedMapDistance.toFixed(1)} km</p>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">Distancia en línea recta desde el centro aproximado de {selectedMapArea}. La distancia por carretera puede ser mayor. El marcador mostrado usa una ubicación aproximada; el enlace de abajo abre la ficha de Google Maps de la oficina.</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">Estimación en línea recta desde una coordenada aproximada de la oficina hasta el centro de {selectedMapArea}. La distancia por carretera puede ser mayor y el valor es orientativo. El mapa muestra la localidad seleccionada, no la ubicación exacta de la oficina. Para llegar a la oficina, utiliza el enlace de Google Maps.</p>
                 </div>
                 <div className="mt-6 rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm font-bold text-slate-900">¿Quieres visitarnos?</p>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">Consulta la ubicación exacta de la oficina antes de acudir.</p>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">La ficha de Google Maps contiene la ubicación para planear tu visita.</p>
                   <a href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4">Cómo llegar a la oficina <ExternalLink size={15} aria-hidden="true" /></a>
                 </div>
                 <a className="focus-ring mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#941B80] px-5 py-3 font-bold text-white transition hover:brightness-90" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl('Hola, quiero consultar opciones de seguro de auto para mi municipio.')}>Consultar por WhatsApp</a>
