@@ -396,7 +396,7 @@ export function QuoteForm() {
                         ['Gastos médicos ocupantes', '$250,000'],
                         ['Gastos legales', 'Incluidos'],
                         ['Muerte accidental del conductor', '$100,000'],
-                        ['Asistencia Vial Plus', 'Hasta los límites contratados'],
+                        ['Asistencia vial (Plus si se contrata)', 'Según límites contratados'],
                         ['Robo total', 'Según propuesta'],
                       ].map((item) => <span key={item[0]} className="flex items-start justify-between gap-3 border-t border-slate-200 py-3 text-sm text-slate-700"><span>{item[0]}</span><strong className="shrink-0 text-right">{item[1]}</strong></span>)}
                     </span>
