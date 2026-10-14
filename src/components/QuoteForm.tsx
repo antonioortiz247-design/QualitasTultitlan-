@@ -18,6 +18,7 @@ type Vehicle = {
 
 export function QuoteForm() {
   const [step, setStep] = useState(1);
+  const [coverage, setCoverage] = useState('amplio');
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<string, string>>({ usage: 'Particular' });
@@ -112,9 +113,12 @@ export function QuoteForm() {
         trackEvent('quote_step_1_completed');
         setStep(2);
       }
-    } else if (step === 2 && validate(['zip', 'age'])) {
-      trackEvent('quote_step_2_completed');
+    } else if (step === 2) {
+      trackEvent('quote_step_2_completed', { coverage });
       setStep(3);
+    } else if (step === 3 && validate(['zip', 'age'])) {
+      trackEvent('quote_step_3_completed');
+      setStep(4);
     }
   }
 
@@ -177,6 +181,7 @@ export function QuoteForm() {
     data.folio ? 'Folio de seguimiento: ' + data.folio : '',
     'Vehículo: ' + data.brand + ' ' + data.model + '; tipo/versión: ' + data.version + '; año: ' + data.year,
     manual ? 'Tipo de vehículo capturado manualmente: ' + data.vehicleType : 'CATE: ' + data.cate + '; CVE (CLAVE AMIS): ' + data.cve + '; clave de marca: ' + data.brandCode,
+    'Paquete solicitado: ' + (coverage === 'amplio' ? 'Amplio' : 'Limitado') + ' (opción orientativa, sin prima calculada)',
     'Código postal: ' + data.zip + '; edad del conductor: ' + data.age + '; uso: ' + data.usage,
     'Nombre: ' + data.name + '; teléfono: ' + data.phone + '; correo: ' + data.email,
   ].filter(Boolean).join('\n');
@@ -204,15 +209,15 @@ export function QuoteForm() {
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
             <p className="mt-2 max-w-xl text-slate-600">Completa los tres pasos. Guardaremos tus datos para que un asesor pueda dar seguimiento a tu solicitud.</p>
           </div>
-          <ol aria-label="Progreso del formulario" className="grid grid-cols-3 gap-2 text-center text-xs font-bold sm:text-sm">
-            {['Vehículo', 'Conductor', 'Contacto'].map((label, index) => (
+          <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-4 sm:text-sm">
+            {['Vehículo', 'Cobertura', 'Conductor', 'Contacto'].map((label, index) => (
               <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-3 py-3 ' + (step === index + 1 ? 'bg-qualitas-purple text-white' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
                 <span className="mb-1 block text-xs">{step > index + 1 ? '✓' : '0' + (index + 1)}</span>{label}
               </li>
             ))}
           </ol>
         </div>
-        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 3) * 100) + '%' }} /></div>
+        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 4) * 100) + '%' }} /></div>
         <form onSubmit={submit} className="mt-7">
           <div className="grid gap-4 md:grid-cols-2">
             {step === 1 && (
@@ -270,7 +275,45 @@ export function QuoteForm() {
                 )}
               </div>
             )}
-            {step === 2 && <>
+            {step === 2 && (
+              <div className="md:col-span-2">
+                <h3 className="text-center text-xl font-extrabold text-qualitas-aqua sm:text-2xl">Elige una opción de cobertura</h3>
+                <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600">Selecciona el paquete que quieres consultar. No se muestra un precio porque la prima debe calcularse con el sistema autorizado de Quálitas.</p>
+                <div className="mt-6 grid gap-5 lg:grid-cols-2">
+                  <button type="button" onClick={() => setCoverage('amplio')} aria-pressed={coverage === 'amplio'} className={'focus-ring overflow-hidden rounded-2xl border-2 text-left transition ' + (coverage === 'amplio' ? 'border-[#941B80] bg-[#941B80] text-white shadow-xl' : 'border-slate-200 bg-white text-slate-800 hover:border-[#941B80]/50')}>
+                    <span className="block px-5 py-5 text-center text-2xl font-black">Paquete Amplio</span>
+                    <span className="block border-t border-current/20 px-5 py-4">
+                      <span className="grid grid-cols-[1fr_auto_auto] gap-3 pb-3 text-[11px] font-bold uppercase tracking-wide opacity-80"><span>Cobertura</span><span>Deducible</span><span>Suma asegurada</span></span>
+                      {[
+                        ['Daños materiales', '5%', 'Valor convenido'],
+                        ['Robo total', '10%', 'Valor convenido'],
+                        ['Responsabilidad civil', 'Según propuesta', 'Según propuesta'],
+                        ['Gastos médicos a ocupantes', 'Según propuesta', 'Según propuesta'],
+                        ['Defensa legal', 'Según propuesta', 'Conforme a póliza'],
+                        ['Asistencia vial', 'Según propuesta', 'Conforme a póliza'],
+                      ].map((item) => <span key={item[0]} className="grid grid-cols-[1fr_auto_auto] gap-3 border-t border-current/15 py-3 text-xs sm:text-sm"><span>• {item[0]}</span><span>{item[1]}</span><span className="text-right">{item[2]}</span></span>)}
+                    </span>
+                    <span className="block px-5 pb-5 text-center text-sm font-bold">{coverage === 'amplio' ? '✓ Seleccionado' : 'Seleccionar paquete'}</span>
+                  </button>
+                  <button type="button" onClick={() => setCoverage('limitado')} aria-pressed={coverage === 'limitado'} className={'focus-ring overflow-hidden rounded-2xl border-2 text-left transition ' + (coverage === 'limitado' ? 'border-[#0096AE] bg-cyan-50 shadow-xl' : 'border-slate-200 bg-white hover:border-[#0096AE]/50')}>
+                    <span className="block px-5 py-5 text-center text-2xl font-black text-slate-800">Cobertura Limitada</span>
+                    <span className="block border-t border-slate-200 px-5 py-4">
+                      <span className="grid grid-cols-[1fr_auto_auto] gap-3 pb-3 text-[11px] font-bold uppercase tracking-wide text-slate-500"><span>Cobertura</span><span>Deducible</span><span>Suma asegurada</span></span>
+                      {[
+                        ['Robo total', '10%', 'Valor convenido'],
+                        ['Responsabilidad civil', 'Según propuesta', 'Según propuesta'],
+                        ['Gastos médicos a ocupantes', 'Según propuesta', 'Según propuesta'],
+                        ['Defensa legal', 'Según propuesta', 'Conforme a póliza'],
+                        ['Asistencia vial', 'Según propuesta', 'Conforme a póliza'],
+                      ].map((item) => <span key={item[0]} className="grid grid-cols-[1fr_auto_auto] gap-3 border-t border-slate-200 py-3 text-xs text-slate-700 sm:text-sm"><span>• {item[0]}</span><span>{item[1]}</span><span className="text-right">{item[2]}</span></span>)}
+                    </span>
+                    <span className="block px-5 pb-5 text-center text-sm font-bold text-[#0096AE]">{coverage === 'limitado' ? '✓ Seleccionado' : 'Seleccionar paquete'}</span>
+                  </button>
+                </div>
+                <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">Información orientativa basada en las referencias visuales proporcionadas. Coberturas, deducibles, límites y sumas aseguradas deben confirmarse en la propuesta oficial y la carátula de la póliza; pueden variar según el vehículo y los criterios de aceptación.</p>
+              </div>
+            )}
+            {step === 3 && <>
               {input('zip', 'Código postal', 'text')}
               {input('age', 'Edad del conductor', 'number')}
               <fieldset className="md:col-span-2">
@@ -280,7 +323,7 @@ export function QuoteForm() {
                 </div>
               </fieldset>
             </>}
-            {step === 3 && <>
+            {step === 4 && <>
               {input('name', 'Nombre completo')}
               {input('phone', 'Teléfono / WhatsApp', 'tel')}
               {input('email', 'Correo electrónico', 'email')}
@@ -293,7 +336,7 @@ export function QuoteForm() {
           {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
-            {step < 3 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
+            {step < 4 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
           </div>
           <div className="mt-5 rounded-xl border border-[#0096AE]/20 bg-cyan-50/60 p-4">
             <p className="text-sm font-bold text-slate-800">¿Qué pasa después?</p>
