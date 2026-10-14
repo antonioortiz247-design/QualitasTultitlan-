@@ -223,7 +223,7 @@ export function QuoteForm() {
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
             <p className="mt-2 max-w-xl text-slate-600">Avanza pantalla por pantalla: marca, modelo, versión, cobertura y datos de contacto. Guardaremos tu solicitud para seguimiento del asesor.</p>
           </div>
-          <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-4 sm:text-sm">
+          <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-3 lg:grid-cols-6 sm:text-sm">
             {['Marca', 'Modelo', 'Versión', 'Cobertura', 'Conductor', 'Contacto'].map((label, index) => (
               <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-3 py-3 ' + (step === index + 1 ? 'bg-qualitas-purple text-white' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
                 <span className="mb-1 block text-xs">{step > index + 1 ? '✓' : '0' + (index + 1)}</span>{label}
@@ -236,10 +236,35 @@ export function QuoteForm() {
           <div className="grid gap-4 md:grid-cols-2">
             {step === 1 && (
               <div className="md:col-span-2">
-                {!manual && !selected && (
-                  <>
-                  </>
-                )}
+                <h3 className="mb-2 text-lg font-bold text-qualitas-purple">¿Qué marca es tu auto?</h3>
+                <p className="mb-5 text-sm text-slate-600">Selecciona una marca para consultar los modelos disponibles.</p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                  {[
+                    { name: 'Honda', logo: 'Honda.png' },
+                    { name: 'Chevrolet', logo: 'Chevrolet.png' },
+                    { name: 'Hyundai', logo: 'Hyundai.png' },
+                    { name: 'Volkswagen', logo: 'Volkswagen.png' },
+                    { name: 'Toyota', logo: 'Toyota.png' },
+                    { name: 'Ford', logo: 'Ford.png' },
+                    { name: 'Nissan', logo: 'Nissan.png' },
+                    { name: 'Kia', logo: 'Kia.png' },
+                    { name: 'Mazda', logo: 'Mazda.png' },
+                  ].map(({ name, logo }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      aria-label={name}
+                      onClick={() => { setSelectedBrand(name); setSelected(null); setManual(false); setSearch(name); setErrors({}); setStep(2); }}
+                      className="focus-ring flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-slate-700 transition hover:-translate-y-0.5 hover:border-[#0096AE] hover:shadow-sm"
+                    >
+                      <img src={`/images/marcas/LogosCotizador/${logo}`} alt="" aria-hidden="true" loading="lazy" className="h-9 w-full max-w-28 object-contain" />
+                      <span className="text-xs font-semibold">{name}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-5 border-t border-slate-200 pt-4">
+                  <button type="button" onClick={() => { setSelectedBrand(''); startManual(); setStep(2); }} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Mi vehículo no aparece</button>
+                </div>
               </div>
             )}
             {step === 2 && (
@@ -374,21 +399,6 @@ export function QuoteForm() {
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
             {step < 6 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
-          </div>
-          <div className="mt-5 rounded-xl border border-[#0096AE]/20 bg-cyan-50/60 p-4">
-            <p className="text-sm font-bold text-slate-800">¿Qué pasa después?</p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">Registraremos tu solicitud para dar seguimiento. El asesor revisará los datos y podrá orientarte sobre las opciones disponibles. Este formulario no genera una póliza ni una cotización oficial.</p>
-            <p className="mt-2 text-xs leading-relaxed text-slate-500">Tus datos se utilizarán conforme al <a className="font-semibold underline underline-offset-2" href="/aviso-privacidad">Aviso de Privacidad</a>.</p>
-          </div>
-        </form>
-      </div>
-    </section>
-  );
-}
-          {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
-          <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
-            {step < 4 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
           </div>
           <div className="mt-5 rounded-xl border border-[#0096AE]/20 bg-cyan-50/60 p-4">
             <p className="text-sm font-bold text-slate-800">¿Qué pasa después?</p>
