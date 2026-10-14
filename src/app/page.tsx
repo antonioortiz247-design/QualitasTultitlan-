@@ -457,9 +457,9 @@ export default function Home() {
               <h2 className="mt-2 text-3xl font-black tracking-tight text-qualitas-purple sm:text-4xl">Nuestra zona de atención</h2>
               <p className="mt-4 text-slate-600">Atención para Cuautitlán Romero Rubio y municipios cercanos. El área sombreada es una referencia regional orientativa, no una delimitación oficial de límites municipales.</p>
             </div>
-            <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[1.45fr_0.75fr]">
-              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
-                <div className="relative aspect-[4/3] max-h-[500px] min-h-[320px] bg-slate-100">
+            <div className="mt-9 grid items-start gap-6 lg:grid-cols-[1.45fr_0.75fr]">
+              <div className="h-fit self-start overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
+                <div className="relative h-[320px] sm:h-[400px] lg:h-[460px] bg-slate-100">
                   <iframe
                     title={`Mapa de Google de ${selectedMapArea}, zona de atención de Quálitas Romero Rubio`}
                     src={googleMapEmbedUrl}
