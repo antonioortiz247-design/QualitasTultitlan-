@@ -372,39 +372,52 @@ export function QuoteForm() {
                         {step === 6 && (
               <div className="md:col-span-2">
                 <h3 className="text-center text-xl font-extrabold text-qualitas-aqua sm:text-2xl">Elige una opción de cobertura</h3>
-                <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600">Selecciona el paquete que quieres consultar. No se muestra un precio porque la prima debe calcularse con el sistema autorizado de Quálitas.</p>
+                <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600">Selecciona el paquete que quieres consultar. Las sumas mostradas corresponden a los parámetros que nos proporcionaste; la contratación y el alcance final se confirman en la carátula de la póliza.</p>
                 <div className="mt-6 grid gap-5 lg:grid-cols-2">
                   <button type="button" onClick={() => setCoverage('amplio')} aria-pressed={coverage === 'amplio'} className={'focus-ring overflow-hidden rounded-2xl border-2 text-left transition ' + (coverage === 'amplio' ? 'border-[#941B80] bg-[#941B80] text-white shadow-xl' : 'border-slate-200 bg-white text-slate-800 hover:border-[#941B80]/50')}>
                     <span className="block px-5 py-5 text-center text-2xl font-black">Paquete Amplio</span>
                     <span className="block border-t border-current/20 px-5 py-4">
-                      <span className="grid grid-cols-[1fr_auto_auto] gap-3 pb-3 text-[11px] font-bold uppercase tracking-wide opacity-80"><span>Cobertura</span><span>Deducible</span><span>Suma asegurada</span></span>
                       {[
-                        ['Daños materiales', '5%', 'Valor convenido'],
-                        ['Robo total', '10%', 'Valor convenido'],
-                        ['Responsabilidad civil', 'Según propuesta', 'Según propuesta'],
-                        ['Gastos médicos a ocupantes', 'Según propuesta', 'Según propuesta'],
-                        ['Defensa legal', 'Según propuesta', 'Conforme a póliza'],
-                        ['Asistencia vial', 'Según propuesta', 'Conforme a póliza'],
-                      ].map((item) => <span key={item[0]} className="grid grid-cols-[1fr_auto_auto] gap-3 border-t border-current/15 py-3 text-xs sm:text-sm"><span>• {item[0]}</span><span>{item[1]}</span><span className="text-right">{item[2]}</span></span>)}
+                        ['Responsabilidad civil', '$3,000,000'],
+                        ['Gastos médicos ocupantes', '$250,000'],
+                        ['Gastos legales', 'Incluidos'],
+                        ['Muerte accidental del conductor', '$100,000'],
+                        ['Asistencia Vial Plus', 'Hasta los límites contratados'],
+                        ['Daños materiales y robo total', 'Según propuesta'],
+                      ].map((item) => <span key={item[0]} className="flex items-start justify-between gap-3 border-t border-current/15 py-3 text-sm"><span>{item[0]}</span><strong className="shrink-0 text-right">{item[1]}</strong></span>)}
                     </span>
                     <span className="block px-5 pb-5 text-center text-sm font-bold">{coverage === 'amplio' ? '✓ Seleccionado' : 'Seleccionar paquete'}</span>
                   </button>
                   <button type="button" onClick={() => setCoverage('limitado')} aria-pressed={coverage === 'limitado'} className={'focus-ring overflow-hidden rounded-2xl border-2 text-left transition ' + (coverage === 'limitado' ? 'border-[#0096AE] bg-cyan-50 shadow-xl' : 'border-slate-200 bg-white hover:border-[#0096AE]/50')}>
                     <span className="block px-5 py-5 text-center text-2xl font-black text-slate-800">Cobertura Limitada</span>
                     <span className="block border-t border-slate-200 px-5 py-4">
-                      <span className="grid grid-cols-[1fr_auto_auto] gap-3 pb-3 text-[11px] font-bold uppercase tracking-wide text-slate-500"><span>Cobertura</span><span>Deducible</span><span>Suma asegurada</span></span>
                       {[
-                        ['Robo total', '10%', 'Valor convenido'],
-                        ['Responsabilidad civil', 'Según propuesta', 'Según propuesta'],
-                        ['Gastos médicos a ocupantes', 'Según propuesta', 'Según propuesta'],
-                        ['Defensa legal', 'Según propuesta', 'Conforme a póliza'],
-                        ['Asistencia vial', 'Según propuesta', 'Conforme a póliza'],
-                      ].map((item) => <span key={item[0]} className="grid grid-cols-[1fr_auto_auto] gap-3 border-t border-slate-200 py-3 text-xs text-slate-700 sm:text-sm"><span>• {item[0]}</span><span>{item[1]}</span><span className="text-right">{item[2]}</span></span>)}
+                        ['Responsabilidad civil', '$3,000,000'],
+                        ['Gastos médicos ocupantes', '$250,000'],
+                        ['Gastos legales', 'Incluidos'],
+                        ['Muerte accidental del conductor', '$100,000'],
+                        ['Asistencia Vial Plus', 'Hasta los límites contratados'],
+                        ['Robo total', 'Según propuesta'],
+                      ].map((item) => <span key={item[0]} className="flex items-start justify-between gap-3 border-t border-slate-200 py-3 text-sm text-slate-700"><span>{item[0]}</span><strong className="shrink-0 text-right">{item[1]}</strong></span>)}
                     </span>
                     <span className="block px-5 pb-5 text-center text-sm font-bold text-[#0096AE]">{coverage === 'limitado' ? '✓ Seleccionado' : 'Seleccionar paquete'}</span>
                   </button>
                 </div>
-                <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">Información orientativa basada en las referencias visuales proporcionadas. Coberturas, deducibles, límites y sumas aseguradas deben confirmarse en la propuesta oficial y la carátula de la póliza; pueden variar según el vehículo y los criterios de aceptación.</p>
+
+                <div className="mt-6 space-y-3">
+                  <h4 className="text-lg font-extrabold text-qualitas-purple">Consulta las condiciones de cada cobertura</h4>
+                  {[
+                    { title: 'Responsabilidad Civil · $3,000,000', text: 'Ampara la responsabilidad civil en que incurra el asegurado o una persona autorizada al usar el vehículo y cause daños materiales a bienes de terceros, lesiones corporales o la muerte de terceros. También contempla ciertos gastos y costas de juicio y daño moral bajo los términos de la póliza. El límite y los riesgos aplicables son los que aparezcan en la carátula. Condiciones Generales, cobertura 3, páginas impresas 16–19.' },
+                    { title: 'Gastos Médicos Ocupantes · $250,000', text: 'Cubre, dentro de los límites y términos contratados, gastos médicos necesarios para la atención de las lesiones de los ocupantes a consecuencia de un accidente automovilístico mientras viajan dentro del compartimiento destinado al transporte de personas. El total y la distribución de la suma asegurada deben confirmarse en la carátula. Condiciones Generales, cobertura 5, páginas impresas 26–27.' },
+                    { title: 'Gastos Legales · incluidos', text: 'Ampara la defensa legal del asegurado o conductor autorizado cuando, por un accidente vial en el que participe el vehículo asegurado, se vea involucrado en procedimientos penales o civiles. Puede incluir honorarios de abogados, gastos del proceso penal, determinadas multas impuestas por sentencia, primas de fianzas o cauciones y gestiones para la devolución de la unidad retenida. Debe notificarse el siniestro de inmediato y atender las citaciones; aplican exclusiones, límites y requisitos de la póliza. Condiciones Generales, cobertura 4, páginas impresas 22–26.' },
+                    { title: 'Muerte accidental del conductor · $100,000', text: 'Ampara las pérdidas previstas en la cobertura cuando sean consecuencia directa de un accidente automovilístico cubierto mientras el conductor conduce el vehículo asegurado con consentimiento del asegurado. Para muerte, la condición general establece el pago del 100% de la suma asegurada si ocurre dentro de los 90 días naturales siguientes al accidente; hay exclusiones específicas. Condiciones Generales, cobertura 15, página impresa 50.' },
+                    { title: 'Asistencia Vial Quálitas Plus', text: 'Según los parámetros proporcionados para esta propuesta: hasta 10 eventos al año con recorrido de hasta 40 km por evento, exclusivamente para automóviles y pick-ups de uso particular; hasta 5 eventos de paso de corriente, 5 de cambio de llanta, 5 de paso de gasolina y 2 de cerrajero por año. Los límites de eventos, distancia, disponibilidad, requisitos y exclusiones dependen de la cobertura contratada y de las condiciones aplicables. Consulta la cobertura 6 Bis, Asistencia Vial Quálitas Plus, en las Condiciones Generales.' },
+                  ].map((item) => <details key={item.title} className="group rounded-xl border border-slate-200 bg-white open:border-[#0096AE]">
+                    <summary className="focus-ring flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-4 py-4 font-bold text-slate-800"><span>{item.title}</span><span aria-hidden="true" className="text-xl text-qualitas-aqua group-open:rotate-45">+</span></summary>
+                    <p className="px-4 pb-4 text-sm leading-6 text-slate-600">{item.text}</p>
+                  </details>)}
+                </div>
+                <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">Importante: los montos de $3,000,000, $250,000 y $100,000, así como el detalle operativo de Asistencia Vial Plus, se presentan con base en los parámetros proporcionados para este cotizador. Las Condiciones Generales describen alcances, requisitos y exclusiones, pero no sustituyen la carátula de la póliza. La cobertura solo aplica si aparece contratada y está sujeta a las condiciones correspondientes.</p>
               </div>
             )}
             {step === 7 && <>
