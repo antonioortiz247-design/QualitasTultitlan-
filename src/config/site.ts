@@ -13,7 +13,7 @@ export const siteConfig = {
   socialLinks: { facebook: '#', instagram: '#', whatsapp: '#' },
   officialQualitasUrl: 'https://www.qualitas.com.mx/',
   officeMapUrl: 'https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7',
-  url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://qualitas-tultitlan-lemon.vercel.app').replace(/\\/+$/, ''),
+  url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://qualitas-tultitlan-lemon.vercel.app').replace(/\/+$/, ''),
 };
 export const whatsappMessages = {
   hero: 'Hola, quiero información sobre un seguro Quálitas.',
