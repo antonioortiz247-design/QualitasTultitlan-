@@ -311,6 +311,10 @@ export function QuoteForm() {
                           <span className="min-w-0">
                             <span className="block font-bold text-slate-900">{vehicle.brand} {vehicle.type}</span>
                             <span className="mt-1 block text-sm text-slate-600">{vehicle.description || vehicle.subbrand || 'Versión registrada en catálogo'}</span>
+                            <span className="mt-2 inline-flex flex-wrap items-center gap-2">
+                              <span className="rounded-md bg-cyan-50 px-2 py-1 text-xs font-bold text-[#087d91]">AMIS: {vehicle.cve || 'No disponible en catálogo'}</span>
+                              <span className="text-xs text-slate-500">CATE: {vehicle.cate || 'No disponible'}</span>
+                            </span>
                             <span className="mt-1 block text-xs text-slate-500">Años disponibles: {vehicle.years.slice().sort((a, b) => Number(b) - Number(a)).slice(0, 6).join(', ') || 'Consultar con asesor'}</span>
                           </span>
                           <span className="shrink-0 rounded-lg bg-[#941B80] px-3 py-2 text-sm font-bold text-white">Elegir</span>
