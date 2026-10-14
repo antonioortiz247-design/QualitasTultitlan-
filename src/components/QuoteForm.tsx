@@ -226,9 +226,32 @@ export function QuoteForm() {
                   <>
                     <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">¿Qué marca es tu auto?</label>
                     <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-                      {['Honda', 'Chevrolet', 'Hyundai', 'Volkswagen', 'Toyota', 'Ford', 'Nissan', 'Kia', 'Mazda'].map((brand) => (
-                        <button key={brand} type="button" onClick={() => { setSelected(null); setManual(false); setSearch(brand); }} className={'focus-ring min-h-14 rounded-xl border px-3 py-3 text-sm font-extrabold transition hover:-translate-y-0.5 hover:shadow-sm ' + (search.toLowerCase() === brand.toLowerCase() ? 'border-[#941B80] bg-[#941B80]/5 text-[#941B80]' : 'border-slate-200 bg-white text-slate-700 hover:border-[#0096AE]')}>
-                          {brand}
+                      {[
+                        { name: 'Honda', logo: 'Honda.png' },
+                        { name: 'Chevrolet', logo: 'Chevrolet.png' },
+                        { name: 'Hyundai', logo: 'Hyundai.png' },
+                        { name: 'Volkswagen', logo: 'Volkswagen.png' },
+                        { name: 'Toyota', logo: 'Toyota.png' },
+                        { name: 'Ford', logo: 'Ford.png' },
+                        { name: 'Nissan', logo: 'Nissan.png' },
+                        { name: 'Kia', logo: 'Kia.png' },
+                        { name: 'Mazda', logo: 'Mazda.png' },
+                      ].map(({ name, logo }) => (
+                        <button
+                          key={name}
+                          type="button"
+                          aria-label={name}
+                          onClick={() => { setSelected(null); setManual(false); setSearch(name); }}
+                          className={'focus-ring flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border px-3 py-3 transition hover:-translate-y-0.5 hover:shadow-sm ' + (search.toLowerCase() === name.toLowerCase() ? 'border-[#941B80] bg-[#941B80]/5 text-[#941B80]' : 'border-slate-200 bg-white text-slate-700 hover:border-[#0096AE]')}
+                        >
+                          <img
+                            src={`/images/marcas/LogosCotizador/${logo}`}
+                            alt=""
+                            aria-hidden="true"
+                            loading="lazy"
+                            className="h-9 w-full max-w-28 object-contain"
+                          />
+                          <span className="text-xs font-semibold">{name}</span>
                         </button>
                       ))}
                     </div>
