@@ -36,7 +36,14 @@ async function getCatalog(): Promise<CatalogRow[]> {
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const action = params.get('action') || 'search';
-  const term = (params.get('q') || '').trim().toLocaleLowerCase('es-MX');
+  const normalizeSearch = (value: unknown) => String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\\u0300-\\u036f]/g, '')
+    .toLocaleLowerCase('es-MX')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\\s+/g, ' ');
+  const term = normalizeSearch(params.get('q'));
   const brandFilter = (params.get('brand') || '').trim().toLocaleLowerCase('es-MX');
   const yearFilter = params.get('year') || '';
   const modelFilter = (params.get('model') || '').trim().toLocaleLowerCase('es-MX');
