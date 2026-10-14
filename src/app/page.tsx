@@ -475,7 +475,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-2 border-t border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                   <span className="text-xs text-slate-500">Google Maps · Municipio seleccionado</span>
-                  <a className="inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMapArea + ', Estado de México, México')}`} target="_blank" rel="noopener noreferrer">
+                  <a className="inline-flex items-center gap-2 text-sm font-bold text-[#941B80] underline underline-offset-4" href="https://maps.app.goo.gl/NjsTE1j3iBgA5QvP7" target="_blank" rel="noopener noreferrer">
                     Abrir indicaciones <ExternalLink size={15} aria-hidden="true" />
                   </a>
                 </div>
