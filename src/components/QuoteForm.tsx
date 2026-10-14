@@ -66,7 +66,7 @@ export function QuoteForm() {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [search, manual, selected]);
+  }, [search, manual, selected, selectedBrand]);
 
   useEffect(() => {
     const action = step === 2 ? 'years' : step === 3 ? 'models' : step === 4 ? 'subbrands' : step === 5 ? 'versions' : '';
