@@ -117,7 +117,7 @@ export function QuoteForm() {
       trackEvent('quote_step_2_completed', { coverage });
       setStep(3);
     } else if (step === 3 && validate(['zip', 'age'])) {
-      trackEvent('quote_step_3_completed');
+      trackEvent('quote_step_2_completed', { step: 3, coverage });
       setStep(4);
     }
   }
