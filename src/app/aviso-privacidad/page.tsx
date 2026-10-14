@@ -25,9 +25,13 @@ export default function PrivacyPage() {
       <p className="mt-3 leading-7 text-slate-700">
         Antes de captar datos personales de forma pública, el responsable debe validar y publicar el aviso integral con su identidad y domicilio, las finalidades primarias y secundarias, las opciones para limitar el uso o divulgación, el mecanismo para ejercer derechos ARCO, las transferencias que correspondan, los plazos o criterios de conservación y el procedimiento para comunicar cambios al aviso. Esta información no se presume ni se completa con datos no verificados.
       </p>
+      <h2 className="mt-8 text-xl font-bold">Oficina de atención</h2>
+      <p className="mt-3 leading-7 text-slate-700">
+        ODQ Romero Rubio (Oficina de Desarrollo Quálitas). Dirección de atención: Av. Ferronales Nacionales, Poniente 110, colonia Centro, Cuautitlán, Estado de México, C.P. 54800.
+      </p>
       <h2 className="mt-8 text-xl font-bold">Contacto del sitio</h2>
       <p className="mt-3 leading-7 text-slate-700">
-        Para consultas generales sobre el sitio, puede escribir a <a className="underline" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>. Este contacto no sustituye la identificación legal del responsable del tratamiento que debe incorporarse al aviso integral.
+        Para consultas generales sobre el sitio, puede escribir a <a className="underline" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>. La oficina y su domicilio se indican como datos de atención; la identidad legal del responsable del tratamiento y los demás elementos del aviso integral siguen pendientes de validación.
       </p>
     </main>
   );
