@@ -13,6 +13,7 @@ type Vehicle = {
   brand: string;
   type: string;
   description: string;
+  subbrand?: string;
   years: string[];
 };
 
@@ -20,6 +21,13 @@ export function QuoteForm() {
   const [step, setStep] = useState(1);
   const [coverage, setCoverage] = useState('amplio');
   const [selectedBrand, setSelectedBrand] = useState('');
+  const [availableYears, setAvailableYears] = useState<string[]>([]);
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [availableSubbrands, setAvailableSubbrands] = useState<string[]>([]);
+  const [availableVersions, setAvailableVersions] = useState<Vehicle[]>([]);
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedModel, setSelectedModel] = useState('');
+  const [selectedSubbrand, setSelectedSubbrand] = useState('');
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<string, string>>({ usage: 'Particular' });
@@ -60,6 +68,34 @@ export function QuoteForm() {
     };
   }, [search, manual, selected]);
 
+  useEffect(() => {
+    const action = step === 2 ? 'years' : step === 3 ? 'models' : step === 4 ? 'subbrands' : step === 5 ? 'versions' : '';
+    if (!action || !selectedBrand) return;
+    const controller = new AbortController();
+    const params = new URLSearchParams({ action, brand: selectedBrand });
+    if (selectedYear) params.set('year', selectedYear);
+    if (selectedModel) params.set('model', selectedModel);
+    if (selectedSubbrand) params.set('subbrand', selectedSubbrand);
+    setLoading(true);
+    setCatalogError(false);
+    fetch('/api/vehicle-catalog?' + params.toString(), { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('No se pudo consultar el catálogo');
+        return response.json();
+      })
+      .then((payload) => {
+        if (action === 'years') setAvailableYears(payload.years ?? []);
+        if (action === 'models') setAvailableModels(payload.models ?? []);
+        if (action === 'subbrands') setAvailableSubbrands(payload.subbrands ?? []);
+        if (action === 'versions') setAvailableVersions(payload.versions ?? []);
+      })
+      .catch((error) => {
+        if (!(error instanceof Error && error.name === 'AbortError')) setCatalogError(true);
+      })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [step, selectedBrand, selectedYear, selectedModel, selectedSubbrand]);
+
   function validate(keys: string[]) {
     const nextErrors: Record<string, string> = {};
     keys.forEach((key) => {
@@ -89,12 +125,13 @@ export function QuoteForm() {
     setData((current) => ({
       ...current,
       brand: vehicle.brand,
-      model: vehicle.description || vehicle.type,
-      version: vehicle.type,
-      year: vehicle.years[vehicle.years.length - 1] || '',
+      model: vehicle.type,
+      version: vehicle.description || vehicle.type,
+      year: selectedYear || vehicle.years[vehicle.years.length - 1] || '',
       cate: vehicle.cate,
       cve: vehicle.cve,
       brandCode: vehicle.brandCode,
+      subbrand: vehicle.subbrand || selectedSubbrand,
     }));
     setErrors({});
   }
@@ -109,30 +146,20 @@ export function QuoteForm() {
   }
 
   function next() {
-    if (step === 1) {
-      if (selectedBrand) {
-        trackEvent('quote_step_1_completed');
-        setStep(2);
-      }
-    } else if (step === 2) {
-      if (manual) {
-        const keys = ['brand', 'model', 'version', 'year', 'vehicleType'];
-        if (validate(keys)) setStep(4);
-      } else if (selected) {
-        setStep(3);
+    if (step === 5) {
+      if (availableSubbrands.length === 0) {
+        setSelectedSubbrand('');
+        setStep(6);
+      } else if (selectedSubbrand) {
+        setStep(6);
       } else {
-        setErrors({ vehicle: 'Selecciona una versión del catálogo o captura los datos manualmente.' });
+        setErrors({ subbrand: 'Selecciona una submarca para continuar.' });
       }
-    } else if (step === 3) {
-      if (validate(['year'])) {
-        trackEvent('quote_step_2_completed', { stage: 'vehicle_confirmed' });
-        setStep(4);
-      }
-    } else if (step === 4) {
+    } else if (step === 6) {
       trackEvent('quote_step_2_completed', { coverage });
-      setStep(5);
-    } else if (step === 5 && validate(['zip', 'age'])) {
-      setStep(6);
+      setStep(7);
+    } else if (step === 7 && validate(['zip', 'age'])) {
+      setStep(8);
     }
   }
 
@@ -223,10 +250,12 @@ export function QuoteForm() {
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
             <p className="mt-2 max-w-xl text-slate-600">Avanza pantalla por pantalla: marca, modelo, versión, cobertura y datos de contacto. Guardaremos tu solicitud para seguimiento del asesor.</p>
           </div>
-          <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-3 lg:grid-cols-6 sm:text-sm">
+          <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-4 lg:grid-cols-8 sm:text-sm">
             {[
               { label: 'Marca', Icon: BadgeCheck },
+              { label: 'Año', Icon: ClipboardCheck },
               { label: 'Modelo', Icon: Car },
+              { label: 'Submarca', Icon: BadgeCheck },
               { label: 'Versión', Icon: ClipboardCheck },
               { label: 'Cobertura', Icon: ShieldCheck },
               { label: 'Conductor', Icon: UserRound },
@@ -241,7 +270,7 @@ export function QuoteForm() {
             ))}
           </ol>
         </div>
-        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 6) * 100) + '%' }} /></div>
+        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 8) * 100) + '%' }} /></div>
         <form onSubmit={submit} className="mt-7">
           <div className="grid gap-4 md:grid-cols-2">
             {step === 1 && (
@@ -264,7 +293,7 @@ export function QuoteForm() {
                       key={name}
                       type="button"
                       aria-label={name}
-                      onClick={() => { setSelectedBrand(name); setSelected(null); setManual(false); setSearch(name); setErrors({}); setStep(2); }}
+                      onClick={() => { setSelectedBrand(name); setSelected(null); setManual(false); setSearch(''); setSelectedYear(''); setSelectedModel(''); setSelectedSubbrand(''); setErrors({}); setStep(2); }}
                       className="focus-ring flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-slate-700 transition hover:-translate-y-0.5 hover:border-[#0096AE] hover:shadow-sm"
                     >
                       <img src={`/images/marcas/LogosCotizador/${logo}`} alt="" aria-hidden="true" loading="lazy" className="h-9 w-full max-w-28 object-contain" />
@@ -279,52 +308,54 @@ export function QuoteForm() {
             )}
             {step === 2 && (
               <div className="md:col-span-2">
-                {!manual && !selected && (
-                  <>
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <div><p className="text-sm font-bold text-qualitas-aqua">Marca seleccionada</p><p className="font-extrabold text-qualitas-purple">{selectedBrand || 'Todas las marcas'}</p></div>
-                      <button type="button" onClick={() => { setStep(1); setSearch(''); setSelectedBrand(''); setErrors({}); }} className="text-sm font-semibold underline">Cambiar marca</button>
-                    </div>
-                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">Busca el modelo o versión</label>
-                    <div className="relative">
-                      <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                      <input id="vehicle-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ej. Civic, Versa, Corolla…" autoComplete="off" className="focus-ring min-h-12 w-full rounded-xl border border-qualitas-border bg-white pl-10 pr-3" aria-describedby="vehicle-search-help" />
-                    </div>
-                    <p id="vehicle-search-help" className="mt-2 text-sm text-slate-500">Selecciona una coincidencia del catálogo para continuar a la confirmación de año y versión.</p>
-                    {loading && <p className="mt-3 text-sm text-slate-600" role="status">Buscando vehículos…</p>}
-                    {catalogError && <p className="mt-3 text-sm text-red-700" role="alert">No se pudo consultar el catálogo. Puedes capturar los datos manualmente.</p>}
-                    {results.length > 0 && (
-                      <ul className="mt-3 max-h-72 space-y-2 overflow-y-auto rounded-xl border border-qualitas-border p-2" aria-label="Resultados de vehículos">
-                        {results.map((vehicle, index) => (
-                          <li key={vehicle.cve + '-' + vehicle.cate + '-' + index}>
-                            <button type="button" onClick={() => chooseVehicle(vehicle)} className="focus-ring w-full rounded-lg px-3 py-3 text-left transition-colors hover:bg-slate-50">
-                              <span className="block font-semibold">{vehicle.brand} · {vehicle.type}</span>
-                              <span className="mt-1 block text-sm text-slate-600">{vehicle.description}</span>
-                              <span className="mt-1 block text-xs text-slate-500">Años disponibles: {vehicle.years.join(', ')}</span>
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {!loading && search.trim().length >= 2 && results.length === 0 && !catalogError && <p className="mt-3 text-sm text-slate-600">No encontramos coincidencias. Intenta otra búsqueda o captura los datos manualmente.</p>}
-                    <button type="button" onClick={startManual} className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Mi vehículo no aparece</button>
-                  </>
-                )}
-                {manual && (
-                  <div className="grid gap-4 rounded-xl border border-qualitas-border bg-slate-50 p-4 sm:grid-cols-2">
-                    <div className="sm:col-span-2"><p className="font-bold">Captura manual del vehículo</p><p className="mt-1 text-sm text-slate-600">Escribe los datos para que el asesor pueda identificar el vehículo.</p></div>
-                    {input('brand', 'Marca')}
-                    {input('model', 'Modelo / descripción')}
-                    {input('version', 'Versión')}
-                    {input('year', 'Año del vehículo', 'number')}
-                    {input('vehicleType', 'Tipo de vehículo (auto, pickup, moto, etc.)')}
-                    <button type="button" onClick={() => { setManual(false); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', vehicleType: '' })); }} className="focus-ring min-h-11 text-sm font-semibold underline sm:col-span-2">Volver a buscar en el catálogo</button>
-                  </div>
-                )}
-                {errors.vehicle && <p role="alert" className="mt-3 text-sm text-red-700">{errors.vehicle}</p>}
+                <h3 className="text-lg font-bold text-qualitas-purple">¿De qué año es tu auto?</h3>
+                <p className="mt-1 text-sm text-slate-600">Solo mostramos años disponibles para {selectedBrand} en el catálogo.</p>
+                {loading && <p role="status" className="mt-3 text-sm text-slate-600">Consultando años disponibles…</p>}
+                {catalogError && <p role="alert" className="mt-3 text-sm text-red-700">No se pudo cargar el catálogo. Intenta de nuevo.</p>}
+                <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                  {availableYears.map((year) => <button key={year} type="button" onClick={() => { setSelectedYear(year); setSelectedModel(''); setSelectedSubbrand(''); setSelected(null); setStep(3); }} className="focus-ring min-h-12 rounded-lg border border-slate-200 bg-white px-3 font-semibold hover:border-[#0096AE] hover:bg-cyan-50">{year}</button>)}
+                </div>
+                {!loading && availableYears.length === 0 && !catalogError && <p className="mt-4 text-sm text-slate-600">No encontramos años para esta marca. Puedes capturar los datos manualmente.</p>}
+                <button type="button" onClick={() => { setManual(true); startManual(); setStep(8); }} className="focus-ring mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Capturar vehículo manualmente</button>
               </div>
             )}
-            {step === 3 && (
+            {step === 6 && (
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-bold text-qualitas-purple">Elige el modelo</h3>
+                <p className="mt-1 text-sm text-slate-600">{selectedBrand} · {selectedYear}</p>
+                {loading && <p role="status" className="mt-3 text-sm text-slate-600">Buscando modelos…</p>}
+                {catalogError && <p role="alert" className="mt-3 text-sm text-red-700">No se pudo cargar el catálogo.</p>}
+                <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {availableModels.map((model) => <button key={model} type="button" onClick={() => { setSelectedModel(model); setSelectedSubbrand(''); setSelected(null); setStep(4); }} className="focus-ring min-h-14 rounded-xl border border-slate-200 bg-white p-4 text-left font-semibold hover:border-[#0096AE] hover:bg-cyan-50">{model}</button>)}
+                </div>
+                {!loading && availableModels.length === 0 && !catalogError && <p className="mt-4 text-sm text-slate-600">No hay modelos disponibles para este año.</p>}
+              </div>
+            )}
+            {step === 7 && (
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-bold text-qualitas-purple">Elige la submarca</h3>
+                <p className="mt-1 text-sm text-slate-600">{selectedBrand} · {selectedYear} · {selectedModel}</p>
+                {loading && <p role="status" className="mt-3 text-sm text-slate-600">Buscando submarcas…</p>}
+                {catalogError && <p role="alert" className="mt-3 text-sm text-red-700">No se pudo cargar el catálogo.</p>}
+                <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {availableSubbrands.map((subbrand) => <button key={subbrand} type="button" onClick={() => { setSelectedSubbrand(subbrand); setSelected(null); setStep(5); }} className="focus-ring min-h-14 rounded-xl border border-slate-200 bg-white p-4 text-left font-semibold hover:border-[#0096AE] hover:bg-cyan-50">{subbrand}</button>)}
+                </div>
+                {!loading && availableSubbrands.length === 0 && !catalogError && <div className="mt-4 rounded-xl bg-slate-50 p-4"><p className="text-sm text-slate-600">Este modelo no tiene submarcas separadas en el catálogo.</p><button type="button" onClick={() => { setSelectedSubbrand(''); setStep(5); }} className="focus-ring mt-3 rounded-xl bg-qualitas-purple px-5 py-3 font-bold text-white">Continuar</button></div>}
+              </div>
+            )}
+            {step === 5 && (
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-bold text-qualitas-purple">Elige la versión</h3>
+                <p className="mt-1 text-sm text-slate-600">{selectedBrand} · {selectedYear} · {selectedModel}{selectedSubbrand ? ' · ' + selectedSubbrand : ''}</p>
+                {loading && <p role="status" className="mt-3 text-sm text-slate-600">Buscando versiones disponibles…</p>}
+                {catalogError && <p role="alert" className="mt-3 text-sm text-red-700">No se pudo cargar el catálogo.</p>}
+                <div className="mt-5 space-y-2">
+                  {availableVersions.map((version, index) => <button key={version.cve + '-' + index} type="button" onClick={() => { setSelected(version); setData((current) => ({ ...current, brand: version.brand, model: version.type, version: version.description || version.type, year: selectedYear, cate: version.cate, cve: version.cve, brandCode: version.brandCode, vehicleType: '', subbrand: version.subbrand || selectedSubbrand })); setStep(6); }} className="focus-ring w-full rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-[#0096AE] hover:bg-cyan-50"><span className="block font-semibold">{version.description || version.type}</span><span className="mt-1 block text-sm text-slate-600">Año {selectedYear}{version.subbrand ? ' · ' + version.subbrand : ''}</span></button>)}
+                </div>
+                {!loading && availableVersions.length === 0 && !catalogError && <p className="mt-4 text-sm text-slate-600">No hay versiones para esta selección.</p>}
+              </div>
+            )}
+                        {step === 3 && (
               <div className="md:col-span-2">
                 {selected ? (
                   <div className="rounded-xl border border-qualitas-aqua/40 bg-cyan-50 p-4">
@@ -385,7 +416,7 @@ export function QuoteForm() {
                 <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">Información orientativa basada en las referencias visuales proporcionadas. Coberturas, deducibles, límites y sumas aseguradas deben confirmarse en la propuesta oficial y la carátula de la póliza; pueden variar según el vehículo y los criterios de aceptación.</p>
               </div>
             )}
-            {step === 5 && <>
+            {step === 7 && <>
               {input('zip', 'Código postal', 'text')}
               {input('age', 'Edad del conductor', 'number')}
               <fieldset className="md:col-span-2">
@@ -395,7 +426,7 @@ export function QuoteForm() {
                 </div>
               </fieldset>
             </>}
-            {step === 6 && <>
+            {step === 8 && <>
               {input('name', 'Nombre completo')}
               {input('phone', 'Teléfono / WhatsApp', 'tel')}
               {input('email', 'Correo electrónico', 'email')}
@@ -408,7 +439,7 @@ export function QuoteForm() {
           {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
-            {step < 6 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
+            {step < 8 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
           </div>
           <div className="mt-5 rounded-xl border border-[#0096AE]/20 bg-cyan-50/60 p-4">
             <p className="text-sm font-bold text-slate-800">¿Qué pasa después?</p>
