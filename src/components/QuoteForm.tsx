@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle, MessageCircle, Search, CarFront } from 'lucide-react';
+import { CheckCircle, MessageCircle, Search, CarFront, BadgeCheck, Car, ClipboardCheck, ShieldCheck, UserRound, ContactRound } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { whatsappMessages } from '@/config/site';
 import { trackEvent } from '@/lib/analytics';
@@ -224,9 +224,19 @@ export function QuoteForm() {
             <p className="mt-2 max-w-xl text-slate-600">Avanza pantalla por pantalla: marca, modelo, versión, cobertura y datos de contacto. Guardaremos tu solicitud para seguimiento del asesor.</p>
           </div>
           <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-3 lg:grid-cols-6 sm:text-sm">
-            {['Marca', 'Modelo', 'Versión', 'Cobertura', 'Conductor', 'Contacto'].map((label, index) => (
-              <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-3 py-3 ' + (step === index + 1 ? 'bg-qualitas-purple text-white' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
-                <span className="mb-1 block text-xs">{step > index + 1 ? '✓' : '0' + (index + 1)}</span>{label}
+            {[
+              { label: 'Marca', Icon: BadgeCheck },
+              { label: 'Modelo', Icon: Car },
+              { label: 'Versión', Icon: ClipboardCheck },
+              { label: 'Cobertura', Icon: ShieldCheck },
+              { label: 'Conductor', Icon: UserRound },
+              { label: 'Contacto', Icon: ContactRound },
+            ].map(({ label, Icon }, index) => (
+              <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-2 py-3 transition-colors ' + (step === index + 1 ? 'bg-qualitas-purple text-white shadow-sm' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
+                <span className="mb-1 flex justify-center" aria-hidden="true">
+                  {step > index + 1 ? <CheckCircle size={20} strokeWidth={2.5} /> : <Icon size={20} strokeWidth={2} />}
+                </span>
+                <span className="block">{label}</span>
               </li>
             ))}
           </ol>
