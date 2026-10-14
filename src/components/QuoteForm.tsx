@@ -117,8 +117,15 @@ export function QuoteForm() {
   }
 
   function chooseVehicle(vehicle: Vehicle) {
+    const vehicleYear = selectedYear && vehicle.years.includes(selectedYear)
+      ? selectedYear
+      : [...vehicle.years].sort((a, b) => Number(b) - Number(a))[0] || '';
     setSelected(vehicle);
-    setStep(3);
+    setSelectedBrand(vehicle.brand);
+    setSelectedYear(vehicleYear);
+    setSelectedModel(vehicle.type);
+    setSelectedSubbrand(vehicle.subbrand || '');
+    setStep(6);
     setManual(false);
     setSearch('');
     setResults([]);
@@ -127,11 +134,11 @@ export function QuoteForm() {
       brand: vehicle.brand,
       model: vehicle.type,
       version: vehicle.description || vehicle.type,
-      year: selectedYear || vehicle.years[vehicle.years.length - 1] || '',
+      year: vehicleYear,
       cate: vehicle.cate,
       cve: vehicle.cve,
       brandCode: vehicle.brandCode,
-      subbrand: vehicle.subbrand || selectedSubbrand,
+      subbrand: vehicle.subbrand || '',
     }));
     setErrors({});
   }
@@ -278,7 +285,43 @@ export function QuoteForm() {
             {step === 1 && (
               <div className="md:col-span-2">
                 <h3 className="mb-2 text-lg font-bold text-qualitas-purple">¿Qué marca es tu auto?</h3>
-                <p className="mb-5 text-sm text-slate-600">Selecciona una marca para consultar los modelos disponibles.</p>
+                <p className="mb-5 text-sm text-slate-600">Busca por marca, modelo, versión o año, o selecciona una marca del catálogo.</p>
+                <div className="mb-6">
+                  <label htmlFor="vehicle-search" className="mb-2 block text-sm font-bold text-slate-800">Buscar mi vehículo</label>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-qualitas-aqua" size={21} aria-hidden="true" />
+                    <input
+                      id="vehicle-search"
+                      type="search"
+                      value={search}
+                      onChange={(event) => { setSearch(event.target.value); setSelected(null); setManual(false); }}
+                      placeholder="Ej. Nissan Versa 2022, Honda CR-V..."
+                      autoComplete="off"
+                      className="focus-ring min-h-14 w-full rounded-2xl border border-slate-300 bg-white pl-12 pr-4 text-base shadow-sm"
+                      aria-describedby="vehicle-search-help"
+                    />
+                  </div>
+                  <p id="vehicle-search-help" className="mt-2 text-xs text-slate-500">Escribe al menos 2 caracteres. Puedes buscar por marca, modelo, versión o año.</p>
+                  {loading && search.trim().length >= 2 && <p role="status" className="mt-3 text-sm text-slate-600">Buscando vehículos en el catálogo…</p>}
+                  {catalogError && search.trim().length >= 2 && <p role="alert" className="mt-3 text-sm text-red-700">No se pudo consultar el catálogo. Puedes intentar de nuevo o elegir una marca.</p>}
+                  {search.trim().length >= 2 && !loading && !catalogError && (
+                    <div className="mt-3 space-y-2" aria-live="polite">
+                      {results.length > 0 ? results.map((vehicle, index) => (
+                        <button key={vehicle.cve + '-' + index} type="button" onClick={() => chooseVehicle(vehicle)} className="focus-ring flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-[#0096AE] hover:bg-cyan-50">
+                          <span className="min-w-0">
+                            <span className="block font-bold text-slate-900">{vehicle.brand} {vehicle.type}</span>
+                            <span className="mt-1 block text-sm text-slate-600">{vehicle.description || vehicle.subbrand || 'Versión registrada en catálogo'}</span>
+                            <span className="mt-1 block text-xs text-slate-500">Años disponibles: {vehicle.years.slice().sort((a, b) => Number(b) - Number(a)).slice(0, 6).join(', ') || 'Consultar con asesor'}</span>
+                          </span>
+                          <span className="shrink-0 rounded-lg bg-[#941B80] px-3 py-2 text-sm font-bold text-white">Elegir</span>
+                        </button>
+                      )) : <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">No encontramos coincidencias. Prueba con otra palabra o selecciona la marca abajo.</p>}
+                    </div>
+                  )}
+                </div>
+                <div className="mb-4 border-t border-slate-200 pt-5">
+                  <h4 className="mb-3 text-sm font-bold text-slate-700">O selecciona una marca</h4>
+                </div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
                   {[
                     { name: 'Honda', logo: 'Honda.png' },
