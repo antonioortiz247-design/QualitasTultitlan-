@@ -319,7 +319,7 @@ export function QuoteForm() {
                 <button type="button" onClick={() => { setManual(true); startManual(); setStep(8); }} className="focus-ring mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Capturar vehículo manualmente</button>
               </div>
             )}
-            {step === 6 && (
+            {step === 3 && (
               <div className="md:col-span-2">
                 <h3 className="text-lg font-bold text-qualitas-purple">Elige el modelo</h3>
                 <p className="mt-1 text-sm text-slate-600">{selectedBrand} · {selectedYear}</p>
@@ -331,7 +331,7 @@ export function QuoteForm() {
                 {!loading && availableModels.length === 0 && !catalogError && <p className="mt-4 text-sm text-slate-600">No hay modelos disponibles para este año.</p>}
               </div>
             )}
-            {step === 7 && (
+            {step === 4 && (
               <div className="md:col-span-2">
                 <h3 className="text-lg font-bold text-qualitas-purple">Elige la submarca</h3>
                 <p className="mt-1 text-sm text-slate-600">{selectedBrand} · {selectedYear} · {selectedModel}</p>
@@ -355,30 +355,7 @@ export function QuoteForm() {
                 {!loading && availableVersions.length === 0 && !catalogError && <p className="mt-4 text-sm text-slate-600">No hay versiones para esta selección.</p>}
               </div>
             )}
-                        {step === 3 && (
-              <div className="md:col-span-2">
-                {selected ? (
-                  <div className="rounded-xl border border-qualitas-aqua/40 bg-cyan-50 p-4">
-                    <p className="text-sm font-bold text-qualitas-aqua">Confirma tu vehículo</p>
-                    <p className="mt-1 font-semibold">{selected.brand} · {selected.type}</p>
-                    <p className="mt-1 text-sm text-slate-700">{selected.description}</p>
-                    <label className="mt-3 block text-sm font-semibold" htmlFor="year">Año del vehículo</label>
-                    <select id="year" value={data.year ?? ''} onChange={(e) => setData((current) => ({ ...current, year: e.target.value }))} className="focus-ring mt-1 min-h-12 w-full rounded-lg border border-qualitas-border bg-white px-3">
-                      {selected.years.map((year) => <option key={year} value={year}>{year}</option>)}
-                    </select>
-                    {errors.year && <p className="mt-1 text-sm text-red-700">{errors.year}</p>}
-                    <button type="button" onClick={() => { setSelected(null); setSearch(selectedBrand); setStep(2); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', cate: '', cve: '', brandCode: '' })); }} className="mt-3 text-sm font-semibold underline">Elegir otra versión</button>
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-qualitas-border p-4">
-                    <p className="font-bold">Datos del vehículo</p>
-                    <p className="mt-1 text-sm text-slate-600">{data.brand} {data.model} · {data.version} · {data.year}</p>
-                    <button type="button" onClick={() => setStep(2)} className="mt-3 text-sm font-semibold underline">Editar vehículo</button>
-                  </div>
-                )}
-              </div>
-            )}
-                        {step === 4 && (
+                        {step === 6 && (
               <div className="md:col-span-2">
                 <h3 className="text-center text-xl font-extrabold text-qualitas-aqua sm:text-2xl">Elige una opción de cobertura</h3>
                 <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600">Selecciona el paquete que quieres consultar. No se muestra un precio porque la prima debe calcularse con el sistema autorizado de Quálitas.</p>
