@@ -146,7 +146,9 @@ export function QuoteForm() {
   }
 
   function next() {
-    if (step === 5) {
+    if (step === 2 && manual) {
+      if (validate(['brand', 'model', 'version', 'year', 'vehicleType'])) setStep(6);
+    } else if (step === 5) {
       if (availableSubbrands.length === 0) {
         setSelectedSubbrand('');
         setStep(6);
@@ -308,6 +310,17 @@ export function QuoteForm() {
             )}
             {step === 2 && (
               <div className="md:col-span-2">
+                {manual ? (
+                  <div className="grid gap-4 rounded-xl border border-qualitas-border bg-slate-50 p-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2"><h3 className="text-lg font-bold text-qualitas-purple">Captura los datos de tu vehículo</h3><p className="mt-1 text-sm text-slate-600">No encontramos el vehículo en el catálogo; completa estos campos para continuar.</p></div>
+                    {input('brand', 'Marca')}
+                    {input('model', 'Modelo')}
+                    {input('version', 'Versión')}
+                    {input('year', 'Año del vehículo', 'number')}
+                    {input('vehicleType', 'Tipo de vehículo')}
+                    <button type="button" onClick={() => { setManual(false); setStep(1); }} className="text-left text-sm font-semibold underline sm:col-span-2">Volver a elegir una marca</button>
+                  </div>
+                ) : <>
                 <h3 className="text-lg font-bold text-qualitas-purple">¿De qué año es tu auto?</h3>
                 <p className="mt-1 text-sm text-slate-600">Solo mostramos años disponibles para {selectedBrand} en el catálogo.</p>
                 {loading && <p role="status" className="mt-3 text-sm text-slate-600">Consultando años disponibles…</p>}
@@ -316,7 +329,8 @@ export function QuoteForm() {
                   {availableYears.map((year) => <button key={year} type="button" onClick={() => { setSelectedYear(year); setSelectedModel(''); setSelectedSubbrand(''); setSelected(null); setStep(3); }} className="focus-ring min-h-12 rounded-lg border border-slate-200 bg-white px-3 font-semibold hover:border-[#0096AE] hover:bg-cyan-50">{year}</button>)}
                 </div>
                 {!loading && availableYears.length === 0 && !catalogError && <p className="mt-4 text-sm text-slate-600">No encontramos años para esta marca. Puedes capturar los datos manualmente.</p>}
-                <button type="button" onClick={() => { setManual(true); startManual(); setStep(8); }} className="focus-ring mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Capturar vehículo manualmente</button>
+                <button type="button" onClick={() => { startManual(); setStep(2); }} className="focus-ring mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Capturar vehículo manualmente</button>
+                </>}
               </div>
             )}
             {step === 3 && (
