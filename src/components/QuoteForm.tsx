@@ -224,7 +224,15 @@ export function QuoteForm() {
               <div className="md:col-span-2">
                 {!manual && !selected && (
                   <>
-                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">Busca por marca, tipo o versión</label>
+                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">¿Qué marca es tu auto?</label>
+                    <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                      {['Honda', 'Chevrolet', 'Hyundai', 'Volkswagen', 'Toyota', 'Ford', 'Nissan', 'Kia', 'Mazda'].map((brand) => (
+                        <button key={brand} type="button" onClick={() => { setSelected(null); setManual(false); setSearch(brand); }} className={'focus-ring min-h-14 rounded-xl border px-3 py-3 text-sm font-extrabold transition hover:-translate-y-0.5 hover:shadow-sm ' + (search.toLowerCase() === brand.toLowerCase() ? 'border-[#941B80] bg-[#941B80]/5 text-[#941B80]' : 'border-slate-200 bg-white text-slate-700 hover:border-[#0096AE]')}>
+                          {brand}
+                        </button>
+                      ))}
+                    </div>
+                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">Si tu auto es de otra marca, búscala aquí</label>
                     <div className="relative">
                       <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
                       <input id="vehicle-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ej. Nissan Versa, Toyota Corolla…" autoComplete="off" className="focus-ring min-h-12 w-full rounded-xl border border-qualitas-border bg-white pl-10 pr-3" aria-describedby="vehicle-search-help" />
