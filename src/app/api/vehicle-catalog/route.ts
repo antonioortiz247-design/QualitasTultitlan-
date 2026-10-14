@@ -38,11 +38,11 @@ export async function GET(request: NextRequest) {
   const action = params.get('action') || 'search';
   const normalizeSearch = (value: unknown) => String(value ?? '')
     .normalize('NFD')
-    .replace(/[\\u0300-\\u036f]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLocaleLowerCase('es-MX')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
-    .replace(/\\s+/g, ' ');
+    .replace(/\s+/g, ' ');
   const term = normalizeSearch(params.get('q'));
   const brandFilter = (params.get('brand') || '').trim().toLocaleLowerCase('es-MX');
   const yearFilter = params.get('year') || '';
@@ -86,15 +86,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ versions: versions.slice(0, 200) });
     }
 
-    if (term.length < 2) return NextResponse.json({ vehicles: [] });
-    const words = term.split(/\\s+/).filter(Boolean);
+    if (term.replace(/\s/g, '').length < 2) return NextResponse.json({ vehicles: [] });
+    const words = term.split(/\s+/).filter(Boolean);
     const matches = catalog
       .map((row) => {
         const brand = row.b || row.r || '';
         const type = row.t || '';
         const description = row.d || '';
-        const haystack = [brand, type, description, row.s || '', ...(row.y || [])].join(' ').toLocaleLowerCase('es-MX');
-        const score = words.reduce((total, word) => total + (haystack.includes(word) ? 1 : 0), 0);
+        const subbrand = row.s || '';
+        const years = Array.isArray(row.y) ? row.y.map(String) : [];
+        const haystack = [brand, type, description, subbrand, ...years, row.v || '', row.c || '', row.r || '']
+          .map(normalizeSearch)
+          .join(' ');
+        const score = words.reduce((total, word) => (haystack.includes(word) ? total + 1 : total), 0);
         return { row, brand, type, description, score };
       })
       .filter((item) => item.score === words.length)
