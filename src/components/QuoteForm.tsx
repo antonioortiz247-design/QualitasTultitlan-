@@ -19,6 +19,7 @@ type Vehicle = {
 export function QuoteForm() {
   const [step, setStep] = useState(1);
   const [coverage, setCoverage] = useState('amplio');
+  const [selectedBrand, setSelectedBrand] = useState('');
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<string, string>>({ usage: 'Particular' });
@@ -43,7 +44,7 @@ export function QuoteForm() {
       setLoading(true);
       setCatalogError(false);
       try {
-        const response = await fetch('/api/vehicle-catalog?q=' + encodeURIComponent(term), { signal: controller.signal });
+        const response = await fetch('/api/vehicle-catalog?q=' + encodeURIComponent(selectedBrand && !term.toLocaleLowerCase('es-MX').includes(selectedBrand.toLocaleLowerCase('es-MX')) ? selectedBrand + ' ' + term : term), { signal: controller.signal });
         if (!response.ok) throw new Error('No se pudo consultar el catálogo');
         const payload = await response.json();
         setResults(payload.vehicles ?? []);
@@ -81,6 +82,7 @@ export function QuoteForm() {
 
   function chooseVehicle(vehicle: Vehicle) {
     setSelected(vehicle);
+    setStep(3);
     setManual(false);
     setSearch('');
     setResults([]);
@@ -108,17 +110,29 @@ export function QuoteForm() {
 
   function next() {
     if (step === 1) {
-      const keys = manual ? ['brand', 'model', 'version', 'year', 'vehicleType'] : ['brand', 'model', 'version', 'year'];
-      if (validate(keys)) {
+      if (selectedBrand) {
         trackEvent('quote_step_1_completed');
         setStep(2);
       }
     } else if (step === 2) {
+      if (manual) {
+        const keys = ['brand', 'model', 'version', 'year', 'vehicleType'];
+        if (validate(keys)) setStep(4);
+      } else if (selected) {
+        setStep(3);
+      } else {
+        setErrors({ vehicle: 'Selecciona una versión del catálogo o captura los datos manualmente.' });
+      }
+    } else if (step === 3) {
+      if (validate(['year'])) {
+        trackEvent('quote_step_2_completed', { stage: 'vehicle_confirmed' });
+        setStep(4);
+      }
+    } else if (step === 4) {
       trackEvent('quote_step_2_completed', { coverage });
-      setStep(3);
-    } else if (step === 3 && validate(['zip', 'age'])) {
-      trackEvent('quote_step_2_completed', { step: 3, coverage });
-      setStep(4);
+      setStep(5);
+    } else if (step === 5 && validate(['zip', 'age'])) {
+      setStep(6);
     }
   }
 
@@ -207,60 +221,41 @@ export function QuoteForm() {
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Cotizador orientativo</p>
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
-            <p className="mt-2 max-w-xl text-slate-600">Completa los tres pasos. Guardaremos tus datos para que un asesor pueda dar seguimiento a tu solicitud.</p>
+            <p className="mt-2 max-w-xl text-slate-600">Avanza pantalla por pantalla: marca, modelo, versión, cobertura y datos de contacto. Guardaremos tu solicitud para seguimiento del asesor.</p>
           </div>
           <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-4 sm:text-sm">
-            {['Vehículo', 'Cobertura', 'Conductor', 'Contacto'].map((label, index) => (
+            {['Marca', 'Modelo', 'Versión', 'Cobertura', 'Conductor', 'Contacto'].map((label, index) => (
               <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-3 py-3 ' + (step === index + 1 ? 'bg-qualitas-purple text-white' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
                 <span className="mb-1 block text-xs">{step > index + 1 ? '✓' : '0' + (index + 1)}</span>{label}
               </li>
             ))}
           </ol>
         </div>
-        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 4) * 100) + '%' }} /></div>
+        <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 6) * 100) + '%' }} /></div>
         <form onSubmit={submit} className="mt-7">
           <div className="grid gap-4 md:grid-cols-2">
             {step === 1 && (
               <div className="md:col-span-2">
                 {!manual && !selected && (
                   <>
-                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">¿Qué marca es tu auto?</label>
-                    <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-                      {[
-                        { name: 'Honda', logo: 'Honda.png' },
-                        { name: 'Chevrolet', logo: 'Chevrolet.png' },
-                        { name: 'Hyundai', logo: 'Hyundai.png' },
-                        { name: 'Volkswagen', logo: 'Volkswagen.png' },
-                        { name: 'Toyota', logo: 'Toyota.png' },
-                        { name: 'Ford', logo: 'Ford.png' },
-                        { name: 'Nissan', logo: 'Nissan.png' },
-                        { name: 'Kia', logo: 'Kia.png' },
-                        { name: 'Mazda', logo: 'Mazda.png' },
-                      ].map(({ name, logo }) => (
-                        <button
-                          key={name}
-                          type="button"
-                          aria-label={name}
-                          onClick={() => { setSelected(null); setManual(false); setSearch(name); }}
-                          className={'focus-ring flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border px-3 py-3 transition hover:-translate-y-0.5 hover:shadow-sm ' + (search.toLowerCase() === name.toLowerCase() ? 'border-[#941B80] bg-[#941B80]/5 text-[#941B80]' : 'border-slate-200 bg-white text-slate-700 hover:border-[#0096AE]')}
-                        >
-                          <img
-                            src={`/images/marcas/LogosCotizador/${logo}`}
-                            alt=""
-                            aria-hidden="true"
-                            loading="lazy"
-                            className="h-9 w-full max-w-28 object-contain"
-                          />
-                          <span className="text-xs font-semibold">{name}</span>
-                        </button>
-                      ))}
+                  </>
+                )}
+              </div>
+            )}
+            {step === 2 && (
+              <div className="md:col-span-2">
+                {!manual && !selected && (
+                  <>
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div><p className="text-sm font-bold text-qualitas-aqua">Marca seleccionada</p><p className="font-extrabold text-qualitas-purple">{selectedBrand || 'Todas las marcas'}</p></div>
+                      <button type="button" onClick={() => { setStep(1); setSearch(''); setSelectedBrand(''); setErrors({}); }} className="text-sm font-semibold underline">Cambiar marca</button>
                     </div>
-                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">Si tu auto es de otra marca, búscala aquí</label>
+                    <label htmlFor="vehicle-search" className="mb-2 block text-sm font-semibold">Busca el modelo o versión</label>
                     <div className="relative">
                       <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                      <input id="vehicle-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ej. Nissan Versa, Toyota Corolla…" autoComplete="off" className="focus-ring min-h-12 w-full rounded-xl border border-qualitas-border bg-white pl-10 pr-3" aria-describedby="vehicle-search-help" />
+                      <input id="vehicle-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ej. Civic, Versa, Corolla…" autoComplete="off" className="focus-ring min-h-12 w-full rounded-xl border border-qualitas-border bg-white pl-10 pr-3" aria-describedby="vehicle-search-help" />
                     </div>
-                    <p id="vehicle-search-help" className="mt-2 text-sm text-slate-500">Escribe al menos dos caracteres. El catálogo incluye distintas categorías de vehículos.</p>
+                    <p id="vehicle-search-help" className="mt-2 text-sm text-slate-500">Selecciona una coincidencia del catálogo para continuar a la confirmación de año y versión.</p>
                     {loading && <p className="mt-3 text-sm text-slate-600" role="status">Buscando vehículos…</p>}
                     {catalogError && <p className="mt-3 text-sm text-red-700" role="alert">No se pudo consultar el catálogo. Puedes capturar los datos manualmente.</p>}
                     {results.length > 0 && (
@@ -280,19 +275,6 @@ export function QuoteForm() {
                     <button type="button" onClick={startManual} className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 py-2 font-semibold text-qualitas-aqua"><CarFront size={18} aria-hidden="true" />Mi vehículo no aparece</button>
                   </>
                 )}
-                {selected && (
-                  <div className="rounded-xl border border-qualitas-aqua/40 bg-cyan-50 p-4">
-                    <p className="text-sm font-bold text-qualitas-aqua">Vehículo seleccionado del catálogo</p>
-                    <p className="mt-1 font-semibold">{selected.brand} · {selected.type}</p>
-                    <p className="mt-1 text-sm text-slate-700">{selected.description}</p>
-                    <label className="mt-3 block text-sm font-semibold" htmlFor="year">Año del vehículo</label>
-                    <select id="year" value={data.year ?? ''} onChange={(e) => setData((current) => ({ ...current, year: e.target.value }))} className="focus-ring mt-1 min-h-12 w-full rounded-lg border border-qualitas-border bg-white px-3">
-                      {selected.years.map((year) => <option key={year} value={year}>{year}</option>)}
-                    </select>
-                    {errors.year && <p className="mt-1 text-sm text-red-700">{errors.year}</p>}
-                    <button type="button" onClick={() => { setSelected(null); setSearch(''); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', cate: '', cve: '', brandCode: '' })); }} className="mt-3 text-sm font-semibold underline">Elegir otro vehículo</button>
-                  </div>
-                )}
                 {manual && (
                   <div className="grid gap-4 rounded-xl border border-qualitas-border bg-slate-50 p-4 sm:grid-cols-2">
                     <div className="sm:col-span-2"><p className="font-bold">Captura manual del vehículo</p><p className="mt-1 text-sm text-slate-600">Escribe los datos para que el asesor pueda identificar el vehículo.</p></div>
@@ -304,9 +286,33 @@ export function QuoteForm() {
                     <button type="button" onClick={() => { setManual(false); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', vehicleType: '' })); }} className="focus-ring min-h-11 text-sm font-semibold underline sm:col-span-2">Volver a buscar en el catálogo</button>
                   </div>
                 )}
+                {errors.vehicle && <p role="alert" className="mt-3 text-sm text-red-700">{errors.vehicle}</p>}
               </div>
             )}
-            {step === 2 && (
+            {step === 3 && (
+              <div className="md:col-span-2">
+                {selected ? (
+                  <div className="rounded-xl border border-qualitas-aqua/40 bg-cyan-50 p-4">
+                    <p className="text-sm font-bold text-qualitas-aqua">Confirma tu vehículo</p>
+                    <p className="mt-1 font-semibold">{selected.brand} · {selected.type}</p>
+                    <p className="mt-1 text-sm text-slate-700">{selected.description}</p>
+                    <label className="mt-3 block text-sm font-semibold" htmlFor="year">Año del vehículo</label>
+                    <select id="year" value={data.year ?? ''} onChange={(e) => setData((current) => ({ ...current, year: e.target.value }))} className="focus-ring mt-1 min-h-12 w-full rounded-lg border border-qualitas-border bg-white px-3">
+                      {selected.years.map((year) => <option key={year} value={year}>{year}</option>)}
+                    </select>
+                    {errors.year && <p className="mt-1 text-sm text-red-700">{errors.year}</p>}
+                    <button type="button" onClick={() => { setSelected(null); setSearch(selectedBrand); setStep(2); setData((current) => ({ ...current, brand: '', model: '', version: '', year: '', cate: '', cve: '', brandCode: '' })); }} className="mt-3 text-sm font-semibold underline">Elegir otra versión</button>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-qualitas-border p-4">
+                    <p className="font-bold">Datos del vehículo</p>
+                    <p className="mt-1 text-sm text-slate-600">{data.brand} {data.model} · {data.version} · {data.year}</p>
+                    <button type="button" onClick={() => setStep(2)} className="mt-3 text-sm font-semibold underline">Editar vehículo</button>
+                  </div>
+                )}
+              </div>
+            )}
+                        {step === 4 && (
               <div className="md:col-span-2">
                 <h3 className="text-center text-xl font-extrabold text-qualitas-aqua sm:text-2xl">Elige una opción de cobertura</h3>
                 <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600">Selecciona el paquete que quieres consultar. No se muestra un precio porque la prima debe calcularse con el sistema autorizado de Quálitas.</p>
@@ -344,7 +350,7 @@ export function QuoteForm() {
                 <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">Información orientativa basada en las referencias visuales proporcionadas. Coberturas, deducibles, límites y sumas aseguradas deben confirmarse en la propuesta oficial y la carátula de la póliza; pueden variar según el vehículo y los criterios de aceptación.</p>
               </div>
             )}
-            {step === 3 && <>
+            {step === 5 && <>
               {input('zip', 'Código postal', 'text')}
               {input('age', 'Edad del conductor', 'number')}
               <fieldset className="md:col-span-2">
@@ -354,7 +360,7 @@ export function QuoteForm() {
                 </div>
               </fieldset>
             </>}
-            {step === 4 && <>
+            {step === 6 && <>
               {input('name', 'Nombre completo')}
               {input('phone', 'Teléfono / WhatsApp', 'tel')}
               {input('email', 'Correo electrónico', 'email')}
@@ -364,6 +370,21 @@ export function QuoteForm() {
               </div>
             </>}
           </div>
+          {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
+          <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
+            {step < 6 ? <button type="button" onClick={next} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 sm:min-w-44">Continuar</button> : <button type="submit" disabled={saving} className="focus-ring min-h-12 rounded-xl bg-qualitas-purple px-6 py-3 font-bold text-white transition-colors hover:brightness-90 disabled:cursor-wait disabled:opacity-60 sm:min-w-52">{saving ? 'Enviando solicitud…' : 'Solicitar cotización'}</button>}
+          </div>
+          <div className="mt-5 rounded-xl border border-[#0096AE]/20 bg-cyan-50/60 p-4">
+            <p className="text-sm font-bold text-slate-800">¿Qué pasa después?</p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">Registraremos tu solicitud para dar seguimiento. El asesor revisará los datos y podrá orientarte sobre las opciones disponibles. Este formulario no genera una póliza ni una cotización oficial.</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">Tus datos se utilizarán conforme al <a className="font-semibold underline underline-offset-2" href="/aviso-privacidad">Aviso de Privacidad</a>.</p>
+          </div>
+        </form>
+      </div>
+    </section>
+  );
+}
           {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             {step > 1 && <button type="button" onClick={() => { setErrors({}); setStep(step - 1); }} className="focus-ring min-h-12 rounded-xl border border-qualitas-border px-5 font-bold">Regresar</button>}
