@@ -15,6 +15,7 @@ type CatalogRow = {
   d?: string;
   y?: string[];
   s?: string;
+
 };
 
 let cachedCatalog: CatalogRow[] | null = null;
@@ -33,31 +34,68 @@ async function getCatalog(): Promise<CatalogRow[]> {
 }
 
 export async function GET(request: NextRequest) {
-  const term = (request.nextUrl.searchParams.get('q') || '').trim().toLocaleLowerCase('es-MX');
-  if (term.length < 2) return NextResponse.json({ vehicles: [] });
+  const params = request.nextUrl.searchParams;
+  const action = params.get('action') || 'search';
+  const term = (params.get('q') || '').trim().toLocaleLowerCase('es-MX');
+  const brandFilter = (params.get('brand') || '').trim().toLocaleLowerCase('es-MX');
+  const yearFilter = params.get('year') || '';
+  const modelFilter = (params.get('model') || '').trim().toLocaleLowerCase('es-MX');
+  const subbrandFilter = (params.get('subbrand') || '').trim().toLocaleLowerCase('es-MX');
 
   try {
     const catalog = await getCatalog();
-    const words = term.split(/\s+/).filter(Boolean);
+    const filtered = catalog.filter((row) => {
+      const brand = (row.b || row.r || '').trim().toLocaleLowerCase('es-MX');
+      const model = (row.t || '').trim().toLocaleLowerCase('es-MX');
+      const subbrand = (row.s || '').trim().toLocaleLowerCase('es-MX');
+      const years = Array.isArray(row.y) ? row.y.map(String) : [];
+      return (!brandFilter || brand === brandFilter) &&
+        (!yearFilter || years.includes(yearFilter)) &&
+        (!modelFilter || model === modelFilter) &&
+        (!subbrandFilter || subbrand === subbrandFilter);
+    });
+
+    const unique = (values: string[]) => Array.from(new Set(values.map((value) => value.trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-MX', { numeric: true }));
+    if (action === 'years') {
+      return NextResponse.json({ years: unique(filtered.flatMap((row) => (row.y || []).map(String))).sort((a, b) => Number(b) - Number(a)) });
+    }
+    if (action === 'models') {
+      return NextResponse.json({ models: unique(filtered.map((row) => row.t || '')) });
+    }
+    if (action === 'subbrands') {
+      return NextResponse.json({ subbrands: unique(filtered.map((row) => row.s || '')) });
+    }
+    if (action === 'versions') {
+      const versions = filtered.map((row) => ({
+        cate: row.c || '',
+        cve: row.v || '',
+        brandCode: row.r || '',
+        brand: row.b || row.r || '',
+        type: row.t || '',
+        description: row.d || '',
+        subbrand: row.s || '',
+        years: Array.isArray(row.y) ? row.y.map(String) : [],
+      })).filter((item) => item.description || item.cve);
+      return NextResponse.json({ versions: versions.slice(0, 200) });
+    }
+
+    if (term.length < 2) return NextResponse.json({ vehicles: [] });
+    const words = term.split(/\\s+/).filter(Boolean);
     const matches = catalog
       .map((row) => {
         const brand = row.b || row.r || '';
         const type = row.t || '';
         const description = row.d || '';
-        const haystack = [brand, type, description, ...(row.y || [])].join(' ').toLocaleLowerCase('es-MX');
+        const haystack = [brand, type, description, row.s || '', ...(row.y || [])].join(' ').toLocaleLowerCase('es-MX');
         const score = words.reduce((total, word) => total + (haystack.includes(word) ? 1 : 0), 0);
         return { row, brand, type, description, score };
       })
       .filter((item) => item.score === words.length)
       .sort((a, b) => a.brand.localeCompare(b.brand) || a.type.localeCompare(b.type))
-      .slice(0, 15)
+      .slice(0, 30)
       .map(({ row, brand, type, description }) => ({
-        cate: row.c || '',
-        cve: row.v || '',
-        brandCode: row.r || '',
-        brand,
-        type,
-        description,
+        cate: row.c || '', cve: row.v || '', brandCode: row.r || '',
+        brand, type, description, subbrand: row.s || '',
         years: Array.isArray(row.y) ? row.y.map(String) : [],
       }));
     return NextResponse.json({ vehicles: matches }, { headers: { 'Cache-Control': 'private, max-age=30' } });
