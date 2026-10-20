@@ -251,7 +251,7 @@ export function QuoteForm() {
   }
 
   return (
-    <section id="cotizador" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-12 lg:px-8">
+    <section id="cotizador" className="scroll-reveal mx-auto max-w-7xl scroll-mt-24 px-4 py-12 lg:px-8">
       <div className="rounded-3xl border border-qualitas-border bg-white p-5 shadow-soft md:p-8">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
           <div>
