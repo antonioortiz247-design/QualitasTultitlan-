@@ -27,6 +27,7 @@ import { Header } from '@/components/Header';
 import { JsonLd } from '@/components/JsonLd';
 import { LeadForm } from '@/components/LeadForm';
 import { QuoteForm } from '@/components/QuoteForm';
+import { MotionExperience } from '@/components/MotionExperience';
 import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { useEffect, useRef, useState } from 'react';
@@ -283,6 +284,8 @@ export default function Home() {
         </section>
 
         <QuoteForm />
+
+        <MotionExperience />
 
         <section id="nuestros-seguros" className="scroll-reveal bg-white px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
