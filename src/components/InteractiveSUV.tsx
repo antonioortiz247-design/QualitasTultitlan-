@@ -6,6 +6,7 @@ import { ContactShadows, Html, OrbitControls } from '@react-three/drei';
 import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 type Hotspot = {
   id: string;
@@ -53,11 +54,11 @@ function SUVBody() {
     <group>
       {/* Lower chassis and sculpted body */}
       <mesh position={[0, 0.67, 0]} castShadow receiveShadow material={paint} scale={[1, 0.75, 1]}>
-        <boxGeometry args={[2.15, 0.88, 4.15, 3, 2, 4]} />
+        <primitive object={new RoundedBoxGeometry(2.15, 0.88, 4.15, 5, 0.18)} attach="geometry" />
       </mesh>
       <mesh position={[0, 0.44, -0.04]} castShadow material={lower}><boxGeometry args={[2.08, 0.28, 3.8]} /></mesh>
       <mesh position={[0, 1.13, -0.15]} castShadow material={paint} scale={[0.92, 0.88, 0.9]}>
-        <boxGeometry args={[1.72, 0.9, 2.25, 3, 2, 3]} />
+        <primitive object={new RoundedBoxGeometry(1.72, 0.9, 2.25, 5, 0.16)} attach="geometry" />
       </mesh>
       {/* Windshield and rear glass */}
       <mesh position={[0, 1.43, 0.83]} rotation={[-0.38, 0, 0]} material={glass}><boxGeometry args={[1.52, 0.055, 0.82]} /></mesh>
@@ -99,9 +100,9 @@ function SUVBody() {
 
 export function InteractiveSUV({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
   return (
-    <div className="motion-3d-viewer relative z-[1] mt-3 min-h-[300px] w-full sm:min-h-[390px]" aria-label="SUV 3D interactiva; arrastra para girar el vehículo">
+    <div className="motion-3d-viewer relative z-[1] mt-3 h-[430px] w-full sm:h-[520px] lg:h-[560px]" aria-label="SUV 3D interactiva; arrastra para girar el vehículo">
       <Canvas
-        camera={{ position: [6.4, 3.4, 6.8], fov: 36 }}
+        camera={{ position: [4.5, 2.65, 4.9], fov: 39 }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
         onCreated={({ gl }) => {
@@ -114,7 +115,7 @@ export function InteractiveSUV({ active, onSelect }: { active: string; onSelect:
         <directionalLight position={[5, 8, 5]} intensity={3.1} />
         <directionalLight position={[-5, 4, -4]} intensity={2.2} color="#53c5d1" />
         <pointLight position={[0, 2, 4]} intensity={12} distance={10} color="#941B80" />
-        <group position={[0, -0.15, 0]}>
+        <group position={[0, -0.15, 0]} scale={1.22}>
           <SUVBody />
           {hotspots.map(({ id, label, Icon, position }) => (
             <Html key={id} position={position} center distanceFactor={7} style={{ pointerEvents: 'auto' }}>
@@ -139,7 +140,7 @@ export function InteractiveSUV({ active, onSelect }: { active: string; onSelect:
           makeDefault
           enablePan={false}
           enableZoom={false}
-          minPolarAngle={Math.PI / 3.6}
+          minPolarAngle={Math.PI / 3.4}
           maxPolarAngle={Math.PI / 2.05}
           autoRotate
           autoRotateSpeed={0.55}
