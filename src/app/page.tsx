@@ -282,6 +282,8 @@ export default function Home() {
           </div>
         </section>
 
+        <QuoteForm />
+
         <section id="nuestros-seguros" className="bg-white px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="text-center">
@@ -345,8 +347,6 @@ export default function Home() {
             <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">Las categorías se muestran como orientación general y no garantizan aceptación, cobertura ni emisión. Las opciones se confirman mediante cotización y documentación aplicable.</p>
           </div>
         </section>
-
-        <QuoteForm />
 
         <section id="coberturas" className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
           <h2 className="text-center text-3xl font-black">Conoce algunas coberturas disponibles</h2>
