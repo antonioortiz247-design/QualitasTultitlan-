@@ -35,11 +35,11 @@ type Hotspot = {
 };
 
 const hotspots: Hotspot[] = [
-  { id: 'materiales', label: 'Daños materiales', Icon: CarFront, position: [-1.45, 0.5, 1.1] },
-  { id: 'robo', label: 'Robo total', Icon: KeyRound, position: [1.35, 0.8, -1.05] },
-  { id: 'responsabilidad', label: 'Responsabilidad civil', Icon: ShieldCheck, position: [0, 1.45, 0.15] },
-  { id: 'medicos', label: 'Gastos médicos', Icon: HeartPulse, position: [1.25, 0.4, 1.0] },
-  { id: 'asistencia', label: 'Asistencia vial', Icon: Wrench, position: [-1.15, 0.4, -1.0] },
+  { id: 'materiales', label: 'Daños materiales', Icon: CarFront, position: [-0.9, 0.28, 0.65] },
+  { id: 'robo', label: 'Robo total', Icon: KeyRound, position: [0.82, 0.48, -0.62] },
+  { id: 'responsabilidad', label: 'Responsabilidad civil', Icon: ShieldCheck, position: [0, 0.82, 0.05] },
+  { id: 'medicos', label: 'Gastos médicos', Icon: HeartPulse, position: [0.78, 0.24, 0.58] },
+  { id: 'asistencia', label: 'Asistencia vial', Icon: Wrench, position: [-0.72, 0.24, -0.58] },
 ];
 
 function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
@@ -61,7 +61,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         <primitive object={model} />
       </Center>
       {hotspots.map(({ id, label, Icon, position }) => (
-        <Html key={id} position={position} center distanceFactor={6} style={{ pointerEvents: 'auto' }}>
+        <Html key={id} position={position} center distanceFactor={8} style={{ pointerEvents: 'auto', transform: 'translate3d(0,0,0)' }}>
           <button
             type="button"
             aria-label={label}
