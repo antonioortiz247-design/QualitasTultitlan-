@@ -51,3 +51,20 @@ button, input, select, textarea { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal, .scroll-reveal-soft { animation: none !important; }
 }
+
+
+/* Quálitas Motion Experience */
+.motion-grid { background-image: linear-gradient(rgb(255 255 255 / .035) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .035) 1px, transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%); }
+.motion-car-aura { position: absolute; width: 62%; aspect-ratio: 1; border-radius: 999px; background: radial-gradient(circle, rgb(0 150 174 / .2), rgb(148 27 128 / .08) 45%, transparent 70%); animation: motion-aura 5s ease-in-out infinite alternate; }
+.motion-car { position: relative; z-index: 1; overflow: visible; filter: drop-shadow(0 22px 28px rgb(0 0 0 / .25)); animation: motion-float 5s ease-in-out infinite; }
+.motion-car-body { transform-origin: 50% 50%; animation: motion-body-glow 4s ease-in-out infinite alternate; }
+.motion-orbit { transform-origin: 50% 50%; animation: motion-orbit-rotate 28s linear infinite; }
+.motion-hotspot { box-shadow: 0 0 0 5px rgb(255 255 255 / .08), 0 0 24px rgb(0 150 174 / .18); }
+.motion-hotspot.is-active { box-shadow: 0 0 0 7px rgb(83 197 209 / .18), 0 0 32px rgb(83 197 209 / .5); transform: scale(1.08); }
+.motion-info-panel { animation: motion-panel-in .3s ease both; }
+@keyframes motion-float { 0%, 100% { transform: translateY(0) rotate(-.5deg); } 50% { transform: translateY(-8px) rotate(.5deg); } }
+@keyframes motion-aura { from { transform: scale(.92); opacity: .65; } to { transform: scale(1.08); opacity: 1; } }
+@keyframes motion-body-glow { from { filter: brightness(.96); } to { filter: brightness(1.06); } }
+@keyframes motion-orbit-rotate { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes motion-panel-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .motion-car, .motion-car-body, .motion-orbit, .motion-car-aura, .motion-info-panel { animation: none !important; } .motion-hotspot { transition: none !important; } }
