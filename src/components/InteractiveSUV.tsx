@@ -7,8 +7,8 @@ import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-reac
 import type { LucideIcon } from 'lucide-react';
 import * as THREE from 'three';
 
-// Modelo SUV de cinco puertas, GLB de uso comercial bajo CC0.
-const MODEL_URL = 'https://www.innerscene.com/api/library/a1996830/download';
+// Modelo SUV GLB servido desde raw.githubusercontent.com para evitar la API externa que falló.
+const MODEL_URL = 'https://raw.githubusercontent.com/eflisback/old-sumobile/ff9027759cad1fb889db3f00a294eaf41cc46860/assets/toy-car-kit/Models/GLB%20format/vehicle-suv.glb';
 
 
 class ModelErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
