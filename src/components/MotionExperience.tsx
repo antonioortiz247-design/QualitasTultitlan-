@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { ArrowDownRight, CarFront, ShieldCheck, KeyRound, HeartPulse, Wrench } from 'lucide-react';
+
+const InteractiveSUV = dynamic(() => import('./InteractiveSUV').then((module) => module.InteractiveSUV), { ssr: false, loading: () => <div className="motion-3d-viewer mt-3 min-h-[300px] animate-pulse sm:min-h-[390px]" aria-label="Cargando modelo 3D" /> });
 
 const hotspots = [
   { id: 'materiales', label: 'Daños materiales', short: 'Daños', Icon: CarFront, title: 'Protección para tu vehículo', description: 'Consulta si tu póliza contempla daños materiales y revisa los deducibles, límites y exclusiones aplicables.' },
@@ -52,56 +55,13 @@ export function MotionExperience() {
               <div className="absolute -right-16 -top-16 size-56 rounded-full bg-[#941B80]/20 blur-3xl" aria-hidden="true" />
               <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-[#0096AE]/20 blur-3xl" aria-hidden="true" />
               <div className="relative flex items-center justify-between gap-3">
-                <span className="text-xs font-bold uppercase tracking-[.16em] text-white/55">Vista interactiva · vehículo ilustrativo</span>
-                <span className="rounded-full border border-[#53c5d1]/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#53c5d1]">3D motion</span>
+                <span className="text-xs font-bold uppercase tracking-[.16em] text-white/55">SUV 3D · gira para explorar</span>
+                <span className="rounded-full border border-[#53c5d1]/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#53c5d1]">Giro 360°</span>
               </div>
-              <div className="motion-car-stage relative mt-5 flex min-h-[260px] items-center justify-center sm:min-h-[340px]" aria-label="Ilustración estilizada de automóvil con puntos interactivos de cobertura">
-                <div className="motion-car-aura" aria-hidden="true" />
-                <svg viewBox="0 0 720 360" role="img" aria-labelledby="motion-car-title" className="motion-car w-full max-w-[650px]">
-                  <title id="motion-car-title">Automóvil estilizado con zonas de cobertura interactivas</title>
-                  <defs>
-                    <linearGradient id="motionBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ffffff"/><stop offset="48%" stopColor="#cdd6df"/><stop offset="100%" stopColor="#718096"/></linearGradient>
-                    <linearGradient id="motionGlass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4c687a"/><stop offset="100%" stopColor="#14232e"/></linearGradient>
-                    <linearGradient id="motionLight" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#53c5d1"/><stop offset="100%" stopColor="#0096ae"/></linearGradient>
-                  </defs>
-                  <ellipse cx="360" cy="286" rx="250" ry="26" fill="#0096ae" opacity=".18" />
-                  <g className="motion-car-body">
-                    <path d="M105 231 L128 193 Q146 175 200 164 L270 103 Q295 84 345 84 L440 91 Q477 95 508 133 L560 166 Q596 177 615 202 L632 236 L621 260 L101 260 Z" fill="url(#motionBody)" stroke="#edf4f7" strokeWidth="3"/>
-                    <path d="M225 158 L285 108 Q304 96 342 97 L376 99 L376 158 Z" fill="url(#motionGlass)" stroke="#9aaab6" strokeWidth="2"/>
-                    <path d="M390 100 L437 105 Q461 109 482 136 L500 158 L390 158 Z" fill="url(#motionGlass)" stroke="#9aaab6" strokeWidth="2"/>
-                    <path d="M384 168 L384 252 M511 168 L540 248" stroke="#8796a4" strokeWidth="3" opacity=".8"/>
-                    <path d="M137 205 Q178 185 219 184 L530 184 Q573 188 600 211 L605 228 L132 228 Z" fill="#f8fafc" opacity=".55"/>
-                    <path d="M115 231 L151 230 L163 246 L132 250 Q119 247 115 231Z" fill="url(#motionLight)"/>
-                    <path d="M578 218 L612 222 L621 238 L585 238Z" fill="#941b80"/>
-                    <path d="M185 260 L190 276 L520 276 L532 260" fill="#536273" opacity=".75"/>
-                    <circle cx="218" cy="258" r="42" fill="#10151c" stroke="#7f8b97" strokeWidth="5"/>
-                    <circle cx="218" cy="258" r="22" fill="#d7e0e7" stroke="#697786" strokeWidth="4"/>
-                    <circle cx="218" cy="258" r="8" fill="#778696"/>
-                    <circle cx="520" cy="258" r="42" fill="#10151c" stroke="#7f8b97" strokeWidth="5"/>
-                    <circle cx="520" cy="258" r="22" fill="#d7e0e7" stroke="#697786" strokeWidth="4"/>
-                    <circle cx="520" cy="258" r="8" fill="#778696"/>
-                    <path d="M177 212 L190 207 M556 202 L571 209" stroke="#0096ae" strokeWidth="4" strokeLinecap="round"/>
-                  </g>
-                  <g className="motion-orbit" fill="none" stroke="#53c5d1" strokeWidth="1.5" strokeDasharray="5 8" opacity=".5"><ellipse cx="360" cy="190" rx="278" ry="115"/><ellipse cx="360" cy="190" rx="230" ry="145" transform="rotate(-18 360 190)"/></g>
-                </svg>
-                {hotspots.map(({ id, short, Icon }, index) => {
-                  const positions = [
-                    'left-[17%] top-[55%]',
-                    'left-[72%] top-[65%]',
-                    'left-[49%] top-[24%]',
-                    'left-[36%] top-[48%]',
-                    'left-[61%] top-[38%]',
-                  ];
-                  return (
-                    <button key={id} type="button" aria-label={short} aria-pressed={active === id} onClick={() => setActive(id)} className={'motion-hotspot absolute z-10 flex size-10 items-center justify-center rounded-full border-2 transition-all duration-300 ' + positions[index] + (active === id ? ' is-active border-[#53c5d1] bg-[#53c5d1] text-[#17121c]' : ' border-white/80 bg-[#941B80] text-white hover:scale-110')}>
-                      <Icon size={17} aria-hidden="true" />
-                    </button>
-                  );
-                })}
-              </div>
+              <InteractiveSUV active={active} onSelect={setActive} />
               <div className="relative mt-1 flex items-center justify-between gap-3 border-t border-white/10 pt-4 text-xs text-white/50">
-                <span>Selecciona los puntos para explorar</span>
-                <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#53c5d1]" /> Interactivo</span>
+                <span>Arrastra el vehículo para girarlo</span>
+                <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#53c5d1]" /> Giro táctil y mouse</span>
               </div>
             </div>
           </div>
