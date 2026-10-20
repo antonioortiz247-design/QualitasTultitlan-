@@ -259,25 +259,28 @@ export function QuoteForm() {
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
             <p className="mt-2 max-w-xl text-slate-600">Avanza pantalla por pantalla: marca, modelo, versión, cobertura y datos de contacto. Guardaremos tu solicitud para seguimiento del asesor.</p>
           </div>
-          <ol aria-label="Progreso del formulario" className="grid grid-cols-2 gap-2 text-center text-xs font-bold sm:grid-cols-4 lg:grid-cols-8 sm:text-sm">
-            {[
-              { label: 'Marca', Icon: BadgeCheck },
-              { label: 'Año', Icon: ClipboardCheck },
-              { label: 'Modelo', Icon: Car },
-              { label: 'Submarca', Icon: BadgeCheck },
-              { label: 'Versión', Icon: ClipboardCheck },
-              { label: 'Cobertura', Icon: ShieldCheck },
-              { label: 'Conductor', Icon: UserRound },
-              { label: 'Contacto', Icon: ContactRound },
-            ].map(({ label, Icon }, index) => (
-              <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className={'rounded-xl px-2 py-3 transition-colors ' + (step === index + 1 ? 'bg-qualitas-purple text-white shadow-sm' : step > index + 1 ? 'bg-cyan-50 text-qualitas-aqua' : 'bg-slate-100 text-slate-600')}>
-                <span className="mb-1 flex justify-center" aria-hidden="true">
-                  {step > index + 1 ? <CheckCircle size={20} strokeWidth={2.5} /> : <Icon size={20} strokeWidth={2} />}
-                </span>
-                <span className="block">{label}</span>
-              </li>
-            ))}
-          </ol>
+          <div className="w-full min-w-0 lg:max-w-[760px]">
+            <p className="mb-2 text-right text-xs font-semibold text-slate-500">Paso {step} de 8</p>
+            <ol aria-label="Progreso del formulario" className="flex items-start gap-1 overflow-x-auto pb-2 sm:gap-2">
+              {[
+                { label: 'Marca', Icon: BadgeCheck },
+                { label: 'Año', Icon: ClipboardCheck },
+                { label: 'Modelo', Icon: Car },
+                { label: 'Submarca', Icon: BadgeCheck },
+                { label: 'Versión', Icon: ClipboardCheck },
+                { label: 'Cobertura', Icon: ShieldCheck },
+                { label: 'Conductor', Icon: UserRound },
+                { label: 'Contacto', Icon: ContactRound },
+              ].map(({ label, Icon }, index) => (
+                <li key={label} aria-current={step === index + 1 ? 'step' : undefined} className="flex min-w-[62px] flex-1 flex-col items-center text-center">
+                  <span className={'flex size-9 items-center justify-center rounded-full border transition-colors ' + (step === index + 1 ? 'border-[#941B80] bg-[#941B80] text-white shadow-sm ring-4 ring-[#941B80]/10' : step > index + 1 ? 'border-[#0096AE] bg-[#0096AE]/10 text-[#00849A]' : 'border-slate-200 bg-white text-slate-400')} aria-hidden="true">
+                    {step > index + 1 ? <CheckCircle size={17} strokeWidth={2.4} /> : <Icon size={17} strokeWidth={1.9} />}
+                  </span>
+                  <span className={'mt-1.5 whitespace-nowrap text-[10px] font-semibold sm:text-xs ' + (step === index + 1 ? 'text-[#941B80]' : step > index + 1 ? 'text-slate-700' : 'text-slate-400')}>{label}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
         <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true"><div className="h-full rounded-full bg-qualitas-aqua transition-all" style={{ width: ((step / 8) * 100) + '%' }} /></div>
         <form onSubmit={submit} className="mt-7">
