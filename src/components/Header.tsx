@@ -26,12 +26,12 @@ export function Header() {
         <a href="#inicio" onClick={closeMenu} aria-label="Quálitas — inicio" className="focus-ring flex min-w-0 items-center gap-3 rounded-lg">
           <Image src="/qualitas-logo.png" alt="Quálitas Seguros" width={155} height={54} priority className="h-auto max-h-11 w-auto max-w-[155px] shrink-0 object-contain" />
         </a>
-        <a className="focus-ring hidden shrink-0 items-center gap-2 rounded-xl bg-qualitas-purple px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:brightness-95 2xl:px-5 xl:inline-flex" href="#cotizador"><CarFront size={17} aria-hidden="true" />Cotizar mi auto</a>
-        <nav aria-label="Principal" className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 text-xs font-semibold 2xl:gap-1 xl:flex">
-          {nav.map(({ label, href, Icon, external }) => <a className="focus-ring inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-xl px-2 py-2.5 text-[10px] font-semibold text-slate-700 transition-colors hover:bg-[#941B80]/[0.07] hover:text-[#941B80] 2xl:gap-1.5 2xl:px-2.5 2xl:text-[11px]" key={href} href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}><Icon size={14} strokeWidth={1.9} aria-hidden="true" /><span>{label}</span></a>)}
+        <nav aria-label="Principal" className="hidden min-w-0 flex-1 items-center justify-center gap-1 text-xs font-semibold 2xl:gap-2 xl:flex">
+          {nav.map(({ label, href, Icon, external }) => <a className="focus-ring inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-2.5 text-[11px] font-semibold text-slate-700 transition-colors hover:bg-[#941B80]/[0.07] hover:text-[#941B80] 2xl:px-3 2xl:text-xs" key={href} href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}><Icon size={15} strokeWidth={1.9} aria-hidden="true" /><span>{label}</span></a>)}
         </nav>
         <div className="hidden shrink-0 items-center gap-2 xl:flex">
-          <a onClick={() => trackEvent('whatsapp_click', { placement: 'header' })} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-3 py-3 text-sm font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />WhatsApp</a>
+          <a onClick={() => trackEvent('whatsapp_click', { placement: 'header' })} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-qualitas-aqua px-4 text-sm font-bold text-qualitas-aqua transition-colors hover:bg-cyan-50" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />WhatsApp</a>
+          <a className="focus-ring inline-flex min-h-11 items-center rounded-xl bg-qualitas-purple px-5 text-sm font-bold text-white transition-colors hover:brightness-90" href="#cotizador">Cotizar mi auto</a>
         </div>
         <div className="flex shrink-0 items-center gap-2 xl:hidden">
           <a className="focus-ring rounded-xl bg-qualitas-purple px-4 py-3 text-sm font-bold text-white" href="#cotizador">Cotizar</a>
