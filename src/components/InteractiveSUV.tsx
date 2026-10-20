@@ -4,7 +4,7 @@ import { Suspense, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Center, ContactShadows, Html, OrbitControls, useGLTF } from '@react-three/drei';
 import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
-import type { ComponentType } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import * as THREE from 'three';
 
 const MODEL_URL = 'https://www.innerscene.com/api/library/suv-dc972cab/download';
@@ -12,7 +12,7 @@ const MODEL_URL = 'https://www.innerscene.com/api/library/suv-dc972cab/download'
 type Hotspot = {
   id: string;
   label: string;
-  Icon: ComponentType<{ size?: number; 'aria-hidden'?: boolean }>;
+  Icon: LucideIcon;
   position: [number, number, number];
 };
 
