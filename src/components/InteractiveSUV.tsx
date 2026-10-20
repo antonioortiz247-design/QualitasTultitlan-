@@ -71,9 +71,9 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
               event.stopPropagation();
               onSelect(id);
             }}
-            className={'motion-3d-hotspot ' + (active === id ? 'is-active' : '')}
+            className={'motion-3d-hotspot !h-10 !w-10 !min-h-0 !min-w-0 !max-h-10 !max-w-10 !p-0 !rounded-full flex items-center justify-center shadow-lg ' + (active === id ? 'is-active' : '')}
           >
-            <Icon size={17} aria-hidden="true" />
+            <Icon size={16} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </Html>
       ))}
