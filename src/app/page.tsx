@@ -235,7 +235,7 @@ export default function Home() {
       <Header />
       <main id="inicio">
         <JsonLd />
-        <section className="overflow-hidden bg-gradient-to-br from-white to-slate-50">
+        <section className="scroll-reveal-soft overflow-hidden bg-gradient-to-br from-white to-slate-50">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:px-8">
             <div>
               <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención en Cuautitlán y municipios cercanos</p>
@@ -284,7 +284,7 @@ export default function Home() {
 
         <QuoteForm />
 
-        <section id="nuestros-seguros" className="bg-white px-4 py-16 lg:px-8">
+        <section id="nuestros-seguros" className="scroll-reveal bg-white px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="text-center">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Encuentra una opción para ti</p>
@@ -348,7 +348,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="coberturas" className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
+        <section id="coberturas" className="scroll-reveal mx-auto max-w-7xl px-4 py-12 lg:px-8">
           <h2 className="text-center text-3xl font-black">Conoce algunas coberturas disponibles</h2>
           <p className="mx-auto mt-3 max-w-3xl text-center text-slate-600">
             Descripción general e informativa de algunas coberturas previstas en las Condiciones Generales. La disponibilidad, alcance, suma asegurada, deducible, requisitos y exclusiones dependen de la póliza y de las coberturas señaladas como contratadas en su carátula.
@@ -388,7 +388,7 @@ export default function Home() {
           </p>
         </section>
 
-        <section id="beneficios" className="bg-slate-50 px-4 py-14">
+        <section id="beneficios" className="scroll-reveal" className="bg-slate-50 px-4 py-14">
           <div className="mx-auto max-w-7xl">
             <h2 className="text-center text-3xl font-black">¿Por qué asegurar tu auto con Quálitas?</h2>
             <div className="mt-8 grid gap-5 md:grid-cols-4">
@@ -405,7 +405,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="confianza" className="bg-white px-4 py-16 lg:px-8">
+        <section id="confianza" className="scroll-reveal" className="bg-white px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
@@ -450,7 +450,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="zona-atencion" className="overflow-hidden bg-slate-50 px-4 py-16 lg:px-8">
+        <section id="zona-atencion" className="scroll-reveal overflow-hidden bg-slate-50 px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">Estamos cerca de ti</p>
@@ -529,7 +529,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="activaciones" className="bg-white px-4 py-16 lg:px-8">
+        <section id="activaciones" className="scroll-reveal" className="bg-white px-4 py-16 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-qualitas-aqua">En comunidad</p>
@@ -618,7 +618,7 @@ export default function Home() {
 
         
 
-        <section id="faq" className="mx-auto max-w-7xl px-4 py-14 lg:px-8">
+        <section id="faq" className="scroll-reveal" className="mx-auto max-w-7xl px-4 py-14 lg:px-8">
           <h2 className="text-center text-3xl font-black">Preguntas frecuentes</h2>
           <div className="mt-8 grid gap-3 md:grid-cols-2">
             {faqs.map((faq) => (
