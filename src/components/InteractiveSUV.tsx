@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
+import { Component, Suspense, useMemo, type ErrorInfo, type ReactNode } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Bounds, Center, ContactShadows, Html, OrbitControls, useGLTF } from '@react-three/drei';
 import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
@@ -9,6 +9,23 @@ import * as THREE from 'three';
 
 // Modelo SUV de cinco puertas, GLB de uso comercial bajo CC0.
 const MODEL_URL = 'https://www.innerscene.com/api/library/a1996830/download';
+
+
+class ModelErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('No se pudo cargar el modelo 3D del SUV:', error, info.componentStack);
+  }
+
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children;
+  }
+}
 
 type Hotspot = {
   id: string;
@@ -99,7 +116,9 @@ export function InteractiveSUV({ active, onSelect }: { active: string; onSelect:
         <directionalLight position={[-5, 4, -4]} intensity={2.1} color="#53c5d1" />
         <pointLight position={[0, 2, 4]} intensity={12} distance={10} color="#941B80" />
         <Suspense fallback={<LoadingVehicle />}>
-          <SUVModel active={active} onSelect={onSelect} />
+          <ModelErrorBoundary fallback={<LoadingVehicle />}>
+            <SUVModel active={active} onSelect={onSelect} />
+          </ModelErrorBoundary>
           <ContactShadows position={[0, -0.08, 0]} opacity={0.42} scale={8} blur={2.5} far={4} />
         </Suspense>
         <OrbitControls
@@ -122,4 +141,3 @@ export function InteractiveSUV({ active, onSelect }: { active: string; onSelect:
   );
 }
 
-useGLTF.preload(MODEL_URL);
