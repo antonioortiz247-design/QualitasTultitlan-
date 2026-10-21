@@ -36,11 +36,11 @@ type Hotspot = {
 };
 
 const hotspots: Hotspot[] = [
-  { id: 'materiales', label: 'Daños materiales', Icon: CarFront, position: [-0.62, 0.12, 0.78] },
-  { id: 'robo', label: 'Robo total', Icon: KeyRound, position: [0.62, 0.16, -0.78] },
+  { id: 'materiales', label: 'Daños materiales', Icon: CarFront, position: [-0.34, 0.10, 0.42] },
+  { id: 'robo', label: 'Robo total', Icon: KeyRound, position: [0.34, 0.12, -0.42] },
   { id: 'responsabilidad', label: 'Responsabilidad civil', Icon: ShieldCheck, position: [0, 0.42, 0.02] },
-  { id: 'medicos', label: 'Gastos médicos', Icon: HeartPulse, position: [0.62, 0.08, 0.62] },
-  { id: 'asistencia', label: 'Asistencia vial', Icon: Wrench, position: [-0.62, 0.08, -0.62] },
+  { id: 'medicos', label: 'Gastos médicos', Icon: HeartPulse, position: [0.36, 0.06, 0.34] },
+  { id: 'asistencia', label: 'Asistencia vial', Icon: Wrench, position: [-0.36, 0.06, -0.34] },
 ];
 
 function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
