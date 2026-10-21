@@ -325,7 +325,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const patchBasis = new THREE.Matrix4().makeBasis(patchRight, patchSurfaceUp, trunkNormal);
         const patchOrientation = new THREE.Euler().setFromRotationMatrix(patchBasis);
         const patchGeometry = new DecalGeometry(
-          trunkHit.object,
+          trunkHit.object as THREE.Mesh,
           patchPosition,
           patchOrientation,
           new THREE.Vector3(vehicleSize.x * 0.105, vehicleSize.y * 0.035, 0.035)
