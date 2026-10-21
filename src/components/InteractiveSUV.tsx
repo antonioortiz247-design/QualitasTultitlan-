@@ -47,9 +47,42 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
   const model = useMemo(() => {
     const clone = scene.clone(true);
     clone.traverse((object) => {
+      const objectName = object.name.toLowerCase();
+      // Oculta emblemas/logotipos del fabricante para mantener una presentación neutral.
+      if (/(^|[_\s-])(logo|emblem|badge|brand|toyota)([_\s-]|$)/i.test(object.name)) {
+        object.visible = false;
+      }
+
       if (object instanceof THREE.Mesh) {
         object.castShadow = true;
         object.receiveShadow = true;
+
+        const meshName = object.name.toLowerCase();
+        const isGlassOrWheel = /(glass|window|windshield|tire|tyre|wheel|rim|rubber|light|lamp|lens|chrome|grille|interior|seat)/i.test(meshName);
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        const updatedMaterials = materials.map((sourceMaterial) => {
+          const material = sourceMaterial.clone();
+          const materialName = material.name.toLowerCase();
+          const isBrandMark = /(logo|emblem|badge|brand|toyota)/i.test(materialName);
+          if (isBrandMark) {
+            object.visible = false;
+            return material;
+          }
+
+          // Repinta los materiales claros de la carrocería con el morado corporativo.
+          if (!isGlassOrWheel && material instanceof THREE.MeshStandardMaterial && material.color) {
+            const color = material.color;
+            const isBodyPaint = /(paint|body|carrocer|exterior|shell| кузов)/i.test(materialName) ||
+              (color.r > 0.62 && color.g > 0.62 && color.b > 0.62 && material.roughness < 0.8);
+            if (isBodyPaint) {
+              material.color.set('#941B80');
+              material.metalness = Math.max(material.metalness, 0.18);
+              material.roughness = Math.min(material.roughness, 0.42);
+            }
+          }
+          return material;
+        });
+        object.material = Array.isArray(object.material) ? updatedMaterials : updatedMaterials[0];
       }
     });
     return clone;
@@ -61,7 +94,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         <primitive object={model} />
       </Center>
       {hotspots.map(({ id, label, Icon, position }) => (
-        <Html key={id} position={position} center distanceFactor={8} style={{ pointerEvents: 'auto', transform: 'translate3d(0,0,0)' }}>
+        <Html key={id} position={position} center distanceFactor={3} style={{ pointerEvents: 'auto', transform: 'translate3d(0,0,0)' }}>
           <button
             type="button"
             aria-label={label}
@@ -71,9 +104,9 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
               event.stopPropagation();
               onSelect(id);
             }}
-            className={'motion-3d-hotspot !h-10 !w-10 !min-h-0 !min-w-0 !max-h-10 !max-w-10 !p-0 !rounded-full flex items-center justify-center shadow-lg ' + (active === id ? 'is-active' : '')}
+            className={'motion-3d-hotspot !h-6 !w-6 !min-h-0 !min-w-0 !max-h-6 !max-w-6 !p-0 !rounded-full flex items-center justify-center shadow-lg ' + (active === id ? 'is-active' : '')}
           >
-            <Icon size={16} strokeWidth={2.2} aria-hidden="true" />
+            <Icon size={11} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </Html>
       ))}
