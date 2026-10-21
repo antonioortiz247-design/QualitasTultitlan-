@@ -85,7 +85,16 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
         const c = material.color;
         const explicitPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side|roof)/i.test(partLabel);
-        const neutralPaint = c.r > 0.62 && c.g > 0.62 && c.b > 0.62 && material.roughness < 0.95;
+
+        // Generic GLB names are common. Only treat a neutral material as body paint when
+        // the mesh is broad enough to be an exterior panel; small seats, rims and details stay original.
+        const objectBounds = new THREE.Box3().setFromObject(object);
+        const objectSize = objectBounds.getSize(new THREE.Vector3());
+        const broadExteriorPanel = Math.max(objectSize.x, objectSize.y, objectSize.z) >
+          Math.max(vehicleSize.x, vehicleSize.z) * 0.2;
+        const neutralPaint = broadExteriorPanel &&
+          c.r > 0.62 && c.g > 0.62 && c.b > 0.62 &&
+          material.roughness < 0.95 && material.metalness < 0.42;
         if (!explicitPaint && !neutralPaint) return material;
 
         // Shader-based world-height mask creates a truly straight split independent of mesh triangles.
