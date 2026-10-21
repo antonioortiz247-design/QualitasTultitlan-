@@ -312,6 +312,42 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       return !!normal && normal.z < -0.2 && zN < 0.16 && hN > 0.38 && hN < 0.78 && xN < 0.32;
     });
     if (trunkHit) {
+      // Oculta la insignia original “Prius” con una pequeña calcomanía del
+      // color de la carrocería, adherida a la superficie de la cajuela.
+      const trunkNormal = toWorldNormal(trunkHit);
+      if (trunkNormal) {
+        const patchPosition = trunkHit.point.clone().addScaledVector(trunkNormal, 0.004);
+        const patchUp = new THREE.Vector3(0, 1, 0)
+          .addScaledVector(trunkNormal, -trunkNormal.y)
+          .normalize();
+        const patchRight = patchUp.clone().cross(trunkNormal).normalize();
+        const patchSurfaceUp = trunkNormal.clone().cross(patchRight).normalize();
+        const patchBasis = new THREE.Matrix4().makeBasis(patchRight, patchSurfaceUp, trunkNormal);
+        const patchOrientation = new THREE.Euler().setFromRotationMatrix(patchBasis);
+        const patchGeometry = new DecalGeometry(
+          trunkHit.object,
+          patchPosition,
+          patchOrientation,
+          new THREE.Vector3(vehicleSize.x * 0.105, vehicleSize.y * 0.035, 0.035)
+        );
+        patchGeometry.applyMatrix4(clone.matrixWorld.clone().invert());
+        const patch = new THREE.Mesh(
+          patchGeometry,
+          new THREE.MeshBasicMaterial({
+            color: '#941B80',
+            depthTest: true,
+            depthWrite: false,
+            toneMapped: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -2,
+            side: THREE.FrontSide,
+          })
+        );
+        patch.name = 'RemoveOriginalPriusBadge';
+        patch.renderOrder = 2;
+        clone.add(patch);
+      }
+
       const trunkWidth = vehicleSize.x * 0.15;
       addLogoDecal(
         trunkHit, trunkWidth, trunkWidth / logoAspect,
