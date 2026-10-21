@@ -357,6 +357,76 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       );
     }
 
+    // Lema institucional en la defensa trasera, proyectado sobre la superficie real.
+    const sloganCanvas = document.createElement('canvas');
+    sloganCanvas.width = 1400;
+    sloganCanvas.height = 240;
+    const sloganContext = sloganCanvas.getContext('2d');
+    if (sloganContext) {
+      sloganContext.clearRect(0, 0, sloganCanvas.width, sloganCanvas.height);
+      sloganContext.fillStyle = '#FFFFFF';
+      sloganContext.font = '600 92px Arial, sans-serif';
+      sloganContext.textAlign = 'center';
+      sloganContext.textBaseline = 'middle';
+      sloganContext.fillText('Aseguramos autos cuidamos personas', sloganCanvas.width / 2, sloganCanvas.height / 2, 1340);
+      const sloganTexture = new THREE.CanvasTexture(sloganCanvas);
+      sloganTexture.colorSpace = THREE.SRGBColorSpace;
+      sloganTexture.needsUpdate = true;
+
+      const bumperRaycaster = new THREE.Raycaster(
+        new THREE.Vector3(centerX, vehicleBounds.min.y + vehicleSize.y * 0.27, vehicleBounds.min.z - vehicleSize.z * 0.3),
+        new THREE.Vector3(0, 0, 1)
+      );
+      const bumperHit = bumperRaycaster.intersectObject(clone, true).find((hit) => {
+        if (!(hit.object instanceof THREE.Mesh)) return false;
+        const normal = toWorldNormal(hit);
+        const zN = (hit.point.z - vehicleBounds.min.z) / vehicleSize.z;
+        const hN = (hit.point.y - vehicleBounds.min.y) / vehicleSize.y;
+        const xN = Math.abs(hit.point.x - centerX) / vehicleSize.x;
+        return !!normal && normal.z < -0.2 && zN < 0.14 && hN > 0.12 && hN < 0.39 && xN < 0.3;
+      });
+
+      if (bumperHit && bumperHit.object instanceof THREE.Mesh) {
+        const normal = toWorldNormal(bumperHit);
+        if (normal) {
+          if (normal.z > 0) normal.negate();
+          const preferredUp = new THREE.Vector3(0, 1, 0)
+            .addScaledVector(normal, -normal.y)
+            .normalize();
+          const right = preferredUp.clone().cross(normal).normalize();
+          const surfaceUp = normal.clone().cross(right).normalize();
+          const basis = new THREE.Matrix4().makeBasis(right, surfaceUp, normal);
+          const orientation = new THREE.Euler().setFromRotationMatrix(basis);
+          const position = bumperHit.point.clone().addScaledVector(normal, 0.003);
+          const sloganWidth = vehicleSize.x * 0.30;
+          const sloganHeight = sloganWidth / (sloganCanvas.width / sloganCanvas.height);
+          const sloganGeometry = new DecalGeometry(
+            bumperHit.object,
+            position,
+            orientation,
+            new THREE.Vector3(sloganWidth, sloganHeight, 0.025)
+          );
+          sloganGeometry.applyMatrix4(clone.matrixWorld.clone().invert());
+          const slogan = new THREE.Mesh(
+            sloganGeometry,
+            new THREE.MeshBasicMaterial({
+              map: sloganTexture,
+              transparent: true,
+              depthTest: true,
+              depthWrite: false,
+              toneMapped: false,
+              polygonOffset: true,
+              polygonOffsetFactor: -2,
+              side: THREE.FrontSide,
+            })
+          );
+          slogan.name = 'QualitasRearBumperSlogan';
+          slogan.renderOrder = 4;
+          clone.add(slogan);
+        }
+      }
+    }
+
     return clone;
   }, [scene, qualitasLogo]);
 
