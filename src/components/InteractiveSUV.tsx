@@ -73,15 +73,14 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
       const bodyMask = new Float32Array(positions.count);
       const bounds = vehicleBounds;
-      const minY = bounds.min.y;
-      const maxY = bounds.max.y;
-      const minZ = bounds.min.z;
-      const maxZ = bounds.max.z;
       const width = Math.max(vehicleSize.x, 0.001);
       const length = Math.max(vehicleSize.z, 0.001);
       const height = Math.max(vehicleSize.y, 0.001);
       const toWorld = new THREE.Vector3();
+      const centerX = (bounds.min.x + bounds.max.x) / 2;
 
+      // Paint all neutral surfaces instead of guessing panel shapes by dimensions.
+      // Keep the wheel and lamp regions out of the paint mask.
       for (let i = 0; i < positions.count; i += 3) {
         const world = new THREE.Vector3();
         for (let j = 0; j < 3; j++) {
@@ -90,26 +89,14 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           world.add(toWorld);
         }
         world.multiplyScalar(1 / 3);
-
-        const xN = Math.abs(world.x - (bounds.min.x + bounds.max.x) / 2) / (width * 0.5);
-        const hN = (world.y - minY) / height;
-        const zN = (world.z - minZ) / length;
-        const atFrontOrRear = zN < 0.19 || zN > 0.81;
-
-        // Paneles laterales: puertas, salpicaderas y cuartos traseros.
-        const sidePanel = xN > 0.53 && hN > 0.20 && hN < 0.76;
-        // Techo, cofre y portón trasero.
-        const roofPanel = hN > 0.69 && xN < 0.49 && zN > 0.16 && zN < 0.84;
-        const hoodOrHatch = atFrontOrRear && hN > 0.34 && hN < 0.72 && xN < 0.47;
-        // Fascias debajo de los grupos ópticos.
-        const bumper = atFrontOrRear && hN > 0.10 && hN < 0.34 && xN < 0.48;
-
-        // Protección de neumáticos/rines y grupos ópticos en ambos extremos.
-        const wheelZ = [0.22, 0.78].some((p) => Math.abs(zN - p) < 0.095);
-        const wheelZone = xN > 0.57 && wheelZ && hN < 0.38;
-        const lampZone = atFrontOrRear && xN > 0.34 && hN > 0.28 && hN < 0.58;
-
-        const selected = (sidePanel || roofPanel || hoodOrHatch || bumper) && !wheelZone && !lampZone;
+        const xN = Math.abs(world.x - centerX) / (width * 0.5);
+        const hN = (world.y - bounds.min.y) / height;
+        const zN = (world.z - bounds.min.z) / length;
+        const atFrontOrRear = zN < 0.17 || zN > 0.83;
+        const wheelZ = Math.abs(zN - 0.22) < 0.105 || Math.abs(zN - 0.78) < 0.105;
+        const wheelZone = xN > 0.56 && wheelZ && hN < 0.39;
+        const lampZone = atFrontOrRear && xN > 0.43 && hN > 0.27 && hN < 0.49;
+        const selected = !(wheelZone || lampZone);
         bodyMask[i] = selected ? 1 : 0;
         bodyMask[i + 1] = selected ? 1 : 0;
         bodyMask[i + 2] = selected ? 1 : 0;
