@@ -95,11 +95,12 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const atFrontOrRear = zN < 0.13 || zN > 0.87;
 
         // Exclusiones compactas para no dejar sin pintar alas ni fascias.
-        const wheelZ = Math.abs(zN - 0.22) < 0.065 || Math.abs(zN - 0.78) < 0.065;
-        const wheelZone = xN > 0.76 && wheelZ && hN < 0.31;
+        const wheelZ = Math.abs(zN - 0.22) < 0.055 || Math.abs(zN - 0.78) < 0.055;
+        const wheelZone = xN > 0.91 && wheelZ && hN < 0.27;
 
-        // Solo proteger los extremos externos de faros y calaveras.
-        const lampZone = atFrontOrRear && xN > 0.72 && hN > 0.34 && hN < 0.48;
+        // Protección mínima de los extremos ópticos: las máscaras anteriores
+        // cubrían también fascia, salpicadera y portón, dejando parches blancos.
+        const lampZone = atFrontOrRear && xN > 0.91 && hN > 0.37 && hN < 0.43;
         const selected = !(wheelZone || lampZone);
         bodyMask[i] = selected ? 1 : 0;
         bodyMask[i + 1] = selected ? 1 : 0;
