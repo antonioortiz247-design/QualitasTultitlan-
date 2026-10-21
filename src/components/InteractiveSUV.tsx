@@ -83,18 +83,21 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
 function LoadingVehicle() {
   return (
-    <group>
-      <mesh position={[0, 0.65, 0]} castShadow>
-        <boxGeometry args={[1.8, 0.9, 3.8]} />
-        <meshPhysicalMaterial color="#f4f6f8" metalness={0.55} roughness={0.24} clearcoat={0.9} />
-      </mesh>
-      {[[-0.95, 0.35, 1.15], [0.95, 0.35, 1.15], [-0.95, 0.35, -1.15], [0.95, 0.35, -1.15]].map((p, i) => (
-        <mesh key={i} position={p as [number, number, number]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.34, 0.34, 0.22, 24]} />
-          <meshStandardMaterial color="#252a31" roughness={0.85} />
-        </mesh>
-      ))}
-    </group>
+    <Html center>
+      <div className="whitespace-nowrap rounded-xl border border-white/10 bg-[#17121c]/90 px-4 py-3 text-sm font-medium text-white shadow-xl">
+        Cargando Toyota Prius 3D…
+      </div>
+    </Html>
+  );
+}
+
+function ModelLoadError() {
+  return (
+    <Html center>
+      <div className="max-w-xs rounded-xl border border-white/10 bg-[#17121c]/95 px-4 py-3 text-center text-sm text-white shadow-xl">
+        No se pudo cargar el Toyota Prius. Revisa que el archivo <code>/models/qualitas-prius.glb</code> esté disponible.
+      </div>
+    </Html>
   );
 }
 
@@ -116,7 +119,7 @@ export function InteractiveSUV({ active, onSelect }: { active: string; onSelect:
         <directionalLight position={[-5, 4, -4]} intensity={2.1} color="#53c5d1" />
         <pointLight position={[0, 2, 4]} intensity={12} distance={10} color="#941B80" />
         <Suspense fallback={<LoadingVehicle />}>
-          <ModelErrorBoundary fallback={<LoadingVehicle />}>
+          <ModelErrorBoundary fallback={<ModelLoadError />}>
             <SUVModel active={active} onSelect={onSelect} />
           </ModelErrorBoundary>
           <ContactShadows position={[0, -0.08, 0]} opacity={0.42} scale={8} blur={2.5} far={4} />
