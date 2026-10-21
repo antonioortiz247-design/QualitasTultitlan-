@@ -89,26 +89,27 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           const nonIndexed = geometry.index ? geometry.toNonIndexed() : geometry;
           const position = nonIndexed.getAttribute('position');
           const colors = new Float32Array(position.count * 3);
-          const worldPosition = new THREE.Vector3();
           const a = new THREE.Vector3();
           const b = new THREE.Vector3();
           const d = new THREE.Vector3();
+          const vertexWorld = new THREE.Vector3();
           const faceNormal = new THREE.Vector3();
+          const purple = new THREE.Color('#941B80');
+          const aqua = new THREE.Color('#0096AE');
+          const band = Math.max(vehicleSize.y * 0.035, 0.012);
 
           for (let i = 0; i < position.count; i += 3) {
             a.fromBufferAttribute(position, i).applyMatrix4(object.matrixWorld);
             b.fromBufferAttribute(position, i + 1).applyMatrix4(object.matrixWorld);
             d.fromBufferAttribute(position, i + 2).applyMatrix4(object.matrixWorld);
-            worldPosition.copy(a).add(b).add(d).multiplyScalar(1 / 3);
             faceNormal.subVectors(b, a).cross(d.clone().sub(a)).normalize();
-
-            // Hood and roof face upward, so keep them purple. Side panels use a height split.
             const isUpperSurface = faceNormal.y > 0.48;
-            const color = (isUpperSurface || worldPosition.y >= splitHeight)
-              ? new THREE.Color('#941B80')
-              : new THREE.Color('#0096AE');
 
+            // Per-vertex blending softens the color boundary and avoids jagged triangle-shaped seams.
             for (let vertex = 0; vertex < 3; vertex++) {
+              vertexWorld.fromBufferAttribute(position, i + vertex).applyMatrix4(object.matrixWorld);
+              const t = THREE.MathUtils.smoothstep(vertexWorld.y, splitHeight - band, splitHeight + band);
+              const color = isUpperSurface ? purple : aqua.clone().lerp(purple, t);
               const offset = (i + vertex) * 3;
               colors[offset] = color.r;
               colors[offset + 1] = color.g;
