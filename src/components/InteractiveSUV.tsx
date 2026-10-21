@@ -176,7 +176,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       logoMap.image && logoMap.image.width && logoMap.image.height
         ? logoMap.image.width / logoMap.image.height
         : 3.2;
-    const logoWidth = vehicleSize.x * 0.40;
+    const logoWidth = vehicleSize.x * 0.28;
     const logoHeight = logoWidth / logoAspect;
     const logoMaterial = new THREE.MeshBasicMaterial({
       map: logoMap,
