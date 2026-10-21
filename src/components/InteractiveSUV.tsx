@@ -198,10 +198,10 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     // El frente del Prius corresponde al extremo +Z del modelo.
     const logoWorldPosition = new THREE.Vector3(
       (vehicleBounds.min.x + vehicleBounds.max.x) / 2,
-      vehicleBounds.min.y + vehicleSize.y * 0.49 + 0.012,
-      vehicleBounds.min.z + vehicleSize.z * 0.80
+      vehicleBounds.min.y + vehicleSize.y * 0.465 + 0.035,
+      vehicleBounds.min.z + vehicleSize.z * 0.22
     );
-    const hoodNormal = new THREE.Vector3(0, 0.88, 0.47).normalize();
+    const hoodNormal = new THREE.Vector3(0, 0.96, 0.28).normalize();
     const worldLogoQuaternion = new THREE.Quaternion().setFromUnitVectors(
       new THREE.Vector3(0, 0, 1),
       hoodNormal
