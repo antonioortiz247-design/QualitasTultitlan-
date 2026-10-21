@@ -81,48 +81,50 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
       for (let i = 0; i < positions.count; i++) {
         const x = positions.getX(i); // ancho
-        const y = positions.getY(i); // altura: glTF usa Y-up
-        const z = positions.getZ(i); // largo: frente positivo, parte trasera negativo
+        const length = positions.getY(i); // largo del vehículo antes de la rotación del nodo
+        const height = -positions.getZ(i); // la rotación X=90° del nodo convierte -Z local en altura
 
-        // Paneles laterales y salpicaderas. La banda vertical evita teñir techo,
-        // cristales y componentes del interior que comparten el material del GLB.
+        // Laterales y paneles de carrocería. Se usan coordenadas previas a la
+        // rotación del nodo GLB; las versiones anteriores mezclaban ejes y por
+        // eso el techo y la mitad trasera quedaban blancos.
         const sideBody =
           Math.abs(x) > 0.135 &&
-          smoothRange(y, 0.055, 0.275, 0.025) > 0.25 &&
-          Math.abs(z) < 0.555;
+          smoothRange(height, 0.045, 0.285, 0.025) > 0.2 &&
+          Math.abs(length) < 0.565;
 
-        // Superficies horizontales: techo, cofre y portón trasero.
-        // La textura de los cristales permanece protegida por su luminosidad.
+        // Techo: parte alta, centrada a lo ancho, recorriendo el largo de la cabina.
         const roof =
-          y > 0.285 &&
+          height > 0.285 &&
           Math.abs(x) < 0.255 &&
-          z > -0.36 && z < 0.30;
+          length > -0.43 && length < 0.36;
+
+        // Cofre y portón trasero; ambos están en los extremos longitudinales.
         const hood =
-          y > 0.115 &&
-          Math.abs(x) < 0.255 &&
-          z > 0.28 && z < 0.555;
+          length > 0.355 &&
+          height > 0.105 && height < 0.30 &&
+          Math.abs(x) < 0.255;
         const rearHatch =
-          y > 0.12 &&
-          Math.abs(x) < 0.245 &&
-          z < -0.43 && z > -0.595;
+          length < -0.405 &&
+          height > 0.105 && height < 0.29 &&
+          Math.abs(x) < 0.245;
 
-        // Parachoques de los extremos, manteniendo fuera las áreas de faros
-        // delanteros y calaveras traseras para conservar sus colores originales.
         const frontBumper =
-          z > 0.505 && y > 0.015 && y < 0.135 && Math.abs(x) < 0.255;
+          length > 0.49 && height > 0.015 && height < 0.13 && Math.abs(x) < 0.25;
         const rearBumper =
-          z < -0.555 && y > 0.015 && y < 0.13 && Math.abs(x) < 0.25;
-        const lampZone =
-          Math.abs(x) > 0.105 &&
-          y > 0.075 && y < 0.235 &&
-          (z > 0.425 || z < -0.475);
+          length < -0.49 && height > 0.015 && height < 0.13 && Math.abs(x) < 0.25;
 
-        // Protección circular de los cuatro pasos de rueda (coordenadas X/Y,
-        // centrados en cada extremo del eje longitudinal Z).
+        // Faros y calaveras se excluyen del tinte de pintura para que la textura
+        // original mantenga los segmentos transparentes, rojos y ámbar.
+        const lampZone =
+          Math.abs(x) > 0.10 &&
+          height > 0.075 && height < 0.235 &&
+          (length > 0.415 || length < -0.415);
+
+        // Los cuatro pasos de rueda: dos lados y dos extremos del eje longitudinal.
         const wheelZone =
           Math.abs(x) > 0.15 &&
-          [ -0.385, 0.345 ].some((wheelZ) =>
-            ((z - wheelZ) / 0.105) ** 2 + ((y - 0.105) / 0.09) ** 2 < 1.2
+          [-0.385, 0.345].some((wheelLength) =>
+            ((length - wheelLength) / 0.105) ** 2 + ((height - 0.105) / 0.09) ** 2 < 1.2
           );
 
         const candidate = sideBody || roof || hood || rearHatch || frontBumper || rearBumper;
@@ -177,7 +179,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
                diffuseColor.rgb = mix(diffuseColor.rgb, qualitasBrandPaint, qualitasPaintMask);`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v5';
+        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v6';
         material.needsUpdate = true;
         return material;
       });
