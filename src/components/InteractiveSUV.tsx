@@ -65,70 +65,54 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       object.castShadow = true;
       object.receiveShadow = true;
 
-      // El GLB tiene una sola malla/material. Creamos una máscara por vértice
-      // usando los ejes locales reales: X=ancho, Y=largo, Z=alto (alto = -Z en mundo).
+      // Segmenta en coordenadas mundiales reales después de aplicar las
+      // transformaciones del GLB. Las versiones anteriores usaban ejes locales
+      // y por eso dejaban manchas blancas en cofre, fascia y portón trasero.
       const geometry = object.geometry.toNonIndexed();
       object.geometry = geometry;
       const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
-      const normals = geometry.getAttribute('normal') as THREE.BufferAttribute;
       const bodyMask = new Float32Array(positions.count);
+      const bounds = vehicleBounds;
+      const minY = bounds.min.y;
+      const maxY = bounds.max.y;
+      const minZ = bounds.min.z;
+      const maxZ = bounds.max.z;
+      const width = Math.max(vehicleSize.x, 0.001);
+      const length = Math.max(vehicleSize.z, 0.001);
+      const height = Math.max(vehicleSize.y, 0.001);
+      const toWorld = new THREE.Vector3();
 
-      const smoothRange = (value: number, low: number, high: number, feather: number) => {
-        const lower = THREE.MathUtils.smoothstep(value, low - feather, low + feather);
-        const upper = 1 - THREE.MathUtils.smoothstep(value, high - feather, high + feather);
-        return lower * upper;
-      };
+      for (let i = 0; i < positions.count; i += 3) {
+        const world = new THREE.Vector3();
+        for (let j = 0; j < 3; j++) {
+          toWorld.set(positions.getX(i + j), positions.getY(i + j), positions.getZ(i + j));
+          object.localToWorld(toWorld);
+          world.add(toWorld);
+        }
+        world.multiplyScalar(1 / 3);
 
-      for (let i = 0; i < positions.count; i++) {
-        const x = positions.getX(i); // ancho
-        const length = positions.getY(i); // largo del vehículo antes de la rotación del nodo
-        const height = -positions.getZ(i); // la rotación X=90° del nodo convierte -Z local en altura
+        const xN = Math.abs(world.x - (bounds.min.x + bounds.max.x) / 2) / (width * 0.5);
+        const hN = (world.y - minY) / height;
+        const zN = (world.z - minZ) / length;
+        const atFrontOrRear = zN < 0.19 || zN > 0.81;
 
-        // Laterales y paneles de carrocería. Se usan coordenadas previas a la
-        // rotación del nodo GLB; las versiones anteriores mezclaban ejes y por
-        // eso el techo y la mitad trasera quedaban blancos.
-        const sideBody =
-          Math.abs(x) > 0.135 &&
-          smoothRange(height, 0.045, 0.285, 0.025) > 0.2 &&
-          Math.abs(length) < 0.565;
+        // Paneles laterales: puertas, salpicaderas y cuartos traseros.
+        const sidePanel = xN > 0.53 && hN > 0.20 && hN < 0.76;
+        // Techo, cofre y portón trasero.
+        const roofPanel = hN > 0.69 && xN < 0.49 && zN > 0.16 && zN < 0.84;
+        const hoodOrHatch = atFrontOrRear && hN > 0.34 && hN < 0.72 && xN < 0.47;
+        // Fascias debajo de los grupos ópticos.
+        const bumper = atFrontOrRear && hN > 0.10 && hN < 0.34 && xN < 0.48;
 
-        // Techo: parte alta, centrada a lo ancho, recorriendo el largo de la cabina.
-        const roof =
-          height > 0.285 &&
-          Math.abs(x) < 0.255 &&
-          length > -0.43 && length < 0.36;
+        // Protección de neumáticos/rines y grupos ópticos en ambos extremos.
+        const wheelZ = [0.22, 0.78].some((p) => Math.abs(zN - p) < 0.095);
+        const wheelZone = xN > 0.57 && wheelZ && hN < 0.38;
+        const lampZone = atFrontOrRear && xN > 0.34 && hN > 0.28 && hN < 0.58;
 
-        // Cofre y portón trasero; ambos están en los extremos longitudinales.
-        const hood =
-          length > 0.355 &&
-          height > 0.105 && height < 0.30 &&
-          Math.abs(x) < 0.255;
-        const rearHatch =
-          length < -0.405 &&
-          height > 0.105 && height < 0.29 &&
-          Math.abs(x) < 0.245;
-
-        const frontBumper =
-          length > 0.49 && height > 0.015 && height < 0.13 && Math.abs(x) < 0.25;
-        const rearBumper =
-          length < -0.49 && height > 0.015 && height < 0.13 && Math.abs(x) < 0.25;
-
-        // Faros y calaveras se excluyen del tinte de pintura para que la textura
-        // original mantenga los segmentos transparentes, rojos y ámbar.
-        const lampZone =
-          Math.abs(x) > 0.10 &&
-          height > 0.075 && height < 0.235 &&
-          (length > 0.415 || length < -0.415);
-
-        // Los cuatro pasos de rueda: dos lados y dos extremos del eje longitudinal.
-        const wheelZone =
-          Math.abs(x) > 0.15 &&
-          [-0.385, 0.345].some((wheelLength) =>
-            ((length - wheelLength) / 0.105) ** 2 + ((height - 0.105) / 0.09) ** 2 < 1.2
-          );
-
-        const candidate = sideBody || roof || hood || rearHatch || frontBumper || rearBumper;
-        bodyMask[i] = candidate && !wheelZone && !lampZone ? 1 : 0;
+        const selected = (sidePanel || roofPanel || hoodOrHatch || bumper) && !wheelZone && !lampZone;
+        bodyMask[i] = selected ? 1 : 0;
+        bodyMask[i + 1] = selected ? 1 : 0;
+        bodyMask[i + 2] = selected ? 1 : 0;
       }
       geometry.setAttribute('qualitasBodyMask', new THREE.BufferAttribute(bodyMask, 1));
 
@@ -179,7 +163,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
                diffuseColor.rgb = mix(diffuseColor.rgb, qualitasBrandPaint, qualitasPaintMask);`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v6';
+        material.customProgramCacheKey = () => 'qualitas-world-space-body-mask-v7';
         material.needsUpdate = true;
         return material;
       });
