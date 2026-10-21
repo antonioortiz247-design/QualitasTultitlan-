@@ -80,29 +80,53 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       };
 
       for (let i = 0; i < positions.count; i++) {
-        const x = positions.getX(i);
-        const y = positions.getY(i);
-        const z = positions.getZ(i);
+        const x = positions.getX(i); // ancho
+        const y = positions.getY(i); // altura: glTF usa Y-up
+        const z = positions.getZ(i); // largo: frente positivo, parte trasera negativo
 
-        // En este GLB, Z es la altura local: el techo está cerca de Z=0,
-        // la parte baja de la carrocería cerca de Z=-0.35 y Y recorre el largo.
-        // Seleccionar por región espacial evita dejar techo y cofre blancos
-        // cuando sus normales no coinciden con las de los paneles laterales.
-        const upperBody = z > -0.205 && Math.abs(x) < 0.255;
-        const sideBody = Math.abs(x) > 0.145 &&
-          smoothRange(z, -0.365, -0.045, 0.025) > 0.25;
-        const endBody = Math.abs(y) > 0.405 &&
-          smoothRange(z, -0.36, -0.045, 0.025) > 0.25;
-        const candidate = upperBody || sideBody || endBody;
+        // Paneles laterales y salpicaderas. La banda vertical evita teñir techo,
+        // cristales y componentes del interior que comparten el material del GLB.
+        const sideBody =
+          Math.abs(x) > 0.135 &&
+          smoothRange(y, 0.055, 0.275, 0.025) > 0.25 &&
+          Math.abs(z) < 0.555;
 
-        // Deja libres las zonas centrales de las cuatro ruedas.
+        // Superficies horizontales: techo, cofre y portón trasero.
+        // La textura de los cristales permanece protegida por su luminosidad.
+        const roof =
+          y > 0.285 &&
+          Math.abs(x) < 0.255 &&
+          z > -0.36 && z < 0.30;
+        const hood =
+          y > 0.115 &&
+          Math.abs(x) < 0.255 &&
+          z > 0.28 && z < 0.555;
+        const rearHatch =
+          y > 0.12 &&
+          Math.abs(x) < 0.245 &&
+          z < -0.43 && z > -0.595;
+
+        // Parachoques de los extremos, manteniendo fuera las áreas de faros
+        // delanteros y calaveras traseras para conservar sus colores originales.
+        const frontBumper =
+          z > 0.505 && y > 0.015 && y < 0.135 && Math.abs(x) < 0.255;
+        const rearBumper =
+          z < -0.555 && y > 0.015 && y < 0.13 && Math.abs(x) < 0.25;
+        const lampZone =
+          Math.abs(x) > 0.105 &&
+          y > 0.075 && y < 0.235 &&
+          (z > 0.425 || z < -0.475);
+
+        // Protección circular de los cuatro pasos de rueda (coordenadas X/Y,
+        // centrados en cada extremo del eje longitudinal Z).
         const wheelZone =
-          Math.abs(x) > 0.185 &&
-          [-0.385, 0.345].some((wheelY) =>
-            ((y - wheelY) / 0.082) ** 2 + ((z + 0.315) / 0.072) ** 2 < 1
+          Math.abs(x) > 0.15 &&
+          [ -0.385, 0.345 ].some((wheelZ) =>
+            ((z - wheelZ) / 0.105) ** 2 + ((y - 0.105) / 0.09) ** 2 < 1.2
           );
 
-        bodyMask[i] = candidate && !wheelZone ? 1 : 0;
+        const candidate = sideBody || roof || hood || rearHatch || frontBumper || rearBumper;
+        bodyMask[i] = candidate && !wheelZone && !lampZone ? 1 : 0;
       }
       geometry.setAttribute('qualitasBodyMask', new THREE.BufferAttribute(bodyMask, 1));
 
@@ -153,7 +177,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
                diffuseColor.rgb = mix(diffuseColor.rgb, qualitasBrandPaint, qualitasPaintMask);`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v4';
+        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v5';
         material.needsUpdate = true;
         return material;
       });
