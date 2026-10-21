@@ -176,7 +176,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       logoMap.image && logoMap.image.width && logoMap.image.height
         ? logoMap.image.width / logoMap.image.height
         : 3.2;
-    const logoWidth = vehicleSize.x * 0.34;
+    const logoWidth = vehicleSize.x * 0.40;
     const logoHeight = logoWidth / logoAspect;
     const logoMaterial = new THREE.MeshBasicMaterial({
       map: logoMap,
@@ -198,10 +198,10 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     // El frente del Prius corresponde al extremo +Z del modelo.
     const logoWorldPosition = new THREE.Vector3(
       (vehicleBounds.min.x + vehicleBounds.max.x) / 2,
-      vehicleBounds.min.y + vehicleSize.y * 0.425,
-      vehicleBounds.min.z + vehicleSize.z * 0.775
+      vehicleBounds.min.y + vehicleSize.y * 0.49 + 0.012,
+      vehicleBounds.min.z + vehicleSize.z * 0.80
     );
-    const hoodNormal = new THREE.Vector3(0, 0.62, 0.785).normalize();
+    const hoodNormal = new THREE.Vector3(0, 0.88, 0.47).normalize();
     const worldLogoQuaternion = new THREE.Quaternion().setFromUnitVectors(
       new THREE.Vector3(0, 0, 1),
       hoodNormal
