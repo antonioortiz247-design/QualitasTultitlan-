@@ -206,6 +206,12 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       new THREE.Vector3(0, 0, 1),
       hoodNormal
     );
+    // Alinear el wordmark transversalmente al cofre, no a lo largo del auto.
+    const logoRoll = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(0, 0, 1),
+      Math.PI / 2
+    );
+    worldLogoQuaternion.multiply(logoRoll);
     const rootWorldQuaternion = clone.getWorldQuaternion(new THREE.Quaternion());
     logoMesh.quaternion.copy(rootWorldQuaternion.invert().multiply(worldLogoQuaternion));
     logoMesh.position.copy(clone.worldToLocal(logoWorldPosition));
