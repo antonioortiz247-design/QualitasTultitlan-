@@ -51,7 +51,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     const vehicleSize = vehicleBounds.getSize(new THREE.Vector3());
     const vehicleCenterY = vehicleBounds.getCenter(new THREE.Vector3()).y;
     const splitHeight = vehicleBounds.min.y + vehicleSize.y * 0.43;
-    // Center moves the GLB to the origin at render time; compensate for that shift in the shader.
+    // Compensa el centrado que aplica <Center> al modelo en el Canvas.
     const centeredSplitHeight = splitHeight - vehicleCenterY;
 
     clone.traverse((object) => {
@@ -64,11 +64,54 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
       object.castShadow = true;
       object.receiveShadow = true;
-      const materials = Array.isArray(object.material) ? object.material : [object.material];
-      const geometryBounds = new THREE.Box3().setFromObject(object);
-      const geometrySize = geometryBounds.getSize(new THREE.Vector3());
 
-      // Separate materials such as glass, rubber, wheels, lights and trim stay untouched.
+      // El GLB tiene una sola malla y un único material para el coche completo.
+      // Expandimos los triángulos para poder marcar la carrocería cara por cara,
+      // sin teñir ruedas, cristales, luces ni interior por compartir material.
+      const geometry = object.geometry.toNonIndexed();
+      object.geometry = geometry;
+      const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
+      const normals = geometry.getAttribute('normal') as THREE.BufferAttribute;
+      const bodyMask = new Float32Array(positions.count);
+
+      for (let i = 0; i < positions.count; i += 3) {
+        const x = (positions.getX(i) + positions.getX(i + 1) + positions.getX(i + 2)) / 3;
+        const y = (positions.getY(i) + positions.getY(i + 1) + positions.getY(i + 2)) / 3;
+        const z = (positions.getZ(i) + positions.getZ(i + 1) + positions.getZ(i + 2)) / 3;
+        const nx = (normals.getX(i) + normals.getX(i + 1) + normals.getX(i + 2)) / 3;
+        const nz = (normals.getZ(i) + normals.getZ(i + 1) + normals.getZ(i + 2)) / 3;
+
+        // Ejes locales del GLB: Z corresponde a la altura del vehículo.
+        // Las superficies laterales y superiores son candidatas a carrocería.
+        const sidePanel =
+          Math.abs(nx) > 0.52 &&
+          Math.abs(x) > 0.13 &&
+          z > -0.36 &&
+          z < -0.025 &&
+          Math.abs(y) < 0.53;
+        const upperPanel =
+          nz < -0.48 &&
+          z < -0.18 &&
+          z > -0.405 &&
+          Math.abs(y) < 0.59;
+
+        // Excluye las cuatro zonas circulares de rueda, incluso si el GLB
+        // no las nombra como ruedas o rines.
+        const nearWheel =
+          Math.abs(x) > 0.13 &&
+          [-0.38, 0.36].some((wheelY) =>
+            ((y - wheelY) / 0.135) ** 2 + ((z + 0.085) / 0.12) ** 2 < 1.35
+          );
+
+        if ((sidePanel || upperPanel) && !nearWheel) {
+          bodyMask[i] = 1;
+          bodyMask[i + 1] = 1;
+          bodyMask[i + 2] = 1;
+        }
+      }
+      geometry.setAttribute('qualitasBodyMask', new THREE.BufferAttribute(bodyMask, 1));
+
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
       const updatedMaterials = materials.map((sourceMaterial) => {
         const material = sourceMaterial.clone();
         const materialName = material.name.toLowerCase();
@@ -78,58 +121,44 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         }
         if (!(material instanceof THREE.MeshStandardMaterial)) return material;
 
-        const partLabel = name + ' ' + materialName;
-        const excluded = /(glass|window|windshield|windscreen|tire|tyre|wheel|rim|alloy|hubcap|spoke|rubber|brake|caliper|rotor|disc|light|lamp|lens|chrome|silver|metal|grille|interior|seat|plastic|black|mirror|trim|handle|dashboard|steering|logo|emblem|badge|exhaust)/i.test(partLabel);
-        // Also protect wheel meshes whose GLB object/material names are generic.
-        const objectBounds = new THREE.Box3().setFromObject(object);
-        const objectSize = objectBounds.getSize(new THREE.Vector3());
-        const objectCenter = objectBounds.getCenter(new THREE.Vector3());
-        const vehicleLength = Math.max(vehicleSize.x, vehicleSize.z);
-        const wheelSizedMesh = Math.max(objectSize.x, objectSize.y, objectSize.z) < vehicleLength * 0.19;
-        const nearLowerBody = objectCenter.y < vehicleBounds.min.y + vehicleSize.y * 0.34;
-        if (excluded || (wheelSizedMesh && nearLowerBody)) return material;
-
-        const c = material.color;
-        const explicitPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side|roof)/i.test(partLabel);
-
-        // Generic GLB names are common. Only treat a neutral material as body paint when
-        // the mesh is broad enough to be an exterior panel; small seats, rims and details stay original.
-        const broadExteriorPanel = Math.max(objectSize.x, objectSize.y, objectSize.z) >
-          Math.max(vehicleSize.x, vehicleSize.z) * 0.2;
-        const neutralPaint = broadExteriorPanel &&
-          c.r > 0.62 && c.g > 0.62 && c.b > 0.62 &&
-          material.roughness < 0.95 && material.metalness < 0.42;
-        if (!explicitPaint && !neutralPaint) return material;
-
-        // Shader-based world-height mask creates a truly straight split independent of mesh triangles.
-        // Only neutral/body-paint materials reach this branch; glass, wheels, trim and lights are excluded above.
         const purple = new THREE.Color('#941B80');
         const aqua = new THREE.Color('#0096AE');
         const purpleRGB = `${purple.r.toFixed(6)}, ${purple.g.toFixed(6)}, ${purple.b.toFixed(6)}`;
         const aquaRGB = `${aqua.r.toFixed(6)}, ${aqua.g.toFixed(6)}, ${aqua.b.toFixed(6)}`;
         const split = centeredSplitHeight.toFixed(6);
 
-        material.color.set('#ffffff');
-        material.vertexColors = false;
+        // El mapa original sigue activo. Solo se reemplaza el color de las caras
+        // marcadas como carrocería; los píxeles oscuros de cristales y detalles
+        // conservan su textura original.
         material.onBeforeCompile = (shader) => {
           shader.vertexShader = shader.vertexShader
-            .replace('#include <common>', '#include <common>\nvarying vec3 vQualitasWorldPosition;')
-            .replace('#include <begin_vertex>', '#include <begin_vertex>\nvQualitasWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+            .replace(
+              '#include <common>',
+              '#include <common>\nattribute float qualitasBodyMask;\nvarying float vQualitasBodyMask;\nvarying vec3 vQualitasWorldPosition;'
+            )
+            .replace(
+              '#include <begin_vertex>',
+              '#include <begin_vertex>\nvQualitasBodyMask = qualitasBodyMask;\nvQualitasWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;'
+            );
 
           shader.fragmentShader = shader.fragmentShader
-            .replace('#include <common>', '#include <common>\nvarying vec3 vQualitasWorldPosition;')
+            .replace(
+              '#include <common>',
+              '#include <common>\nvarying float vQualitasBodyMask;\nvarying vec3 vQualitasWorldPosition;'
+            )
             .replace(
               '#include <color_fragment>',
               `#include <color_fragment>
-               diffuseColor.rgb = (vQualitasWorldPosition.y >= ${split})
-                 ? vec3(${purpleRGB})
-                 : vec3(${aquaRGB});`
+               float qualitasTextureBrightness = (diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0;
+               if (vQualitasBodyMask > 0.5 && qualitasTextureBrightness > 0.32) {
+                 diffuseColor.rgb = (vQualitasWorldPosition.y >= ${split})
+                   ? vec3(${purpleRGB})
+                   : vec3(${aquaRGB});
+               }`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-two-tone-horizontal-split-v1';
+        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v2';
         material.needsUpdate = true;
-        material.metalness = Math.max(material.metalness, 0.18);
-        material.roughness = Math.min(material.roughness, 0.48);
         return material;
       });
 
