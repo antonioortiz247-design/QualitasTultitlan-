@@ -2,7 +2,7 @@
 
 import { Component, Suspense, useMemo, type ErrorInfo, type ReactNode } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Bounds, Center, ContactShadows, Html, OrbitControls, useGLTF } from '@react-three/drei';
+import { Bounds, Center, ContactShadows, Html, OrbitControls, useGLTF, useTexture } from '@react-three/drei';
 import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import * as THREE from 'three';
@@ -44,6 +44,7 @@ const hotspots: Hotspot[] = [
 
 function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
   const { scene } = useGLTF(MODEL_URL);
+  const qualitasLogo = useTexture('/qualitas-logo-blanco.png');
   const model = useMemo(() => {
     const clone = scene.clone(true);
     clone.updateMatrixWorld(true);
@@ -165,8 +166,53 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
       object.material = Array.isArray(object.material) ? updatedMaterials : updatedMaterials[0];
     });
+
+    // Logotipo Quálitas como calcomanía 3D sobre el cofre, independiente de
+    // la máscara de pintura para que no altere faros, parrilla ni carrocería.
+    const logoMap = qualitasLogo.clone();
+    logoMap.colorSpace = THREE.SRGBColorSpace;
+    logoMap.needsUpdate = true;
+    const logoAspect =
+      logoMap.image && logoMap.image.width && logoMap.image.height
+        ? logoMap.image.width / logoMap.image.height
+        : 3.2;
+    const logoWidth = vehicleSize.x * 0.34;
+    const logoHeight = logoWidth / logoAspect;
+    const logoMaterial = new THREE.MeshBasicMaterial({
+      map: logoMap,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false,
+      toneMapped: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      side: THREE.DoubleSide,
+    });
+    const logoMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(logoWidth, logoHeight),
+      logoMaterial
+    );
+    logoMesh.name = 'QualitasHoodDecal';
+    logoMesh.renderOrder = 3;
+
+    // El frente del Prius corresponde al extremo +Z del modelo.
+    const logoWorldPosition = new THREE.Vector3(
+      (vehicleBounds.min.x + vehicleBounds.max.x) / 2,
+      vehicleBounds.min.y + vehicleSize.y * 0.425,
+      vehicleBounds.min.z + vehicleSize.z * 0.775
+    );
+    const hoodNormal = new THREE.Vector3(0, 0.62, 0.785).normalize();
+    const worldLogoQuaternion = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 0, 1),
+      hoodNormal
+    );
+    const rootWorldQuaternion = clone.getWorldQuaternion(new THREE.Quaternion());
+    logoMesh.quaternion.copy(rootWorldQuaternion.invert().multiply(worldLogoQuaternion));
+    logoMesh.position.copy(clone.worldToLocal(logoWorldPosition));
+    clone.add(logoMesh);
+
     return clone;
-  }, [scene]);
+  }, [scene, qualitasLogo]);
 
   return (
     <Bounds fit clip observe margin={1.25}>
