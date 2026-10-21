@@ -49,64 +49,85 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     clone.updateMatrixWorld(true);
     const vehicleBounds = new THREE.Box3().setFromObject(clone);
     const vehicleSize = vehicleBounds.getSize(new THREE.Vector3());
+    const splitHeight = vehicleBounds.min.y + vehicleSize.y * 0.43;
 
     clone.traverse((object) => {
       const name = object.name.toLowerCase();
-      // Hide separately named manufacturer marks where the GLB exposes them as objects.
       if (/(logo|emblem|brand|badge|toyota|corolla)/i.test(name)) {
         object.visible = false;
         return;
       }
-
       if (!(object instanceof THREE.Mesh)) return;
+
       object.castShadow = true;
       object.receiveShadow = true;
-
-      const bounds = new THREE.Box3().setFromObject(object);
-      const center = bounds.getCenter(new THREE.Vector3());
-      const size = bounds.getSize(new THREE.Vector3());
       const materials = Array.isArray(object.material) ? object.material : [object.material];
+      const geometryBounds = new THREE.Box3().setFromObject(object);
+      const geometrySize = geometryBounds.getSize(new THREE.Vector3());
 
-      const nextMaterials = materials.map((original) => {
-        const material = original.clone();
+      // Separate materials such as glass, rubber, wheels, lights and trim stay untouched.
+      const updatedMaterials = materials.map((sourceMaterial) => {
+        const material = sourceMaterial.clone();
         const materialName = material.name.toLowerCase();
         if (/(logo|emblem|brand|badge|toyota|corolla)/i.test(materialName)) {
           object.visible = false;
           return material;
         }
+        if (!(material instanceof THREE.MeshStandardMaterial)) return material;
 
-        if (!(material instanceof THREE.MeshStandardMaterial) || !material.color) return material;
+        const excluded = /(glass|window|windshield|windscreen|tire|tyre|wheel|rim|rubber|light|lamp|lens|chrome|grille|interior|seat|plastic|black|mirror)/i.test(name + ' ' + materialName);
+        if (excluded) return material;
 
         const c = material.color;
-        const likelyPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side)/i.test(name + ' ' + materialName) ||
-          (c.r > 0.62 && c.g > 0.62 && c.b > 0.62 && material.roughness < 0.9);
-        const excluded = /(glass|window|windshield|tire|tyre|wheel|rim|rubber|light|lamp|lens|chrome|grille|interior|seat|plastic|black)/i.test(name + ' ' + materialName);
-        if (!likelyPaint || excluded) return material;
+        const explicitPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side|roof)/i.test(name + ' ' + materialName);
+        const neutralPaint = c.r > 0.62 && c.g > 0.62 && c.b > 0.62 && material.roughness < 0.95;
+        if (!explicitPaint && !neutralPaint) return material;
 
-        // Two-tone Quálitas-inspired wrap: purple on hood/roof/doors and aqua on bumpers/lower body.
-        const purplePart = /(hood|bonnet|roof|door|side|quarter|trunk|boot|decklid|body.?upper)/i.test(name + ' ' + materialName);
-        const aquaPart = /(bumper|lower|skirt|sill|fender|front.?fascia|rear.?fascia)/i.test(name + ' ' + materialName);
-        let paint = purplePart ? '#941B80' : aquaPart ? '#0096AE' : '';
+        // Use vertex colors for generic body meshes instead of painting the whole mesh one color.
+        if (object.geometry && (materials.length === 1 || sourceMaterial === materials[0])) {
+          const geometry = object.geometry.clone();
+          const nonIndexed = geometry.index ? geometry.toNonIndexed() : geometry;
+          const position = nonIndexed.getAttribute('position');
+          const colors = new Float32Array(position.count * 3);
+          const worldPosition = new THREE.Vector3();
+          const a = new THREE.Vector3();
+          const b = new THREE.Vector3();
+          const d = new THREE.Vector3();
+          const faceNormal = new THREE.Vector3();
 
-        // If the GLB uses generic mesh names, use its part proportions as a fallback.
-        if (!paint) {
-          const partLabel = (name + ' ' + materialName);
-          if (/(body|carrocer|exterior|shell|paint)/i.test(partLabel)) {
-            paint = center.y > vehicleBounds.min.y + vehicleSize.y * 0.42 ? '#941B80' : '#0096AE';
-          } else if (c.r > 0.62 && c.g > 0.62 && c.b > 0.62) {
-            paint = center.y > vehicleBounds.min.y + vehicleSize.y * 0.42 ? '#941B80' : '#0096AE';
+          for (let i = 0; i < position.count; i += 3) {
+            a.fromBufferAttribute(position, i).applyMatrix4(object.matrixWorld);
+            b.fromBufferAttribute(position, i + 1).applyMatrix4(object.matrixWorld);
+            d.fromBufferAttribute(position, i + 2).applyMatrix4(object.matrixWorld);
+            worldPosition.copy(a).add(b).add(d).multiplyScalar(1 / 3);
+            faceNormal.subVectors(b, a).cross(d.clone().sub(a)).normalize();
+
+            // Hood and roof face upward, so keep them purple. Side panels use a height split.
+            const isUpperSurface = faceNormal.y > 0.48;
+            const color = (isUpperSurface || worldPosition.y >= splitHeight)
+              ? new THREE.Color('#941B80')
+              : new THREE.Color('#0096AE');
+
+            for (let vertex = 0; vertex < 3; vertex++) {
+              const offset = (i + vertex) * 3;
+              colors[offset] = color.r;
+              colors[offset + 1] = color.g;
+              colors[offset + 2] = color.b;
+            }
           }
-        }
 
-        if (paint) {
-          material.color.set(paint);
-          material.metalness = Math.max(material.metalness, 0.22);
-          material.roughness = Math.min(material.roughness, 0.4);
+          nonIndexed.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+          if (nonIndexed !== geometry) geometry.dispose();
+          object.geometry = nonIndexed;
+          material.color.set('#ffffff');
+          material.vertexColors = true;
+          material.metalness = Math.max(material.metalness, 0.18);
+          material.roughness = Math.min(material.roughness, 0.48);
         }
         return material;
       });
 
-      object.material = Array.isArray(object.material) ? nextMaterials : nextMaterials[0];
+      object.material = Array.isArray(object.material) ? updatedMaterials : updatedMaterials[0];
     });
     return clone;
   }, [scene]);
