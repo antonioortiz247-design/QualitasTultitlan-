@@ -49,7 +49,10 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     clone.updateMatrixWorld(true);
     const vehicleBounds = new THREE.Box3().setFromObject(clone);
     const vehicleSize = vehicleBounds.getSize(new THREE.Vector3());
+    const vehicleCenterY = vehicleBounds.getCenter(new THREE.Vector3()).y;
     const splitHeight = vehicleBounds.min.y + vehicleSize.y * 0.43;
+    // Center moves the GLB to the origin at render time; compensate for that shift in the shader.
+    const centeredSplitHeight = splitHeight - vehicleCenterY;
 
     clone.traverse((object) => {
       const name = object.name.toLowerCase();
@@ -89,7 +92,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const aqua = new THREE.Color('#0096AE');
         const purpleRGB = `${purple.r.toFixed(6)}, ${purple.g.toFixed(6)}, ${purple.b.toFixed(6)}`;
         const aquaRGB = `${aqua.r.toFixed(6)}, ${aqua.g.toFixed(6)}, ${aqua.b.toFixed(6)}`;
-        const split = splitHeight.toFixed(6);
+        const split = centeredSplitHeight.toFixed(6);
 
         material.color.set('#ffffff');
         material.vertexColors = false;
