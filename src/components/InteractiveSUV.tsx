@@ -65,49 +65,43 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       object.castShadow = true;
       object.receiveShadow = true;
 
-      // El GLB tiene una sola malla y un único material para el coche completo.
-      // Expandimos los triángulos para poder marcar la carrocería cara por cara,
-      // sin teñir ruedas, cristales, luces ni interior por compartir material.
+      // El GLB tiene una sola malla/material. Creamos una máscara por vértice
+      // usando los ejes locales reales: X=ancho, Y=largo, Z=alto (alto = -Z en mundo).
       const geometry = object.geometry.toNonIndexed();
       object.geometry = geometry;
       const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
       const normals = geometry.getAttribute('normal') as THREE.BufferAttribute;
       const bodyMask = new Float32Array(positions.count);
 
-      for (let i = 0; i < positions.count; i += 3) {
-        const x = (positions.getX(i) + positions.getX(i + 1) + positions.getX(i + 2)) / 3;
-        const y = (positions.getY(i) + positions.getY(i + 1) + positions.getY(i + 2)) / 3;
-        const z = (positions.getZ(i) + positions.getZ(i + 1) + positions.getZ(i + 2)) / 3;
-        const nx = (normals.getX(i) + normals.getX(i + 1) + normals.getX(i + 2)) / 3;
-        const nz = (normals.getZ(i) + normals.getZ(i + 1) + normals.getZ(i + 2)) / 3;
+      const smoothRange = (value: number, low: number, high: number, feather: number) => {
+        const lower = THREE.MathUtils.smoothstep(value, low - feather, low + feather);
+        const upper = 1 - THREE.MathUtils.smoothstep(value, high - feather, high + feather);
+        return lower * upper;
+      };
 
-        // Ejes locales del GLB: Z corresponde a la altura del vehículo.
-        // Las superficies laterales y superiores son candidatas a carrocería.
-        const sidePanel =
-          Math.abs(nx) > 0.52 &&
-          Math.abs(x) > 0.13 &&
-          z > -0.36 &&
-          z < -0.025 &&
-          Math.abs(y) < 0.53;
-        const upperPanel =
-          nz < -0.48 &&
-          z < -0.18 &&
-          z > -0.405 &&
-          Math.abs(y) < 0.59;
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = positions.getZ(i);
+        const nx = Math.abs(normals.getX(i));
+        const ny = Math.abs(normals.getY(i));
+        const nz = normals.getZ(i);
 
-        // Excluye las cuatro zonas circulares de rueda, incluso si el GLB
-        // no las nombra como ruedas o rines.
-        const nearWheel =
-          Math.abs(x) > 0.13 &&
-          [-0.38, 0.36].some((wheelY) =>
-            ((y - wheelY) / 0.135) ** 2 + ((z + 0.085) / 0.12) ** 2 < 1.35
-          );
+        // Carrocería lateral, paneles de extremos y superficies superiores.
+        const side = nx > 0.38 && Math.abs(x) > 0.145 &&
+          smoothRange(z, -0.355, -0.025, 0.025) > 0.35;
+        const frontRear = ny > 0.52 && Math.abs(y) > 0.405 &&
+          smoothRange(z, -0.355, -0.035, 0.025) > 0.35;
+        const topPanels = nz > 0.42 && z > -0.19 && Math.abs(y) < 0.53;
+        const candidate = side || frontRear || topPanels;
 
-        if ((sidePanel || upperPanel) && !nearWheel) {
-          bodyMask[i] = 1;
-          bodyMask[i + 1] = 1;
-          bodyMask[i + 2] = 1;
-        }
+        // Protege centros de rines; los neumáticos oscuros también quedan protegidos
+        // por su textura original en el shader. Los pasos de rueda no se excluyen enteros.
+        const wheelZone = Math.abs(x) > 0.185 && [-0.385, 0.345].some((wheelY) =>
+          ((y - wheelY) / 0.082) ** 2 + ((z + 0.315) / 0.072) ** 2 < 1
+        );
+
+        bodyMask[i] = candidate && !wheelZone ? 1 : 0;
       }
       geometry.setAttribute('qualitasBodyMask', new THREE.BufferAttribute(bodyMask, 1));
 
@@ -150,14 +144,15 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
               '#include <color_fragment>',
               `#include <color_fragment>
                float qualitasTextureBrightness = (diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0;
-               if (vQualitasBodyMask > 0.5 && qualitasTextureBrightness > 0.32) {
-                 diffuseColor.rgb = (vQualitasWorldPosition.y >= ${split})
-                   ? vec3(${purpleRGB})
-                   : vec3(${aquaRGB});
-               }`
+               float qualitasPaintMask = smoothstep(0.25, 0.8, vQualitasBodyMask) *
+                 smoothstep(0.24, 0.42, qualitasTextureBrightness);
+               vec3 qualitasBrandPaint = (vQualitasWorldPosition.y >= ${split})
+                 ? vec3(${purpleRGB})
+                 : vec3(${aquaRGB});
+               diffuseColor.rgb = mix(diffuseColor.rgb, qualitasBrandPaint, qualitasPaintMask);`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v2';
+        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v3';
         material.needsUpdate = true;
         return material;
       });
