@@ -398,7 +398,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           const basis = new THREE.Matrix4().makeBasis(right, surfaceUp, normal);
           const orientation = new THREE.Euler().setFromRotationMatrix(basis);
           const position = bumperHit.point.clone().addScaledVector(normal, 0.003);
-          const sloganWidth = vehicleSize.x * 0.58; // frase legible a lo ancho de la defensa trasera
+          const sloganWidth = vehicleSize.x * 0.82; // lema extendido para abarcar prácticamente toda la defensa trasera
           const sloganHeight = sloganWidth / (sloganCanvas.width / sloganCanvas.height);
           const sloganGeometry = new DecalGeometry(
             bumperHit.object,
