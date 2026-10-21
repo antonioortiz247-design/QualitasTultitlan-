@@ -95,11 +95,11 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         material.vertexColors = false;
         material.onBeforeCompile = (shader) => {
           shader.vertexShader = shader.vertexShader
-            .replace('#include <common>', '#include <common>\\nvarying vec3 vQualitasWorldPosition;')
-            .replace('#include <begin_vertex>', '#include <begin_vertex>\\nvQualitasWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+            .replace('#include <common>', '#include <common>\nvarying vec3 vQualitasWorldPosition;')
+            .replace('#include <begin_vertex>', '#include <begin_vertex>\nvQualitasWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;');
 
           shader.fragmentShader = shader.fragmentShader
-            .replace('#include <common>', '#include <common>\\nvarying vec3 vQualitasWorldPosition;')
+            .replace('#include <common>', '#include <common>\nvarying vec3 vQualitasWorldPosition;')
             .replace(
               '#include <color_fragment>',
               `#include <color_fragment>
