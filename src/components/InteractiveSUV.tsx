@@ -359,16 +359,16 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
     // Lema institucional en la defensa trasera, proyectado sobre la superficie real.
     const sloganCanvas = document.createElement('canvas');
-    sloganCanvas.width = 1400;
-    sloganCanvas.height = 240;
+    sloganCanvas.width = 1800;
+    sloganCanvas.height = 220;
     const sloganContext = sloganCanvas.getContext('2d');
     if (sloganContext) {
       sloganContext.clearRect(0, 0, sloganCanvas.width, sloganCanvas.height);
       sloganContext.fillStyle = '#FFFFFF';
-      sloganContext.font = '600 92px Arial, sans-serif';
+      sloganContext.font = '600 68px Arial, sans-serif';
       sloganContext.textAlign = 'center';
       sloganContext.textBaseline = 'middle';
-      sloganContext.fillText('Aseguramos autos, cuidamos personas.', sloganCanvas.width / 2, sloganCanvas.height / 2, 1340);
+      sloganContext.fillText('Aseguramos autos, cuidamos personas.', sloganCanvas.width / 2, sloganCanvas.height / 2, 1740);
       const sloganTexture = new THREE.CanvasTexture(sloganCanvas);
       sloganTexture.colorSpace = THREE.SRGBColorSpace;
       sloganTexture.needsUpdate = true;
@@ -398,7 +398,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           const basis = new THREE.Matrix4().makeBasis(right, surfaceUp, normal);
           const orientation = new THREE.Euler().setFromRotationMatrix(basis);
           const position = bumperHit.point.clone().addScaledVector(normal, 0.003);
-          const sloganWidth = vehicleSize.x * 0.82; // lema extendido para abarcar prácticamente toda la defensa trasera
+          const sloganWidth = vehicleSize.x * 0.82; // mantiene el ancho y reduce la altura del decal para evitar recortes en la curvatura
           const sloganHeight = sloganWidth / (sloganCanvas.width / sloganCanvas.height);
           const sloganGeometry = new DecalGeometry(
             bumperHit.object,
