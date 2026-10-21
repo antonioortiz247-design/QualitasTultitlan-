@@ -78,12 +78,16 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         }
         if (!(material instanceof THREE.MeshStandardMaterial)) return material;
 
-        const excluded = /(glass|window|windshield|windscreen|tire|tyre|wheel|rim|rubber|light|lamp|lens|chrome|grille|interior|seat|plastic|black|mirror)/i.test(name + ' ' + materialName);
-        if (excluded) return material;
+        const partLabel = name + ' ' + materialName;
+        const excluded = /(glass|window|windshield|windscreen|tire|tyre|wheel|rim|alloy|hubcap|spoke|rubber|brake|caliper|rotor|disc|light|lamp|lens|chrome|silver|metal|grille|interior|seat|plastic|black|mirror|trim|handle|dashboard|steering|logo|emblem|badge|exhaust)/i.test(partLabel);
+        // Keep factory metallic finishes and dark/detail materials untouched, even when the mesh has a generic name.
+        if (excluded || material.metalness > 0.42 || material.roughness < 0.2) return material;
 
         const c = material.color;
-        const explicitPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side|roof)/i.test(name + ' ' + materialName);
-        const neutralPaint = c.r > 0.62 && c.g > 0.62 && c.b > 0.62 && material.roughness < 0.95;
+        const explicitPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side|roof)/i.test(partLabel);
+        const neutralPaint = c.r > 0.62 && c.g > 0.62 && c.b > 0.62 &&
+          material.roughness >= 0.2 && material.roughness < 0.92 &&
+          material.metalness < 0.42;
         if (!explicitPaint && !neutralPaint) return material;
 
         // Shader-based world-height mask creates a truly straight split independent of mesh triangles.
