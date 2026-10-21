@@ -181,7 +181,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     const logoMaterial = new THREE.MeshBasicMaterial({
       map: logoMap,
       transparent: true,
-      depthTest: false,
+      depthTest: true,
       depthWrite: false,
       toneMapped: false,
       polygonOffset: true,
@@ -196,24 +196,43 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     logoMesh.renderOrder = 3;
 
     // El frente del Prius corresponde al extremo +Z del modelo.
-    const logoWorldPosition = new THREE.Vector3(
-      (vehicleBounds.min.x + vehicleBounds.max.x) / 2,
-      vehicleBounds.min.y + vehicleSize.y * 0.47 + 0.018,
-      vehicleBounds.min.z + vehicleSize.z * 0.86
+    const hoodTargetX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
+    const hoodTargetZ = vehicleBounds.min.z + vehicleSize.z * 0.86;
+
+    // Proyectar desde arriba sobre la superficie real del cofre. Esto evita
+    // colocar la calcomanía dentro del habitáculo o hacerla visible desde atrás.
+    clone.updateMatrixWorld(true);
+    const hoodRaycaster = new THREE.Raycaster(
+      new THREE.Vector3(hoodTargetX, vehicleBounds.max.y + vehicleSize.y, hoodTargetZ),
+      new THREE.Vector3(0, -1, 0)
     );
-    const hoodNormal = new THREE.Vector3(0, 0.985, 0.17).normalize();
+    const hoodHits = hoodRaycaster.intersectObject(clone, true);
+    const hoodHit = hoodHits.find((hit) =>
+      hit.object !== logoMesh &&
+      hit.point.y > vehicleBounds.min.y + vehicleSize.y * 0.35
+    );
+
+    const logoWorldPosition = hoodHit
+      ? hoodHit.point.clone()
+      : new THREE.Vector3(
+          hoodTargetX,
+          vehicleBounds.min.y + vehicleSize.y * 0.47,
+          hoodTargetZ
+        );
+    const hoodNormal = hoodHit?.face
+      ? hoodHit.face.normal.clone().applyNormalMatrix(
+          new THREE.Matrix3().getNormalMatrix(hoodHit.object.matrixWorld)
+        ).normalize()
+      : new THREE.Vector3(0, 0.985, 0.17).normalize();
+
+    // El texto conserva su orientación original, transversal al vehículo.
     const worldLogoQuaternion = new THREE.Quaternion().setFromUnitVectors(
       new THREE.Vector3(0, 0, 1),
       hoodNormal
     );
-    // Alinear el wordmark transversalmente al cofre, no a lo largo del auto.
-    const logoRoll = new THREE.Quaternion().setFromAxisAngle(
-      new THREE.Vector3(0, 0, 1),
-      Math.PI / 2
-    );
-    worldLogoQuaternion.multiply(logoRoll);
     const rootWorldQuaternion = clone.getWorldQuaternion(new THREE.Quaternion());
     logoMesh.quaternion.copy(rootWorldQuaternion.invert().multiply(worldLogoQuaternion));
+    logoWorldPosition.addScaledVector(hoodNormal, 0.012);
     logoMesh.position.copy(clone.worldToLocal(logoWorldPosition));
     clone.add(logoMesh);
 
