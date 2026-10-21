@@ -83,23 +83,24 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const x = positions.getX(i);
         const y = positions.getY(i);
         const z = positions.getZ(i);
-        const nx = Math.abs(normals.getX(i));
-        const ny = Math.abs(normals.getY(i));
-        const nz = normals.getZ(i);
 
-        // Carrocería lateral, paneles de extremos y superficies superiores.
-        const side = nx > 0.38 && Math.abs(x) > 0.145 &&
-          smoothRange(z, -0.355, -0.025, 0.025) > 0.35;
-        const frontRear = ny > 0.52 && Math.abs(y) > 0.405 &&
-          smoothRange(z, -0.355, -0.035, 0.025) > 0.35;
-        const topPanels = nz > 0.42 && z > -0.19 && Math.abs(y) < 0.53;
-        const candidate = side || frontRear || topPanels;
+        // En este GLB, Z es la altura local: el techo está cerca de Z=0,
+        // la parte baja de la carrocería cerca de Z=-0.35 y Y recorre el largo.
+        // Seleccionar por región espacial evita dejar techo y cofre blancos
+        // cuando sus normales no coinciden con las de los paneles laterales.
+        const upperBody = z > -0.205 && Math.abs(x) < 0.255;
+        const sideBody = Math.abs(x) > 0.145 &&
+          smoothRange(z, -0.365, -0.045, 0.025) > 0.25;
+        const endBody = Math.abs(y) > 0.405 &&
+          smoothRange(z, -0.36, -0.045, 0.025) > 0.25;
+        const candidate = upperBody || sideBody || endBody;
 
-        // Protege centros de rines; los neumáticos oscuros también quedan protegidos
-        // por su textura original en el shader. Los pasos de rueda no se excluyen enteros.
-        const wheelZone = Math.abs(x) > 0.185 && [-0.385, 0.345].some((wheelY) =>
-          ((y - wheelY) / 0.082) ** 2 + ((z + 0.315) / 0.072) ** 2 < 1
-        );
+        // Deja libres las zonas centrales de las cuatro ruedas.
+        const wheelZone =
+          Math.abs(x) > 0.185 &&
+          [-0.385, 0.345].some((wheelY) =>
+            ((y - wheelY) / 0.082) ** 2 + ((z + 0.315) / 0.072) ** 2 < 1
+          );
 
         bodyMask[i] = candidate && !wheelZone ? 1 : 0;
       }
@@ -152,7 +153,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
                diffuseColor.rgb = mix(diffuseColor.rgb, qualitasBrandPaint, qualitasPaintMask);`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v3';
+        material.customProgramCacheKey = () => 'qualitas-selective-body-segmentation-v4';
         material.needsUpdate = true;
         return material;
       });
