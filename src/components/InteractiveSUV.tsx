@@ -225,14 +225,19 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         ).normalize()
       : new THREE.Vector3(0, 0.985, 0.17).normalize();
 
-    // El texto conserva su orientación original, transversal al vehículo.
-    const worldLogoQuaternion = new THREE.Quaternion().setFromUnitVectors(
-      new THREE.Vector3(0, 0, 1),
-      hoodNormal
-    );
+    // Asegurar que la normal apunte hacia fuera y orientar el logo siguiendo
+    // el eje longitudinal del cofre, proyectado sobre la superficie detectada.
+    if (hoodNormal.y < 0) hoodNormal.negate();
+    const hoodForward = new THREE.Vector3(0, 0, 1);
+    hoodForward.addScaledVector(hoodNormal, -hoodForward.dot(hoodNormal)).normalize();
+    const logoRight = hoodForward.clone().cross(hoodNormal).normalize();
+    const logoUp = hoodNormal.clone().cross(logoRight).normalize();
+    const logoBasis = new THREE.Matrix4().makeBasis(logoRight, logoUp, hoodNormal);
+    const worldLogoQuaternion = new THREE.Quaternion().setFromRotationMatrix(logoBasis);
+
     const rootWorldQuaternion = clone.getWorldQuaternion(new THREE.Quaternion());
     logoMesh.quaternion.copy(rootWorldQuaternion.invert().multiply(worldLogoQuaternion));
-    logoWorldPosition.addScaledVector(hoodNormal, 0.012);
+    logoWorldPosition.addScaledVector(hoodNormal, 0.018);
     logoMesh.position.copy(clone.worldToLocal(logoWorldPosition));
     clone.add(logoMesh);
 
