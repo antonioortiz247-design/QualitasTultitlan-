@@ -155,15 +155,18 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
               '#include <color_fragment>',
               `#include <color_fragment>
                float qualitasTextureBrightness = (diffuseColor.r + diffuseColor.g + diffuseColor.b) / 3.0;
+               float qualitasMaxChannel = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b));
+               float qualitasMinChannel = min(diffuseColor.r, min(diffuseColor.g, diffuseColor.b));
+               float qualitasNeutralPaint = 1.0 - smoothstep(0.08, 0.24, qualitasMaxChannel - qualitasMinChannel);
                float qualitasPaintMask = smoothstep(0.25, 0.8, vQualitasBodyMask) *
-                 smoothstep(0.24, 0.42, qualitasTextureBrightness);
+                 smoothstep(0.30, 0.55, qualitasTextureBrightness) * qualitasNeutralPaint;
                vec3 qualitasBrandPaint = (vQualitasWorldPosition.y >= ${split})
                  ? vec3(${purpleRGB})
                  : vec3(${aquaRGB});
                diffuseColor.rgb = mix(diffuseColor.rgb, qualitasBrandPaint, qualitasPaintMask);`
             );
         };
-        material.customProgramCacheKey = () => 'qualitas-world-space-body-mask-v7';
+        material.customProgramCacheKey = () => 'qualitas-neutral-texture-paint-v8';
         material.needsUpdate = true;
         return material;
       });
