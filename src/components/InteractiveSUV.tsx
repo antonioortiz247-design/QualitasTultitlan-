@@ -92,24 +92,20 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           const a = new THREE.Vector3();
           const b = new THREE.Vector3();
           const d = new THREE.Vector3();
-          const vertexWorld = new THREE.Vector3();
-          const faceNormal = new THREE.Vector3();
+          const faceCenter = new THREE.Vector3();
           const purple = new THREE.Color('#941B80');
           const aqua = new THREE.Color('#0096AE');
-          const band = Math.max(vehicleSize.y * 0.035, 0.012);
 
           for (let i = 0; i < position.count; i += 3) {
             a.fromBufferAttribute(position, i).applyMatrix4(object.matrixWorld);
             b.fromBufferAttribute(position, i + 1).applyMatrix4(object.matrixWorld);
             d.fromBufferAttribute(position, i + 2).applyMatrix4(object.matrixWorld);
-            faceNormal.subVectors(b, a).cross(d.clone().sub(a)).normalize();
-            const isUpperSurface = faceNormal.y > 0.48;
+            faceCenter.copy(a).add(b).add(d).multiplyScalar(1 / 3);
 
-            // Per-vertex blending softens the color boundary and avoids jagged triangle-shaped seams.
+            // Hard split: each triangle gets exactly one paint color, with no fade or blended seam.
+            // All body surfaces below the horizontal cutoff, including bumper faces, stay aqua.
+            const color = faceCenter.y >= splitHeight ? purple : aqua;
             for (let vertex = 0; vertex < 3; vertex++) {
-              vertexWorld.fromBufferAttribute(position, i + vertex).applyMatrix4(object.matrixWorld);
-              const t = THREE.MathUtils.smoothstep(vertexWorld.y, splitHeight - band, splitHeight + band);
-              const color = isUpperSurface ? purple : aqua.clone().lerp(purple, t);
               const offset = (i + vertex) * 3;
               colors[offset] = color.r;
               colors[offset + 1] = color.g;
