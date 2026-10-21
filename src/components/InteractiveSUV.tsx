@@ -45,7 +45,7 @@ const hotspots: Hotspot[] = [
 
 function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
   const { scene } = useGLTF(MODEL_URL);
-  const qualitasLogo = useTexture('/qualitas-logo-blanco.png');
+  const qualitasLogo = useTexture('/qualitas-logo.png');
   const model = useMemo(() => {
     const clone = scene.clone(true);
     clone.updateMatrixWorld(true);
@@ -168,15 +168,68 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       object.material = Array.isArray(object.material) ? updatedMaterials : updatedMaterials[0];
     });
 
-    // Logotipo Quálitas como calcomanía 3D sobre el cofre, independiente de
-    // la máscara de pintura para que no altere faros, parrilla ni carrocería.
-    const logoMap = qualitasLogo.clone();
-    logoMap.colorSpace = THREE.SRGBColorSpace;
-    logoMap.needsUpdate = true;
-    const logoAspect =
-      logoMap.image && logoMap.image.width && logoMap.image.height
-        ? logoMap.image.width / logoMap.image.height
-        : 3.2;
+    // Convierte el archivo horizontal de marca a blanco conservando su alfa,
+    // y recorta el área visible para que el tamaño del sticker corresponda al logo.
+    const makeWhiteLogoTexture = (
+      source: THREE.Texture,
+      crop?: { x: number; y: number; width: number; height: number }
+    ) => {
+      const image = source.image as HTMLImageElement;
+      const imageWidth = image.naturalWidth || image.width;
+      const imageHeight = image.naturalHeight || image.height;
+      const sx = crop ? Math.round(imageWidth * crop.x) : 0;
+      const sy = crop ? Math.round(imageHeight * crop.y) : 0;
+      const sw = crop ? Math.round(imageWidth * crop.width) : imageWidth;
+      const sh = crop ? Math.round(imageHeight * crop.height) : imageHeight;
+      const sourceCanvas = document.createElement('canvas');
+      sourceCanvas.width = Math.max(1, sw);
+      sourceCanvas.height = Math.max(1, sh);
+      const sourceContext = sourceCanvas.getContext('2d');
+      if (!sourceContext) return source.clone();
+      sourceContext.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
+      const pixels = sourceContext.getImageData(0, 0, sw, sh);
+      let minX = sw, minY = sh, maxX = 0, maxY = 0;
+      for (let y = 0; y < sh; y++) {
+        for (let x = 0; x < sw; x++) {
+          if (pixels.data[(y * sw + x) * 4 + 3] > 8) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+      if (maxX <= minX || maxY <= minY) return source.clone();
+      const width = maxX - minX + 1;
+      const height = maxY - minY + 1;
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = width;
+      croppedCanvas.height = height;
+      const croppedContext = croppedCanvas.getContext('2d');
+      if (!croppedContext) return source.clone();
+      const croppedPixels = sourceContext.getImageData(minX, minY, width, height);
+      for (let i = 0; i < croppedPixels.data.length; i += 4) {
+        if (croppedPixels.data[i + 3] > 0) {
+          croppedPixels.data[i] = 255;
+          croppedPixels.data[i + 1] = 255;
+          croppedPixels.data[i + 2] = 255;
+        }
+      }
+      croppedContext.putImageData(croppedPixels, 0, 0);
+      const texture = new THREE.CanvasTexture(croppedCanvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+      return texture;
+    };
+
+    const logoMap = makeWhiteLogoTexture(qualitasLogo);
+    const logoAspect = logoMap.image.width / logoMap.image.height;
+    // El letragrama se recorta del wordmark horizontal oficial: no incluye
+    // el símbolo cuadrado ni la línea “Compañía de seguros”.
+    const doorLogoMap = makeWhiteLogoTexture(qualitasLogo, {
+      x: 0.30, y: 0.11, width: 0.685, height: 0.55,
+    });
+    const doorLogoAspect = doorLogoMap.image.width / doorLogoMap.image.height;
     // Todas las aplicaciones usan DecalGeometry para adherirse a la superficie
     // real del vehículo, respetando la profundidad y evitando planos flotantes.
     const logoWidth = vehicleSize.x * 0.23; // tamaño del sticker del cofre; no altera la pintura
@@ -194,7 +247,9 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       height: number,
       preferredUp: THREE.Vector3,
       expectedNormal: THREE.Vector3,
-      name: string
+      name: string,
+      decalTexture: THREE.Texture = logoMap,
+      decalAspect: number = logoAspect
     ) => {
       if (!(hit.object instanceof THREE.Mesh)) return;
       const normal = toWorldNormal(hit);
@@ -217,7 +272,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       );
       decalGeometry.applyMatrix4(clone.matrixWorld.clone().invert());
       const material = new THREE.MeshBasicMaterial({
-        map: logoMap,
+        map: decalTexture,
         transparent: true,
         depthTest: true,
         depthWrite: false,
@@ -260,8 +315,8 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
     const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.65;
     const doorY = vehicleBounds.min.y + vehicleSize.y * 0.50;
-    const doorWidth = vehicleSize.z * 0.105; // calcomanía más discreta, centrada en la puerta delantera
-    const doorHeight = doorWidth / logoAspect;
+    const doorWidth = vehicleSize.z * 0.31; // letragrama extendido sobre ambas puertas de cada costado
+    const doorHeight = doorWidth / doorLogoAspect;
     const doorTargets = [
       {
         origin: new THREE.Vector3(vehicleBounds.max.x + vehicleSize.x * 0.5, doorY, doorZ),
@@ -293,7 +348,9 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           hit, doorWidth, doorHeight,
           new THREE.Vector3(0, 1, 0),
           target.expectedNormal,
-          target.name
+          target.name,
+          doorLogoMap,
+          doorLogoAspect
         );
       }
     }
