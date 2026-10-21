@@ -83,44 +83,35 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const neutralPaint = c.r > 0.62 && c.g > 0.62 && c.b > 0.62 && material.roughness < 0.95;
         if (!explicitPaint && !neutralPaint) return material;
 
-        // Use vertex colors for generic body meshes instead of painting the whole mesh one color.
-        if (object.geometry && (materials.length === 1 || sourceMaterial === materials[0])) {
-          const geometry = object.geometry.clone();
-          const nonIndexed = geometry.index ? geometry.toNonIndexed() : geometry;
-          const position = nonIndexed.getAttribute('position');
-          const colors = new Float32Array(position.count * 3);
-          const a = new THREE.Vector3();
-          const b = new THREE.Vector3();
-          const d = new THREE.Vector3();
-          const faceCenter = new THREE.Vector3();
-          const purple = new THREE.Color('#941B80');
-          const aqua = new THREE.Color('#0096AE');
+        // Shader-based world-height mask creates a truly straight split independent of mesh triangles.
+        // Only neutral/body-paint materials reach this branch; glass, wheels, trim and lights are excluded above.
+        const purple = new THREE.Color('#941B80');
+        const aqua = new THREE.Color('#0096AE');
+        const purpleRGB = `${purple.r.toFixed(6)}, ${purple.g.toFixed(6)}, ${purple.b.toFixed(6)}`;
+        const aquaRGB = `${aqua.r.toFixed(6)}, ${aqua.g.toFixed(6)}, ${aqua.b.toFixed(6)}`;
+        const split = splitHeight.toFixed(6);
 
-          for (let i = 0; i < position.count; i += 3) {
-            a.fromBufferAttribute(position, i).applyMatrix4(object.matrixWorld);
-            b.fromBufferAttribute(position, i + 1).applyMatrix4(object.matrixWorld);
-            d.fromBufferAttribute(position, i + 2).applyMatrix4(object.matrixWorld);
-            faceCenter.copy(a).add(b).add(d).multiplyScalar(1 / 3);
+        material.color.set('#ffffff');
+        material.vertexColors = false;
+        material.onBeforeCompile = (shader) => {
+          shader.vertexShader = shader.vertexShader
+            .replace('#include <common>', '#include <common>\\nvarying vec3 vQualitasWorldPosition;')
+            .replace('#include <begin_vertex>', '#include <begin_vertex>\\nvQualitasWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;');
 
-            // Hard split: each triangle gets exactly one paint color, with no fade or blended seam.
-            // All body surfaces below the horizontal cutoff, including bumper faces, stay aqua.
-            const color = faceCenter.y >= splitHeight ? purple : aqua;
-            for (let vertex = 0; vertex < 3; vertex++) {
-              const offset = (i + vertex) * 3;
-              colors[offset] = color.r;
-              colors[offset + 1] = color.g;
-              colors[offset + 2] = color.b;
-            }
-          }
-
-          nonIndexed.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-          if (nonIndexed !== geometry) geometry.dispose();
-          object.geometry = nonIndexed;
-          material.color.set('#ffffff');
-          material.vertexColors = true;
-          material.metalness = Math.max(material.metalness, 0.18);
-          material.roughness = Math.min(material.roughness, 0.48);
-        }
+          shader.fragmentShader = shader.fragmentShader
+            .replace('#include <common>', '#include <common>\\nvarying vec3 vQualitasWorldPosition;')
+            .replace(
+              '#include <color_fragment>',
+              `#include <color_fragment>
+               diffuseColor.rgb = (vQualitasWorldPosition.y >= ${split})
+                 ? vec3(${purpleRGB})
+                 : vec3(${aquaRGB});`
+            );
+        };
+        material.customProgramCacheKey = () => 'qualitas-two-tone-horizontal-split-v1';
+        material.needsUpdate = true;
+        material.metalness = Math.max(material.metalness, 0.18);
+        material.roughness = Math.min(material.roughness, 0.48);
         return material;
       });
 
