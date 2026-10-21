@@ -7,8 +7,8 @@ import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-reac
 import type { LucideIcon } from 'lucide-react';
 import * as THREE from 'three';
 
-// Modelo SUV GLB servido desde raw.githubusercontent.com para evitar la API externa que falló.
-const MODEL_URL = 'https://raw.githubusercontent.com/eflisback/old-sumobile/ff9027759cad1fb889db3f00a294eaf41cc46860/assets/toy-car-kit/Models/GLB%20format/vehicle-suv.glb';
+// Usa el modelo Toyota Prius subido al propio repositorio para evitar depender de un host externo.
+const MODEL_URL = '/models/qualitas-prius.glb';
 
 
 class ModelErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
