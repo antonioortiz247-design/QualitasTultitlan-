@@ -6,6 +6,7 @@ import { Bounds, Center, ContactShadows, Html, OrbitControls, useGLTF, useTextur
 import { CarFront, HeartPulse, KeyRound, ShieldCheck, Wrench } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import * as THREE from 'three';
+import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
 
 // Usa el modelo Toyota Prius subido al propio repositorio para evitar depender de un host externo.
 const MODEL_URL = '/models/qualitas-prius.glb';
@@ -176,70 +177,70 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       logoMap.image && logoMap.image.width && logoMap.image.height
         ? logoMap.image.width / logoMap.image.height
         : 3.2;
-    const logoWidth = vehicleSize.x * 0.28;
+    // El logotipo se proyecta como una calcomanía sobre la malla del cofre,
+    // no como un plano flotante que atraviesa el parabrisas o el habitáculo.
+    const logoWidth = vehicleSize.x * 0.19;
     const logoHeight = logoWidth / logoAspect;
-    const logoMaterial = new THREE.MeshBasicMaterial({
-      map: logoMap,
-      transparent: true,
-      depthTest: true,
-      depthWrite: false,
-      toneMapped: false,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-      side: THREE.DoubleSide,
-    });
-    const logoMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(logoWidth, logoHeight),
-      logoMaterial
-    );
-    logoMesh.name = 'QualitasHoodDecal';
-    logoMesh.renderOrder = 3;
-
-    // El frente del Prius corresponde al extremo +Z del modelo.
     const hoodTargetX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
-    const hoodTargetZ = vehicleBounds.min.z + vehicleSize.z * 0.86;
+    const hoodTargetZ = vehicleBounds.min.z + vehicleSize.z * 0.93;
 
-    // Proyectar desde arriba sobre la superficie real del cofre. Esto evita
-    // colocar la calcomanía dentro del habitáculo o hacerla visible desde atrás.
     clone.updateMatrixWorld(true);
     const hoodRaycaster = new THREE.Raycaster(
       new THREE.Vector3(hoodTargetX, vehicleBounds.max.y + vehicleSize.y, hoodTargetZ),
       new THREE.Vector3(0, -1, 0)
     );
     const hoodHits = hoodRaycaster.intersectObject(clone, true);
-    const hoodHit = hoodHits.find((hit) =>
-      hit.object !== logoMesh &&
-      hit.point.y > vehicleBounds.min.y + vehicleSize.y * 0.35
-    );
+    const hoodHit = hoodHits.find((hit) => {
+      if (!(hit.object instanceof THREE.Mesh) || !hit.face) return false;
+      const normal = hit.face.normal.clone().applyNormalMatrix(
+        new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
+      ).normalize();
+      const frontHoodZone = hit.point.z > vehicleBounds.min.z + vehicleSize.z * 0.86;
+      const upperExterior = hit.point.y > vehicleBounds.min.y + vehicleSize.y * 0.38;
+      return frontHoodZone && upperExterior && normal.y > 0.25;
+    });
 
-    const logoWorldPosition = hoodHit
-      ? hoodHit.point.clone()
-      : new THREE.Vector3(
-          hoodTargetX,
-          vehicleBounds.min.y + vehicleSize.y * 0.47,
-          hoodTargetZ
-        );
-    const hoodNormal = hoodHit?.face
-      ? hoodHit.face.normal.clone().applyNormalMatrix(
-          new THREE.Matrix3().getNormalMatrix(hoodHit.object.matrixWorld)
-        ).normalize()
-      : new THREE.Vector3(0, 0.985, 0.17).normalize();
+    if (hoodHit && hoodHit.object instanceof THREE.Mesh && hoodHit.face) {
+      const logoWorldPosition = hoodHit.point.clone();
+      const hoodNormal = hoodHit.face.normal.clone().applyNormalMatrix(
+        new THREE.Matrix3().getNormalMatrix(hoodHit.object.matrixWorld)
+      ).normalize();
+      if (hoodNormal.y < 0) hoodNormal.negate();
 
-    // Asegurar que la normal apunte hacia fuera y orientar el logo siguiendo
-    // el eje longitudinal del cofre, proyectado sobre la superficie detectada.
-    if (hoodNormal.y < 0) hoodNormal.negate();
-    const hoodForward = new THREE.Vector3(0, 0, 1);
-    hoodForward.addScaledVector(hoodNormal, -hoodForward.dot(hoodNormal)).normalize();
-    const logoRight = hoodForward.clone().cross(hoodNormal).normalize();
-    const logoUp = hoodNormal.clone().cross(logoRight).normalize();
-    const logoBasis = new THREE.Matrix4().makeBasis(logoRight, logoUp, hoodNormal);
-    const worldLogoQuaternion = new THREE.Quaternion().setFromRotationMatrix(logoBasis);
+      // Mantener el logotipo alineado con el largo del vehículo y tangente al cofre.
+      const hoodForward = new THREE.Vector3(0, 0, 1);
+      hoodForward.addScaledVector(hoodNormal, -hoodForward.dot(hoodNormal)).normalize();
+      const logoRight = hoodForward.clone().cross(hoodNormal).normalize();
+      const logoUp = hoodNormal.clone().cross(logoRight).normalize();
+      const logoBasis = new THREE.Matrix4().makeBasis(logoRight, logoUp, hoodNormal);
+      const logoOrientation = new THREE.Euler().setFromRotationMatrix(logoBasis);
 
-    const rootWorldQuaternion = clone.getWorldQuaternion(new THREE.Quaternion());
-    logoMesh.quaternion.copy(rootWorldQuaternion.invert().multiply(worldLogoQuaternion));
-    logoWorldPosition.addScaledVector(hoodNormal, 0.018);
-    logoMesh.position.copy(clone.worldToLocal(logoWorldPosition));
-    clone.add(logoMesh);
+      logoWorldPosition.addScaledVector(hoodNormal, 0.004);
+      const decalGeometry = new DecalGeometry(
+        hoodHit.object,
+        logoWorldPosition,
+        logoOrientation,
+        new THREE.Vector3(logoWidth, logoHeight, 0.035)
+      );
+      // DecalGeometry genera vértices en coordenadas mundiales; convertirlos
+      // al espacio local del modelo evita que se desplace al rotar el vehículo.
+      decalGeometry.applyMatrix4(clone.matrixWorld.clone().invert());
+
+      const logoMaterial = new THREE.MeshBasicMaterial({
+        map: logoMap,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        toneMapped: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+        side: THREE.FrontSide,
+      });
+      const logoMesh = new THREE.Mesh(decalGeometry, logoMaterial);
+      logoMesh.name = 'QualitasHoodDecal';
+      logoMesh.renderOrder = 3;
+      clone.add(logoMesh);
+    }
 
     return clone;
   }, [scene, qualitasLogo]);
