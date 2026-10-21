@@ -179,7 +179,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         : 3.2;
     // Todas las aplicaciones usan DecalGeometry para adherirse a la superficie
     // real del vehículo, respetando la profundidad y evitando planos flotantes.
-    const logoWidth = vehicleSize.x * 0.19; // centrado transversalmente sobre el cofre
+    const logoWidth = vehicleSize.x * 0.23; // tamaño del sticker del cofre; no altera la pintura
     const logoHeight = logoWidth / logoAspect;
     const centerX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
     const toWorldNormal = (hit: THREE.Intersection) => {
@@ -260,7 +260,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
     const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.65;
     const doorY = vehicleBounds.min.y + vehicleSize.y * 0.42;
-    const doorWidth = vehicleSize.x * 0.115;
+    const doorWidth = vehicleSize.z * 0.19; // wordmark legible, centrado sobre cada puerta delantera
     const doorHeight = doorWidth / logoAspect;
     const doorTargets = [
       {
@@ -348,7 +348,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         clone.add(patch);
       }
 
-      const trunkWidth = vehicleSize.x * 0.15;
+      const trunkWidth = vehicleSize.x * 0.19; // logotipo centrado en la tapa de la cajuela
       addLogoDecal(
         trunkHit, trunkWidth, trunkWidth / logoAspect,
         new THREE.Vector3(0, 1, 0),
@@ -368,7 +368,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       sloganContext.font = '600 92px Arial, sans-serif';
       sloganContext.textAlign = 'center';
       sloganContext.textBaseline = 'middle';
-      sloganContext.fillText('Aseguramos autos cuidamos personas', sloganCanvas.width / 2, sloganCanvas.height / 2, 1340);
+      sloganContext.fillText('Aseguramos autos, cuidamos personas.', sloganCanvas.width / 2, sloganCanvas.height / 2, 1340);
       const sloganTexture = new THREE.CanvasTexture(sloganCanvas);
       sloganTexture.colorSpace = THREE.SRGBColorSpace;
       sloganTexture.needsUpdate = true;
@@ -398,7 +398,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           const basis = new THREE.Matrix4().makeBasis(right, surfaceUp, normal);
           const orientation = new THREE.Euler().setFromRotationMatrix(basis);
           const position = bumperHit.point.clone().addScaledVector(normal, 0.003);
-          const sloganWidth = vehicleSize.x * 0.30;
+          const sloganWidth = vehicleSize.x * 0.58; // frase legible a lo ancho de la defensa trasera
           const sloganHeight = sloganWidth / (sloganCanvas.width / sloganCanvas.height);
           const sloganGeometry = new DecalGeometry(
             bumperHit.object,
