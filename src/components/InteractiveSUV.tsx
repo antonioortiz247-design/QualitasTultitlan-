@@ -398,13 +398,13 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
           const basis = new THREE.Matrix4().makeBasis(right, surfaceUp, normal);
           const orientation = new THREE.Euler().setFromRotationMatrix(basis);
           const position = bumperHit.point.clone().addScaledVector(normal, 0.003);
-          const sloganWidth = vehicleSize.x * 0.82; // mantiene el ancho y reduce la altura del decal para evitar recortes en la curvatura
+          const sloganWidth = vehicleSize.x * 0.92; // caja de proyección amplia para cubrir la curvatura de la defensa
           const sloganHeight = sloganWidth / (sloganCanvas.width / sloganCanvas.height);
           const sloganGeometry = new DecalGeometry(
             bumperHit.object,
             position,
             orientation,
-            new THREE.Vector3(sloganWidth, sloganHeight, 0.025)
+            new THREE.Vector3(sloganWidth, sloganHeight, 0.14)
           );
           sloganGeometry.applyMatrix4(clone.matrixWorld.clone().invert());
           const slogan = new THREE.Mesh(
