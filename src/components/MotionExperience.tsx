@@ -55,7 +55,7 @@ export function MotionExperience() {
               <div className="absolute -right-16 -top-16 size-56 rounded-full bg-[#941B80]/20 blur-3xl" aria-hidden="true" />
               <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-[#0096AE]/20 blur-3xl" aria-hidden="true" />
               <div className="relative flex items-center justify-between gap-3">
-                <span className="text-xs font-bold uppercase tracking-[.16em] text-white/55">Toyota Prius 3D · gira para explorar</span>
+                <span className="text-xs font-bold uppercase tracking-[.16em] text-white/55">Vehículo 3D · gira para explorar</span>
                 <span className="rounded-full border border-[#53c5d1]/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#53c5d1]">Giro 360°</span>
               </div>
               <InteractiveSUV active={active} onSelect={setActive} />
