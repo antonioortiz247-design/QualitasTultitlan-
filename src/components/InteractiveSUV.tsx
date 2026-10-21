@@ -36,11 +36,11 @@ type Hotspot = {
 };
 
 const hotspots: Hotspot[] = [
-  { id: 'materiales', label: 'Daños materiales', Icon: CarFront, position: [-0.9, 0.28, 0.65] },
-  { id: 'robo', label: 'Robo total', Icon: KeyRound, position: [0.82, 0.48, -0.62] },
-  { id: 'responsabilidad', label: 'Responsabilidad civil', Icon: ShieldCheck, position: [0, 0.82, 0.05] },
-  { id: 'medicos', label: 'Gastos médicos', Icon: HeartPulse, position: [0.78, 0.24, 0.58] },
-  { id: 'asistencia', label: 'Asistencia vial', Icon: Wrench, position: [-0.72, 0.24, -0.58] },
+  { id: 'materiales', label: 'Daños materiales', Icon: CarFront, position: [-0.62, 0.12, 0.78] },
+  { id: 'robo', label: 'Robo total', Icon: KeyRound, position: [0.62, 0.16, -0.78] },
+  { id: 'responsabilidad', label: 'Responsabilidad civil', Icon: ShieldCheck, position: [0, 0.42, 0.02] },
+  { id: 'medicos', label: 'Gastos médicos', Icon: HeartPulse, position: [0.62, 0.08, 0.62] },
+  { id: 'asistencia', label: 'Asistencia vial', Icon: Wrench, position: [-0.62, 0.08, -0.62] },
 ];
 
 function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
@@ -259,8 +259,8 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     // Puertas delanteras: apuntar al centro geométrico aproximado de cada panel,
     // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
     const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.65;
-    const doorY = vehicleBounds.min.y + vehicleSize.y * 0.42;
-    const doorWidth = vehicleSize.z * 0.19; // wordmark legible, centrado sobre cada puerta delantera
+    const doorY = vehicleBounds.min.y + vehicleSize.y * 0.50;
+    const doorWidth = vehicleSize.z * 0.105; // calcomanía más discreta, centrada en la puerta delantera
     const doorHeight = doorWidth / logoAspect;
     const doorTargets = [
       {
@@ -286,7 +286,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         return !!normal &&
           normal.dot(target.expectedNormal) > 0.18 &&
           zN > 0.48 && zN < 0.80 &&
-          hN > 0.25 && hN < 0.62;
+          hN > 0.34 && hN < 0.68;
       });
       if (hit) {
         addLogoDecal(
@@ -434,24 +434,24 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     <Bounds fit clip observe margin={1.25}>
       <Center>
         <primitive object={model} />
+        {hotspots.map(({ id, label, Icon, position }) => (
+          <Html key={id} position={position} center distanceFactor={3} style={{ pointerEvents: 'auto', transform: 'translate3d(0,0,0)' }}>
+            <button
+              type="button"
+              aria-label={label}
+              aria-pressed={active === id}
+              title={label}
+              onClick={(event) => {
+                event.stopPropagation();
+                onSelect(id);
+              }}
+              className={'motion-3d-hotspot !h-6 !w-6 !min-h-0 !min-w-0 !max-h-6 !max-w-6 !p-0 !rounded-full flex items-center justify-center shadow-lg ' + (active === id ? 'is-active' : '')}
+            >
+              <Icon size={11} strokeWidth={2.2} aria-hidden="true" />
+            </button>
+          </Html>
+        ))}
       </Center>
-      {hotspots.map(({ id, label, Icon, position }) => (
-        <Html key={id} position={position} center distanceFactor={3} style={{ pointerEvents: 'auto', transform: 'translate3d(0,0,0)' }}>
-          <button
-            type="button"
-            aria-label={label}
-            aria-pressed={active === id}
-            title={label}
-            onClick={(event) => {
-              event.stopPropagation();
-              onSelect(id);
-            }}
-            className={'motion-3d-hotspot !h-6 !w-6 !min-h-0 !min-w-0 !max-h-6 !max-w-6 !p-0 !rounded-full flex items-center justify-center shadow-lg ' + (active === id ? 'is-active' : '')}
-          >
-            <Icon size={11} strokeWidth={2.2} aria-hidden="true" />
-          </button>
-        </Html>
-      ))}
     </Bounds>
   );
 }
