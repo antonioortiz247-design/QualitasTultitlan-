@@ -46,44 +46,65 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
   const { scene } = useGLTF(MODEL_URL);
   const model = useMemo(() => {
     const clone = scene.clone(true);
+    clone.updateMatrixWorld(true);
+
     clone.traverse((object) => {
-      const objectName = object.name.toLowerCase();
-      // Oculta emblemas/logotipos del fabricante para mantener una presentación neutral.
-      if (/(^|[_\s-])(logo|emblem|badge|brand|toyota)([_\s-]|$)/i.test(object.name)) {
+      const name = object.name.toLowerCase();
+      // Hide separately named manufacturer marks where the GLB exposes them as objects.
+      if (/(logo|emblem|brand|badge|toyota|corolla)/i.test(name)) {
         object.visible = false;
+        return;
       }
 
-      if (object instanceof THREE.Mesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
+      if (!(object instanceof THREE.Mesh)) return;
+      object.castShadow = true;
+      object.receiveShadow = true;
 
-        const meshName = object.name.toLowerCase();
-        const isGlassOrWheel = /(glass|window|windshield|tire|tyre|wheel|rim|rubber|light|lamp|lens|chrome|grille|interior|seat)/i.test(meshName);
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        const updatedMaterials = materials.map((sourceMaterial) => {
-          const material = sourceMaterial.clone();
-          const materialName = material.name.toLowerCase();
-          const isBrandMark = /(logo|emblem|badge|brand|toyota)/i.test(materialName);
-          if (isBrandMark) {
-            object.visible = false;
-            return material;
-          }
+      const bounds = new THREE.Box3().setFromObject(object);
+      const center = bounds.getCenter(new THREE.Vector3());
+      const size = bounds.getSize(new THREE.Vector3());
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
 
-          // Repinta los materiales claros de la carrocería con el morado corporativo.
-          if (!isGlassOrWheel && material instanceof THREE.MeshStandardMaterial && material.color) {
-            const color = material.color;
-            const isBodyPaint = /(paint|body|carrocer|exterior|shell| кузов)/i.test(materialName) ||
-              (color.r > 0.62 && color.g > 0.62 && color.b > 0.62 && material.roughness < 0.8);
-            if (isBodyPaint) {
-              material.color.set('#941B80');
-              material.metalness = Math.max(material.metalness, 0.18);
-              material.roughness = Math.min(material.roughness, 0.42);
-            }
-          }
+      const nextMaterials = materials.map((original) => {
+        const material = original.clone();
+        const materialName = material.name.toLowerCase();
+        if (/(logo|emblem|brand|badge|toyota|corolla)/i.test(materialName)) {
+          object.visible = false;
           return material;
-        });
-        object.material = Array.isArray(object.material) ? updatedMaterials : updatedMaterials[0];
-      }
+        }
+
+        if (!(material instanceof THREE.MeshStandardMaterial) || !material.color) return material;
+
+        const c = material.color;
+        const likelyPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side)/i.test(name + ' ' + materialName) ||
+          (c.r > 0.62 && c.g > 0.62 && c.b > 0.62 && material.roughness < 0.9);
+        const excluded = /(glass|window|windshield|tire|tyre|wheel|rim|rubber|light|lamp|lens|chrome|grille|interior|seat|plastic|black)/i.test(name + ' ' + materialName);
+        if (!likelyPaint || excluded) return material;
+
+        // Two-tone Quálitas-inspired wrap: purple on hood/roof/doors and aqua on bumpers/lower body.
+        const purplePart = /(hood|bonnet|roof|door|side|quarter|trunk|boot|decklid|body.?upper)/i.test(name + ' ' + materialName);
+        const aquaPart = /(bumper|lower|skirt|sill|fender|front.?fascia|rear.?fascia)/i.test(name + ' ' + materialName);
+        let paint = purplePart ? '#941B80' : aquaPart ? '#0096AE' : '';
+
+        // If the GLB uses generic mesh names, use its part proportions as a fallback.
+        if (!paint) {
+          const partLabel = (name + ' ' + materialName);
+          if (/(body|carrocer|exterior|shell|paint)/i.test(partLabel)) {
+            paint = center.y > bounds.min.y + size.y * 0.58 ? '#941B80' : '#0096AE';
+          } else if (c.r > 0.62 && c.g > 0.62 && c.b > 0.62) {
+            paint = center.y > bounds.min.y + size.y * 0.58 ? '#941B80' : '#0096AE';
+          }
+        }
+
+        if (paint) {
+          material.color.set(paint);
+          material.metalness = Math.max(material.metalness, 0.22);
+          material.roughness = Math.min(material.roughness, 0.4);
+        }
+        return material;
+      });
+
+      object.material = Array.isArray(object.material) ? nextMaterials : nextMaterials[0];
     });
     return clone;
   }, [scene]);
