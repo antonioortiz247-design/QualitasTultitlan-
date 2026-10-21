@@ -179,7 +179,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         : 3.2;
     // Todas las aplicaciones usan DecalGeometry para adherirse a la superficie
     // real del vehículo, respetando la profundidad y evitando planos flotantes.
-    const logoWidth = vehicleSize.x * 0.19;
+    const logoWidth = vehicleSize.x * 0.19; // centrado transversalmente sobre el cofre
     const logoHeight = logoWidth / logoAspect;
     const centerX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
     const toWorldNormal = (hit: THREE.Intersection) => {
@@ -237,7 +237,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     // Cofre: frente del Prius = extremo +Z. La parte superior del logo mira
     // hacia el parabrisas, no hacia la defensa.
     const hoodRaycaster = new THREE.Raycaster(
-      new THREE.Vector3(centerX, vehicleBounds.max.y + vehicleSize.y, vehicleBounds.min.z + vehicleSize.z * 0.93),
+      new THREE.Vector3(centerX, vehicleBounds.max.y + vehicleSize.y, vehicleBounds.min.z + vehicleSize.z * 0.88),
       new THREE.Vector3(0, -1, 0)
     );
     const hoodHit = hoodRaycaster.intersectObject(clone, true).find((hit) => {
@@ -256,10 +256,10 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       );
     }
 
-    // Puertas delanteras: proyectar desde fuera hacia dentro en ambos costados.
-    // El filtro por altura, longitud y normal evita seleccionar cristales o ruedas.
-    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.68;
-    const doorY = vehicleBounds.min.y + vehicleSize.y * 0.43;
+    // Puertas delanteras: apuntar al centro geométrico aproximado de cada panel,
+    // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
+    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.65;
+    const doorY = vehicleBounds.min.y + vehicleSize.y * 0.42;
     const doorWidth = vehicleSize.x * 0.115;
     const doorHeight = doorWidth / logoAspect;
     const doorTargets = [
