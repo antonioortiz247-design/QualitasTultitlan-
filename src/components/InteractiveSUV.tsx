@@ -45,7 +45,7 @@ const hotspots: Hotspot[] = [
 
 function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
   const { scene } = useGLTF(MODEL_URL);
-  const qualitasLogo = useTexture('/qualitas-logo.png');
+  const [qualitasLogo, doorLogoSource] = useTexture(['/qualitas-logo.png', '/letragrama-qualitas-blanco.svg']);
   const model = useMemo(() => {
     const clone = scene.clone(true);
     clone.updateMatrixWorld(true);
@@ -226,9 +226,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     const logoAspect = logoMap.image.width / logoMap.image.height;
     // El letragrama se recorta del wordmark horizontal oficial: no incluye
     // el símbolo cuadrado ni la línea “Compañía de seguros”.
-    const doorLogoMap = makeWhiteLogoTexture(qualitasLogo, {
-      x: 0.30, y: 0.11, width: 0.685, height: 0.55,
-    });
+    const doorLogoMap = makeWhiteLogoTexture(doorLogoSource);
     const doorLogoAspect = doorLogoMap.image.width / doorLogoMap.image.height;
     // Todas las aplicaciones usan DecalGeometry para adherirse a la superficie
     // real del vehículo, respetando la profundidad y evitando planos flotantes.
@@ -485,7 +483,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     }
 
     return clone;
-  }, [scene, qualitasLogo]);
+  }, [scene, qualitasLogo, doorLogoSource]);
 
   return (
     <Bounds fit clip observe margin={1.25}>
