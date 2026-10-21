@@ -47,6 +47,8 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
   const model = useMemo(() => {
     const clone = scene.clone(true);
     clone.updateMatrixWorld(true);
+    const vehicleBounds = new THREE.Box3().setFromObject(clone);
+    const vehicleSize = vehicleBounds.getSize(new THREE.Vector3());
 
     clone.traverse((object) => {
       const name = object.name.toLowerCase();
@@ -90,9 +92,9 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         if (!paint) {
           const partLabel = (name + ' ' + materialName);
           if (/(body|carrocer|exterior|shell|paint)/i.test(partLabel)) {
-            paint = center.y > bounds.min.y + size.y * 0.58 ? '#941B80' : '#0096AE';
+            paint = center.y > vehicleBounds.min.y + vehicleSize.y * 0.42 ? '#941B80' : '#0096AE';
           } else if (c.r > 0.62 && c.g > 0.62 && c.b > 0.62) {
-            paint = center.y > bounds.min.y + size.y * 0.58 ? '#941B80' : '#0096AE';
+            paint = center.y > vehicleBounds.min.y + vehicleSize.y * 0.42 ? '#941B80' : '#0096AE';
           }
         }
 
