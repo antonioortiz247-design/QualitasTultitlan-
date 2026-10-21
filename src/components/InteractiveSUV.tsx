@@ -177,56 +177,46 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
       logoMap.image && logoMap.image.width && logoMap.image.height
         ? logoMap.image.width / logoMap.image.height
         : 3.2;
-    // El logotipo se proyecta como una calcomanía sobre la malla del cofre,
-    // no como un plano flotante que atraviesa el parabrisas o el habitáculo.
+    // Todas las aplicaciones usan DecalGeometry para adherirse a la superficie
+    // real del vehículo, respetando la profundidad y evitando planos flotantes.
     const logoWidth = vehicleSize.x * 0.19;
     const logoHeight = logoWidth / logoAspect;
-    const hoodTargetX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
-    const hoodTargetZ = vehicleBounds.min.z + vehicleSize.z * 0.93;
-
-    clone.updateMatrixWorld(true);
-    const hoodRaycaster = new THREE.Raycaster(
-      new THREE.Vector3(hoodTargetX, vehicleBounds.max.y + vehicleSize.y, hoodTargetZ),
-      new THREE.Vector3(0, -1, 0)
-    );
-    const hoodHits = hoodRaycaster.intersectObject(clone, true);
-    const hoodHit = hoodHits.find((hit) => {
-      if (!(hit.object instanceof THREE.Mesh) || !hit.face) return false;
-      const normal = hit.face.normal.clone().applyNormalMatrix(
+    const centerX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
+    const toWorldNormal = (hit: THREE.Intersection) => {
+      if (!(hit.object instanceof THREE.Mesh) || !hit.face) return null;
+      return hit.face.normal.clone().applyNormalMatrix(
         new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
       ).normalize();
-      const frontHoodZone = hit.point.z > vehicleBounds.min.z + vehicleSize.z * 0.86;
-      const upperExterior = hit.point.y > vehicleBounds.min.y + vehicleSize.y * 0.38;
-      return frontHoodZone && upperExterior && normal.y > 0.25;
-    });
+    };
+    const addLogoDecal = (
+      hit: THREE.Intersection,
+      width: number,
+      height: number,
+      preferredUp: THREE.Vector3,
+      expectedNormal: THREE.Vector3,
+      name: string
+    ) => {
+      if (!(hit.object instanceof THREE.Mesh)) return;
+      const normal = toWorldNormal(hit);
+      if (!normal) return;
+      if (normal.dot(expectedNormal) < 0) normal.negate();
 
-    if (hoodHit && hoodHit.object instanceof THREE.Mesh && hoodHit.face) {
-      const logoWorldPosition = hoodHit.point.clone();
-      const hoodNormal = hoodHit.face.normal.clone().applyNormalMatrix(
-        new THREE.Matrix3().getNormalMatrix(hoodHit.object.matrixWorld)
-      ).normalize();
-      if (hoodNormal.y < 0) hoodNormal.negate();
-
-      // Mantener el logotipo alineado con el largo del vehículo y tangente al cofre.
-      const hoodForward = new THREE.Vector3(0, 0, 1);
-      hoodForward.addScaledVector(hoodNormal, -hoodForward.dot(hoodNormal)).normalize();
-      const logoRight = hoodForward.clone().cross(hoodNormal).normalize();
-      const logoUp = hoodNormal.clone().cross(logoRight).normalize();
-      const logoBasis = new THREE.Matrix4().makeBasis(logoRight, logoUp, hoodNormal);
-      const logoOrientation = new THREE.Euler().setFromRotationMatrix(logoBasis);
-
-      logoWorldPosition.addScaledVector(hoodNormal, 0.004);
+      // Construye una base ortogonal sobre el panel, con la marca en posición legible.
+      const up = preferredUp.clone().addScaledVector(normal, -preferredUp.dot(normal)).normalize();
+      if (up.lengthSq() < 0.01) return;
+      const right = up.clone().cross(normal).normalize();
+      const surfaceUp = normal.clone().cross(right).normalize();
+      const basis = new THREE.Matrix4().makeBasis(right, surfaceUp, normal);
+      const orientation = new THREE.Euler().setFromRotationMatrix(basis);
+      const position = hit.point.clone().addScaledVector(normal, 0.003);
       const decalGeometry = new DecalGeometry(
-        hoodHit.object,
-        logoWorldPosition,
-        logoOrientation,
-        new THREE.Vector3(logoWidth, logoHeight, 0.035)
+        hit.object,
+        position,
+        orientation,
+        new THREE.Vector3(width, height, 0.04)
       );
-      // DecalGeometry genera vértices en coordenadas mundiales; convertirlos
-      // al espacio local del modelo evita que se desplace al rotar el vehículo.
       decalGeometry.applyMatrix4(clone.matrixWorld.clone().invert());
-
-      const logoMaterial = new THREE.MeshBasicMaterial({
+      const material = new THREE.MeshBasicMaterial({
         map: logoMap,
         transparent: true,
         depthTest: true,
@@ -236,10 +226,99 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         polygonOffsetFactor: -1,
         side: THREE.FrontSide,
       });
-      const logoMesh = new THREE.Mesh(decalGeometry, logoMaterial);
-      logoMesh.name = 'QualitasHoodDecal';
-      logoMesh.renderOrder = 3;
-      clone.add(logoMesh);
+      const decal = new THREE.Mesh(decalGeometry, material);
+      decal.name = name;
+      decal.renderOrder = 3;
+      clone.add(decal);
+    };
+
+    clone.updateMatrixWorld(true);
+
+    // Cofre: frente del Prius = extremo +Z. La parte superior del logo mira
+    // hacia el parabrisas, no hacia la defensa.
+    const hoodRaycaster = new THREE.Raycaster(
+      new THREE.Vector3(centerX, vehicleBounds.max.y + vehicleSize.y, vehicleBounds.min.z + vehicleSize.z * 0.93),
+      new THREE.Vector3(0, -1, 0)
+    );
+    const hoodHit = hoodRaycaster.intersectObject(clone, true).find((hit) => {
+      if (!(hit.object instanceof THREE.Mesh)) return false;
+      const normal = toWorldNormal(hit);
+      const zN = (hit.point.z - vehicleBounds.min.z) / vehicleSize.z;
+      const hN = (hit.point.y - vehicleBounds.min.y) / vehicleSize.y;
+      return !!normal && normal.y > 0.25 && zN > 0.84 && hN > 0.38;
+    });
+    if (hoodHit) {
+      addLogoDecal(
+        hoodHit, logoWidth, logoHeight,
+        new THREE.Vector3(0, 0, -1),
+        new THREE.Vector3(0, 1, 0),
+        'QualitasHoodDecal'
+      );
+    }
+
+    // Puertas delanteras: proyectar desde fuera hacia dentro en ambos costados.
+    // El filtro por altura, longitud y normal evita seleccionar cristales o ruedas.
+    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.68;
+    const doorY = vehicleBounds.min.y + vehicleSize.y * 0.43;
+    const doorWidth = vehicleSize.x * 0.115;
+    const doorHeight = doorWidth / logoAspect;
+    const doorTargets = [
+      {
+        origin: new THREE.Vector3(vehicleBounds.max.x + vehicleSize.x * 0.5, doorY, doorZ),
+        direction: new THREE.Vector3(-1, 0, 0),
+        expectedNormal: new THREE.Vector3(1, 0, 0),
+        name: 'QualitasFrontRightDoorDecal',
+      },
+      {
+        origin: new THREE.Vector3(vehicleBounds.min.x - vehicleSize.x * 0.5, doorY, doorZ),
+        direction: new THREE.Vector3(1, 0, 0),
+        expectedNormal: new THREE.Vector3(-1, 0, 0),
+        name: 'QualitasFrontLeftDoorDecal',
+      },
+    ];
+    for (const target of doorTargets) {
+      const raycaster = new THREE.Raycaster(target.origin, target.direction);
+      const hit = raycaster.intersectObject(clone, true).find((candidate) => {
+        if (!(candidate.object instanceof THREE.Mesh)) return false;
+        const normal = toWorldNormal(candidate);
+        const zN = (candidate.point.z - vehicleBounds.min.z) / vehicleSize.z;
+        const hN = (candidate.point.y - vehicleBounds.min.y) / vehicleSize.y;
+        return !!normal &&
+          normal.dot(target.expectedNormal) > 0.18 &&
+          zN > 0.48 && zN < 0.80 &&
+          hN > 0.25 && hN < 0.62;
+      });
+      if (hit) {
+        addLogoDecal(
+          hit, doorWidth, doorHeight,
+          new THREE.Vector3(0, 1, 0),
+          target.expectedNormal,
+          target.name
+        );
+      }
+    }
+
+    // Cajuela/portón trasero: el extremo -Z mira hacia atrás.
+    const trunkRaycaster = new THREE.Raycaster(
+      new THREE.Vector3(centerX, vehicleBounds.min.y + vehicleSize.y * 0.61, vehicleBounds.min.z - vehicleSize.z * 0.25),
+      new THREE.Vector3(0, 0, 1)
+    );
+    const trunkHit = trunkRaycaster.intersectObject(clone, true).find((hit) => {
+      if (!(hit.object instanceof THREE.Mesh)) return false;
+      const normal = toWorldNormal(hit);
+      const zN = (hit.point.z - vehicleBounds.min.z) / vehicleSize.z;
+      const hN = (hit.point.y - vehicleBounds.min.y) / vehicleSize.y;
+      const xN = Math.abs(hit.point.x - centerX) / vehicleSize.x;
+      return !!normal && normal.z < -0.2 && zN < 0.16 && hN > 0.38 && hN < 0.78 && xN < 0.32;
+    });
+    if (trunkHit) {
+      const trunkWidth = vehicleSize.x * 0.15;
+      addLogoDecal(
+        trunkHit, trunkWidth, trunkWidth / logoAspect,
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, 0, -1),
+        'QualitasTrunkDecal'
+      );
     }
 
     return clone;
