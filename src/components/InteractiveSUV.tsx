@@ -80,16 +80,20 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
         const partLabel = name + ' ' + materialName;
         const excluded = /(glass|window|windshield|windscreen|tire|tyre|wheel|rim|alloy|hubcap|spoke|rubber|brake|caliper|rotor|disc|light|lamp|lens|chrome|silver|metal|grille|interior|seat|plastic|black|mirror|trim|handle|dashboard|steering|logo|emblem|badge|exhaust)/i.test(partLabel);
-        // Preserve the earlier body-paint selection; exclude only recognizable non-body details.
-        if (excluded) return material;
+        // Also protect wheel meshes whose GLB object/material names are generic.
+        const objectBounds = new THREE.Box3().setFromObject(object);
+        const objectSize = objectBounds.getSize(new THREE.Vector3());
+        const objectCenter = objectBounds.getCenter(new THREE.Vector3());
+        const vehicleLength = Math.max(vehicleSize.x, vehicleSize.z);
+        const wheelSizedMesh = Math.max(objectSize.x, objectSize.y, objectSize.z) < vehicleLength * 0.19;
+        const nearLowerBody = objectCenter.y < vehicleBounds.min.y + vehicleSize.y * 0.34;
+        if (excluded || (wheelSizedMesh && nearLowerBody)) return material;
 
         const c = material.color;
         const explicitPaint = /(paint|body|carrocer|exterior|shell|bonnet|hood|door|fender|bumper|quarter|trunk|boot|side|roof)/i.test(partLabel);
 
         // Generic GLB names are common. Only treat a neutral material as body paint when
         // the mesh is broad enough to be an exterior panel; small seats, rims and details stay original.
-        const objectBounds = new THREE.Box3().setFromObject(object);
-        const objectSize = objectBounds.getSize(new THREE.Vector3());
         const broadExteriorPanel = Math.max(objectSize.x, objectSize.y, objectSize.z) >
           Math.max(vehicleSize.x, vehicleSize.z) * 0.2;
         const neutralPaint = broadExteriorPanel &&
