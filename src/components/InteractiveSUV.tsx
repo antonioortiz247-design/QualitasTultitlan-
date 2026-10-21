@@ -92,10 +92,14 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const xN = Math.abs(world.x - centerX) / (width * 0.5);
         const hN = (world.y - bounds.min.y) / height;
         const zN = (world.z - bounds.min.z) / length;
-        const atFrontOrRear = zN < 0.17 || zN > 0.83;
-        const wheelZ = Math.abs(zN - 0.22) < 0.105 || Math.abs(zN - 0.78) < 0.105;
-        const wheelZone = xN > 0.56 && wheelZ && hN < 0.39;
-        const lampZone = atFrontOrRear && xN > 0.43 && hN > 0.27 && hN < 0.49;
+        const atFrontOrRear = zN < 0.13 || zN > 0.87;
+
+        // Exclusiones compactas para no dejar sin pintar alas ni fascias.
+        const wheelZ = Math.abs(zN - 0.22) < 0.065 || Math.abs(zN - 0.78) < 0.065;
+        const wheelZone = xN > 0.76 && wheelZ && hN < 0.31;
+
+        // Solo proteger los extremos externos de faros y calaveras.
+        const lampZone = atFrontOrRear && xN > 0.72 && hN > 0.34 && hN < 0.48;
         const selected = !(wheelZone || lampZone);
         bodyMask[i] = selected ? 1 : 0;
         bodyMask[i + 1] = selected ? 1 : 0;
