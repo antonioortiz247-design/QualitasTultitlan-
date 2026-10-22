@@ -230,7 +230,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
     const doorLogoAspect = doorLogoMap.image.width / doorLogoMap.image.height;
     // Todas las aplicaciones usan DecalGeometry para adherirse a la superficie
     // real del vehículo, respetando la profundidad y evitando planos flotantes.
-    const logoWidth = vehicleSize.x * 0.23; // tamaño del sticker del cofre; no altera la pintura
+    const logoWidth = vehicleSize.x * 0.34; // logotipo del cofre ampliado para ser legible en la vista 3D
     const logoHeight = logoWidth / logoAspect;
     const centerX = (vehicleBounds.min.x + vehicleBounds.max.x) / 2;
     const toWorldNormal = (hit: THREE.Intersection) => {
@@ -311,9 +311,9 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
     // Puertas delanteras: apuntar al centro geométrico aproximado de cada panel,
     // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
-    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.65;
+    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.56; // centro longitudinal entre las puertas delantera y trasera
     const doorY = vehicleBounds.min.y + vehicleSize.y * 0.50;
-    const doorWidth = vehicleSize.z * 0.31; // letragrama extendido sobre ambas puertas de cada costado
+    const doorWidth = vehicleSize.z * 0.43; // letragrama centrado y extendido entre ambas puertas de cada costado
     const doorHeight = doorWidth / doorLogoAspect;
     const doorTargets = [
       {
@@ -338,7 +338,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         const hN = (candidate.point.y - vehicleBounds.min.y) / vehicleSize.y;
         return !!normal &&
           normal.dot(target.expectedNormal) > 0.18 &&
-          zN > 0.48 && zN < 0.80 &&
+          zN > 0.35 && zN < 0.76 &&
           hN > 0.34 && hN < 0.68;
       });
       if (hit) {
@@ -403,7 +403,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         clone.add(patch);
       }
 
-      const trunkWidth = vehicleSize.x * 0.19; // logotipo centrado en la tapa de la cajuela
+      const trunkWidth = vehicleSize.x * 0.31; // logotipo de cajuela ampliado y centrado
       addLogoDecal(
         trunkHit, trunkWidth, trunkWidth / logoAspect,
         new THREE.Vector3(0, 1, 0),
