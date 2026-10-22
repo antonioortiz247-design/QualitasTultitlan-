@@ -311,7 +311,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
     // Puertas delanteras: apuntar al centro geométrico aproximado de cada panel,
     // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
-    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.53; // evita proyectar sobre el pilar central y centra el letragrama entre ambas puertas
+    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.44; // desplaza el letragrama hacia atrás para centrarlo en las puertas y alejarlo del retrovisor
     const doorY = vehicleBounds.min.y + vehicleSize.y * 0.50;
     const doorWidth = vehicleSize.z * 0.41; // letragrama centrado entre ambas puertas de cada costado
     const doorHeight = doorWidth / doorLogoAspect;
@@ -355,7 +355,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
     // Cajuela/portón trasero: el extremo -Z mira hacia atrás.
     const trunkRaycaster = new THREE.Raycaster(
-      new THREE.Vector3(centerX, vehicleBounds.min.y + vehicleSize.y * 0.61, vehicleBounds.min.z - vehicleSize.z * 0.25),
+      new THREE.Vector3(centerX, vehicleBounds.min.y + vehicleSize.y * 0.65, vehicleBounds.min.z - vehicleSize.z * 0.25),
       new THREE.Vector3(0, 0, 1)
     );
     const trunkHit = trunkRaycaster.intersectObject(clone, true).find((hit) => {
@@ -403,7 +403,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
         clone.add(patch);
       }
 
-      const trunkWidth = vehicleSize.x * 0.45; // logotipo de cajuela notablemente más grande y centrado
+      const trunkWidth = vehicleSize.x * 0.40; // ajustado para que el logotipo quepa completo en el panel de la cajuela
       addLogoDecal(
         trunkHit, trunkWidth, trunkWidth / logoAspect,
         new THREE.Vector3(0, 1, 0),
