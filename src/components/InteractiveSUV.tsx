@@ -311,7 +311,7 @@ function SUVModel({ active, onSelect }: { active: string; onSelect: (id: string)
 
     // Puertas delanteras: apuntar al centro geométrico aproximado de cada panel,
     // no al borde delantero. La proyección se realiza desde fuera hacia dentro.
-    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.47; // centrado entre ambas puertas, desplazado ligeramente hacia la parte trasera
+    const doorZ = vehicleBounds.min.z + vehicleSize.z * 0.53; // evita proyectar sobre el pilar central y centra el letragrama entre ambas puertas
     const doorY = vehicleBounds.min.y + vehicleSize.y * 0.50;
     const doorWidth = vehicleSize.z * 0.41; // letragrama centrado entre ambas puertas de cada costado
     const doorHeight = doorWidth / doorLogoAspect;
