@@ -24,7 +24,33 @@ export async function GET(request: NextRequest) {
     endpoint.searchParams.set('limit', '200');
     const response = await fetch(endpoint, { headers: { apikey: key, Authorization: 'Bearer ' + key }, cache: 'no-store' });
     if (!response.ok) throw new Error('Supabase respondió ' + response.status);
-    return NextResponse.json({ inspections: await response.json() }, { headers: { 'Cache-Control': 'no-store' } });
+    const inspections = await response.json();
+    let offset = 0;
+    let inspectionCount = 0;
+    let photoCount = 0;
+    let photoBytes = 0;
+    while (true) {
+      const metricsUrl = new URL('/rest/v1/inspecciones_vehiculares', url);
+      metricsUrl.searchParams.set('select', 'fotografias');
+      metricsUrl.searchParams.set('order', 'creado_en.asc');
+      metricsUrl.searchParams.set('limit', '1000');
+      const metricsResponse = await fetch(metricsUrl, { headers: { apikey: key, Authorization: 'Bearer ' + key, Range: offset + '-' + (offset + 999), Prefer: 'count=exact' }, cache: 'no-store' });
+      if (!metricsResponse.ok) throw new Error('No se pudo calcular el consumo de fotografías.');
+      const rows = await metricsResponse.json();
+      inspectionCount += rows.length;
+      for (const row of rows) {
+        for (const photo of Array.isArray(row.fotografias) ? row.fotografias : []) {
+          photoCount++;
+          photoBytes += Number(photo.size) || 0;
+        }
+      }
+      if (rows.length < 1000) break;
+      offset += 1000;
+    }
+    const storageLimitBytes = 1024 * 1024 * 1024;
+    const estimatedPercent = Math.min(100, photoBytes / storageLimitBytes * 100);
+    const warning = estimatedPercent >= 85 ? 'critical' : estimatedPercent >= 70 ? 'warning' : 'normal';
+    return NextResponse.json({ inspections, storageMetrics: { inspectionCount, photoCount, photoBytes, storageLimitBytes, estimatedPercent, remainingBytes: Math.max(0, storageLimitBytes - photoBytes), warning } }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('[admin-inspections] list failed', error instanceof Error ? error.message : 'unknown');
     return NextResponse.json({ error: 'No se pudieron cargar las inspecciones. Verifica la migración de Supabase.' }, { status: 502 });
