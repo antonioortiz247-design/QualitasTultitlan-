@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { ArrowDownRight, CarFront, ShieldCheck, KeyRound, HeartPulse, Wrench } from 'lucide-react';
 
@@ -23,9 +24,7 @@ export function MotionExperience() {
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-10 lg:grid-cols-[.9fr_1.1fr] lg:gap-14">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-xs font-bold uppercase tracking-[.18em] text-[#53c5d1]">
-              <span className="size-2 rounded-full bg-[#53c5d1] shadow-[0_0_14px_#53c5d1]" /> Quálitas Motion Experience
-            </p>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-xs font-bold uppercase tracking-[.18em] text-[#53c5d1]"><Image src="/Q-morado.png" alt="Q de Quálitas" width={22} height={22} className="h-[22px] w-[22px] rounded-sm bg-white p-0.5 object-contain" /><span>Quálitas Motion Experience</span></div>
             <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-5xl">
               Explora tu protección <span className="text-[#53c5d1]">desde otra perspectiva.</span>
             </h2>
