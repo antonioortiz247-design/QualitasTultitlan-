@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, RefreshCw, ShieldCheck, ClipboardList, PackageOpen, ExternalLink, Search, ClipboardCheck } from 'lucide-react';\nimport { siteConfig } from '@/config/site';
+import { LogOut, RefreshCw, ShieldCheck, ClipboardList, PackageOpen, ExternalLink, Search, ClipboardCheck } from 'lucide-react';
+import { siteConfig } from '@/config/site';
 
 type Lead = { folio?: string; nombre?: string; telefono?: string; correo?: string; producto?: string; created_at?: string; origen?: string; tipo?: string };
 
