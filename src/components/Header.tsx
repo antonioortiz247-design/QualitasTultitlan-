@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { Menu, MessageCircle, X, House, ShieldCheck, CarFront, UsersRound, MapPin, Megaphone, CircleHelp, Mail, ClipboardCheck } from 'lucide-react';
+import { Menu, MessageCircle, X, House, ShieldCheck, CarFront, UsersRound, MapPin, Megaphone, CircleHelp, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
@@ -15,7 +15,6 @@ const nav = [
   { label: 'Activaciones', href: '#activaciones', Icon: Megaphone },
   { label: 'Preguntas frecuentes', href: '#faq', Icon: CircleHelp },
   { label: 'Contacto', href: '#contacto', Icon: Mail },
-  { label: 'Inspección vehicular', href: '/inspeccion-vehicular', Icon: ClipboardCheck },
 ];
 
 export function Header() {
