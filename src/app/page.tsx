@@ -239,7 +239,7 @@ export default function Home() {
         <section className="scroll-reveal-soft overflow-hidden bg-gradient-to-br from-white to-slate-50">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:px-8">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención en Cuautitlán y municipios cercanos</p>
+              <div className="mb-3 flex items-center gap-3"><Image src="/Q-morado.png" alt="Quálitas" width={42} height={42} className="h-10 w-10 object-contain" priority /><p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención en Cuautitlán y municipios cercanos</p></div>
               <h1 className="mt-3 text-4xl font-black tracking-tight text-qualitas-purple sm:text-5xl md:text-6xl">
                 Seguro de auto Quálitas en Cuautitlán
               </h1>
@@ -692,7 +692,7 @@ function Footer() {
     <footer className="bg-[#27232B] px-4 py-10 text-white">
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <strong>{siteConfig.businessName}</strong>
+          <div className="mb-4 flex items-center gap-3"><Image src="/Q-morado.png" alt="Símbolo Q de Quálitas" width={48} height={48} className="h-12 w-12 rounded-lg bg-white p-1 object-contain" /><strong>{siteConfig.businessName}</strong></div>
           <p>{siteConfig.relationshipLabel}</p>
           <p className="mt-4 text-sm text-white/70">
             Este sitio corresponde a un agente/intermediario de seguros y no sustituye al portal oficial de Quálitas Compañía de Seguros, S.A. de C.V.
