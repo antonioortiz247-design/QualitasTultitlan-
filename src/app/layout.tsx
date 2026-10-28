@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import { siteConfig } from '@/config/site';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const poppins = Poppins({ subsets: ['latin'], weight: ['400', '500', '600', '700'], display: 'swap' });
 
 const siteTitle = 'Seguro de Auto Quálitas en Cuautitlán y Zona Norte del Estado de México';
 const siteDescription =
@@ -52,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es-MX">
-      <body className={inter.className}>{children}</body>
+      <body className={poppins.className}>{children}</body>
     </html>
   );
 }
