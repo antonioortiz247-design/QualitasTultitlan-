@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, RefreshCw, ShieldCheck, ClipboardList, PackageOpen, ExternalLink, Search, ClipboardCheck } from 'lucide-react';
+import Image from 'next/image';
+import { LogOut, RefreshCw, ClipboardList, PackageOpen, ExternalLink, Search, ClipboardCheck } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
 type Lead = { folio?: string; nombre?: string; telefono?: string; correo?: string; producto?: string; created_at?: string; origen?: string; tipo?: string };
@@ -62,7 +63,7 @@ export default function AdminPage() {
   return <main className="min-h-screen bg-[#f7f8fa] text-[#25232a]">
     <header className="border-b border-[#e4e5e9] bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#941b80]/10 text-[#941b80]"><ShieldCheck/></div><div><p className="text-xs font-semibold uppercase tracking-wider text-[#0096ae]">Quálitas Cuautitlán Romero Rubio</p><h1 className="text-lg font-bold sm:text-xl">Panel privado</h1></div></div>
+        <div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1"><Image src="/Q-morado.png" alt="Q de Quálitas" width={44} height={44} className="h-full w-full object-contain" priority /></div><div><p className="text-xs font-semibold uppercase tracking-wider text-[#0096ae]">Quálitas Cuautitlán Romero Rubio</p><h1 className="text-lg font-bold sm:text-xl">Panel privado</h1></div></div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           <a href="/admin/inspecciones" className="inline-flex items-center gap-2 rounded-lg border border-[#0096ae] px-3 py-2 text-sm font-semibold text-[#007b8e] hover:bg-cyan-50"><ClipboardCheck size={16}/> Inspecciones</a>
           <a href="https://inventario-six-pi.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#941b80] px-3 py-2 text-sm font-semibold text-white hover:bg-[#7e176d]">
