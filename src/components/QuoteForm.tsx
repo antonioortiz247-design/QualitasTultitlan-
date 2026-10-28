@@ -2,6 +2,7 @@
 
 import { CheckCircle, MessageCircle, Search, CarFront, BadgeCheck, Car, ClipboardCheck, ShieldCheck, UserRound, ContactRound } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { whatsappMessages } from '@/config/site';
 import { trackEvent } from '@/lib/analytics';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
@@ -255,7 +256,7 @@ export function QuoteForm() {
       <div className="rounded-3xl border border-qualitas-border bg-white p-5 shadow-soft md:p-8">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
           <div>
-            <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Cotizador orientativo</p>
+            <div className="mb-2 flex items-center gap-3"><Image src="/Q-morado.png" alt="Quálitas" width={38} height={38} className="h-9 w-9 object-contain" /><p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Cotizador orientativo</p></div>
             <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-qualitas-purple sm:text-3xl">Cotiza tu seguro de auto</h2>
             <p className="mt-2 max-w-xl text-slate-600">Avanza pantalla por pantalla: marca, modelo, versión, cobertura y datos de contacto. Guardaremos tu solicitud para seguimiento del asesor.</p>
           </div>
