@@ -1,7 +1,8 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { Camera, CarFront, CheckCircle2, ShieldCheck, Bike, ArrowLeft, LoaderCircle } from 'lucide-react';
+import Image from 'next/image';
+import { Camera, CarFront, CheckCircle2, Bike, ArrowLeft, LoaderCircle } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
 const purple = '#941B80';
@@ -67,7 +68,7 @@ export default function InspectionForm() {
     <div className="mx-auto max-w-3xl">
       <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#941b80]"><ArrowLeft size={16}/> Volver al sitio</a>
       <header className="mt-5 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-9">
-        <div className="flex items-center gap-3"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#941b80]/10" style={{color:purple}}><ShieldCheck size={26}/></div><div><p className="text-xs font-bold uppercase tracking-widest" style={{color:aqua}}>{siteConfig.businessName}</p><h1 className="mt-1 text-2xl font-bold sm:text-3xl">Inspección vehicular</h1></div></div>
+        <div className="flex items-center gap-3"><div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#941b80]/5 p-1"><Image src="/Q-morado.png" alt="Q de Quálitas" width={48} height={48} className="h-full w-full object-contain" priority /></div><div><p className="text-xs font-bold uppercase tracking-widest" style={{color:aqua}}>{siteConfig.businessName}</p><h1 className="mt-1 text-2xl font-bold sm:text-3xl">Inspección vehicular</h1></div></div>
         <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600">Completa tus datos y adjunta fotografías claras de tu unidad. Esta es una herramienta de recepción y seguimiento de nuestra oficina; no sustituye una inspección oficial ni confirma la aceptación del riesgo por parte de la aseguradora.</p>
       </header>
       <form onSubmit={submit} className="mt-5 space-y-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
