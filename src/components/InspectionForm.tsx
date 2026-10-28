@@ -13,7 +13,7 @@ async function compressPhoto(file: File): Promise<File> {
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Usa fotografías JPG, PNG o WebP.');
   const objectUrl = URL.createObjectURL(file);
   try {
-    const image = new Image();
+    const image = new window.Image();
     image.src = objectUrl;
     await image.decode();
     const scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
