@@ -22,6 +22,7 @@ export default function AdminInspectionsPage() {
   const [filter,setFilter] = useState('todas');
   const [query,setQuery] = useState('');
   const [invitePhone,setInvitePhone] = useState('');
+  const [inviteName,setInviteName] = useState('');
   const [inviteError,setInviteError] = useState('');
   const router = useRouter();
   async function load() {
@@ -51,7 +52,9 @@ export default function AdminInspectionsPage() {
     setInviteError('');
     const number=digits.startsWith('52')?digits:('52'+digits);
     const inspectionUrl=siteConfig.url+'/inspeccion-vehicular';
-    const message='Hola, te contactamos de '+siteConfig.businessName+'. Para iniciar tu solicitud de inspección vehicular, llena este formulario: '+inspectionUrl+'. Registra tus propios datos y los de tu automóvil o motocicleta, y adjunta las fotografías solicitadas. Tu folio se generará al enviar el formulario. No necesitas registrarte previamente con nosotros. La recepción no implica aprobación oficial ni emisión de póliza.';
+    const name=inviteName.trim();
+    const greeting=name?'Hola '+name+',':'Hola,';
+    const message=greeting+' te contactamos de '+siteConfig.businessName+'. Para iniciar tu solicitud de inspección vehicular, llena este formulario: '+inspectionUrl+'. Registra tus propios datos y los de tu automóvil o motocicleta, y adjunta las fotografías solicitadas. Tu folio se generará al enviar el formulario. No necesitas registrarte previamente con nosotros. La recepción no implica aprobación oficial ni emisión de póliza.';
     window.open('https://wa.me/'+number+'?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
   }
   function whatsapp(item:Inspection) {
@@ -66,7 +69,7 @@ export default function AdminInspectionsPage() {
     <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#941b80]/10 text-[#941b80]"><ShieldCheck size={25}/></span><div><p className="text-xs font-bold uppercase tracking-widest text-[#0096ae]">{siteConfig.businessName}</p><h1 className="text-2xl font-bold">Inspección vehicular</h1></div></div><div className="flex gap-2"><a href="/admin" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-semibold"><ArrowLeft size={16}/> Panel</a><a href="/inspeccion-vehicular" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#941b80] px-3 text-sm font-bold text-white"><ExternalLink size={16}/> Formulario público</a></div></header>
     <section className="mt-5 rounded-2xl border border-[#0096ae]/30 bg-white p-5">
       <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0096ae]/10 text-[#007b8e]"><MessageCircle size={20}/></span><div><h2 className="font-bold">Invitar a un cliente nuevo</h2><p className="mt-1 max-w-3xl text-sm text-slate-600">Envía el formulario antes de que exista una solicitud. El cliente registrará sus propios datos y, al enviarlo, el sistema creará un único registro con su folio.</p></div></div>
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row"><label className="flex-1"><span className="mb-1 block text-xs font-semibold text-slate-600">WhatsApp del cliente (con lada)</span><input value={invitePhone} onChange={e=>{setInvitePhone(e.target.value);setInviteError('');}} inputMode="tel" placeholder="Ej. 55 1234 5678" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><button type="button" onClick={inviteNewClient} className="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-xl bg-[#0096ae] px-4 py-2 text-sm font-bold text-white hover:bg-[#007b8e]"><MessageCircle size={16}/> Preparar WhatsApp</button></div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]"><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">Nombre del cliente <span className="font-normal text-slate-400">(opcional)</span></span><input value={inviteName} onChange={e=>setInviteName(e.target.value)} maxLength={100} placeholder="Ej. María López" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">WhatsApp del cliente (con lada)</span><input value={invitePhone} onChange={e=>{setInvitePhone(e.target.value);setInviteError('');}} inputMode="tel" placeholder="Ej. 55 1234 5678" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><button type="button" onClick={inviteNewClient} className="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-xl bg-[#0096ae] px-4 py-2 text-sm font-bold text-white hover:bg-[#007b8e]"><MessageCircle size={16}/> Preparar WhatsApp</button></div>
       {inviteError&&<p role="alert" className="mt-2 text-sm text-red-700">{inviteError}</p>}
       <p className="mt-2 text-xs text-slate-500">WhatsApp abrirá el mensaje preparado; tú decides cuándo enviarlo. No se crea ningún registro al generar la invitación.</p>
     </section>
