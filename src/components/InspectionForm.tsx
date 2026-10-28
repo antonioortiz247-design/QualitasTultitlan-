@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Image from 'next/image';
-import { Camera, CarFront, CheckCircle2, Bike, ArrowLeft, LoaderCircle } from 'lucide-react';
+import { Camera, CarFront, CheckCircle2, Bike, ArrowLeft, LoaderCircle, ShieldCheck } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
 const purple = '#941B80';
