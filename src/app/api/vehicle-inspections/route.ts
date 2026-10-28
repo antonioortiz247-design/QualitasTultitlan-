@@ -4,9 +4,9 @@ import { createHash, randomBytes } from 'crypto';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_FILES = 8;
-const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
+const MAX_FILES = 5;
+const ALLOWED_TYPES = new Set(['image/jpeg']);
 
 function text(value: FormDataEntryValue | null, max = 300): string {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
     }
 
     const photos = data.getAll('fotos').filter((value): value is File => value instanceof File && value.size > 0);
-    if (photos.length > MAX_FILES) return jsonError('Puedes adjuntar un máximo de 8 fotografías.', 400);
+    if (photos.length > MAX_FILES) return jsonError('Puedes adjuntar un máximo de 5 fotografías.', 400);
     for (const photo of photos) {
       if (!ALLOWED_TYPES.has(photo.type) || photo.size > MAX_FILE_SIZE) {
-        return jsonError('Cada fotografía debe ser JPG, PNG o WebP y pesar como máximo 10 MB.', 400);
+        return jsonError('Cada fotografía debe ser JPG optimizado y pesar como máximo 2 MB.', 400);
       }
     }
 
