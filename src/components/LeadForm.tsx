@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import Image from 'next/image';
 import { CheckCircle, MessageCircle } from 'lucide-react';
 import { siteConfig, whatsappMessages } from '@/config/site';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
@@ -57,7 +58,7 @@ export function LeadForm() {
     <section id="contacto" className="bg-qualitas-surface px-4 py-14">
       <div className="mx-auto grid max-w-7xl gap-8 rounded-3xl border border-qualitas-border bg-white p-5 shadow-soft md:grid-cols-[.9fr_1.5fr] md:p-8">
         <div>
-          <p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención personalizada</p>
+          <div className="mb-2 flex items-center gap-3"><Image src="/Q-morado.png" alt="Quálitas" width={38} height={38} className="h-9 w-9 object-contain" /><p className="text-sm font-bold uppercase tracking-wider text-qualitas-aqua">Atención personalizada</p></div>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">¿Quieres que te orientemos?</h2>
           <p className="mt-3 text-slate-600">Contáctanos para revisar opciones de seguro para tu vehículo.</p>
           <a className="focus-ring mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-qualitas-aqua px-5 py-3 font-bold text-white" target="_blank" rel="noopener noreferrer" href={buildWhatsAppUrl(whatsappMessages.general)}><MessageCircle size={18} aria-hidden="true" />WhatsApp · {siteConfig.whatsapp.display}</a>
