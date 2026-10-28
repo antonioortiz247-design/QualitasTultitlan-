@@ -16,6 +16,11 @@ export const metadata: Metadata = {
     template: '%s | Quálitas Cuautitlán',
   },
   description: siteDescription,
+  icons: {
+    icon: [{ url: '/Q-morado.png', type: 'image/png', sizes: '512x512' }],
+    shortcut: ['/Q-morado.png'],
+    apple: [{ url: '/Q-morado.png', type: 'image/png' }],
+  },
   alternates: {
     canonical: '/',
   },
