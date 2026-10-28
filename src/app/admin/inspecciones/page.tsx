@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Bike, CarFront, ClipboardCheck, Download, ExternalLink, MessageCircle, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Bike, CarFront, ClipboardCheck, Download, ExternalLink, MessageCircle, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
 type StorageMetrics = { inspectionCount:number; photoCount:number; photoBytes:number; storageLimitBytes:number; estimatedPercent:number; remainingBytes:number; warning:'normal'|'warning'|'critical' };
@@ -18,6 +18,9 @@ const statuses = [
 ];
 export default function AdminInspectionsPage() {
   const [items,setItems] = useState<Inspection[]>([]);
+  const [selectedIds,setSelectedIds] = useState<string[]>([]);
+  const [deleting,setDeleting] = useState(false);
+  const [notice,setNotice] = useState('');
   const [storageMetrics,setStorageMetrics] = useState<StorageMetrics|null>(null);
   const [loading,setLoading] = useState(true);
   const [error,setError] = useState('');
@@ -40,6 +43,42 @@ export default function AdminInspectionsPage() {
     finally {setLoading(false);}
   }
   useEffect(()=>{void load();},[]);
+  function toggleSelected(id:string) {
+    setSelectedIds(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id]);
+  }
+  function toggleAllVisible() {
+    const visibleIds = filtered.map(item => item.id);
+    setSelectedIds(current => visibleIds.every(id => current.includes(id))
+      ? current.filter(id => !visibleIds.includes(id))
+      : [...new Set([...current, ...visibleIds])]);
+  }
+  async function deleteSelected() {
+    if (!selectedIds.length || deleting) return;
+    const chosen = items.filter(item => selectedIds.includes(item.id));
+    const confirmation = window.confirm(
+      'Vas a eliminar ' + chosen.length + ' registro(s) seleccionado(s) y sus fotografías privadas. Esta acción es irreversible. Selecciona únicamente registros de prueba. ¿Deseas continuar?'
+    );
+    if (!confirmation) return;
+    setDeleting(true); setError(''); setNotice('');
+    try {
+      const response = await fetch('/api/admin/vehicle-inspections', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: chosen.map(item => item.id) }),
+      });
+      const data = await response.json();
+      if (response.status === 401) { router.replace('/admin/login'); return; }
+      if (!response.ok) throw new Error(data.error || 'No se pudieron eliminar los registros seleccionados.');
+      setItems(current => current.filter(item => !selectedIds.includes(item.id)));
+      setSelectedIds([]);
+      setNotice('Se eliminaron ' + data.deletedCount + ' registro(s) de prueba y sus fotografías.');
+      void load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al limpiar los registros seleccionados.');
+    } finally {
+      setDeleting(false);
+    }
+  }
   async function updateStatus(id:string,estado:string) {
     const response=await fetch('/api/admin/vehicle-inspections',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,estado})});
     const data=await response.json();
@@ -85,10 +124,10 @@ export default function AdminInspectionsPage() {
       <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full transition-all" style={{width:Math.min(100,storageMetrics?.estimatedPercent||0)+'%',background:storageColor}}/></div>
       <p className="mt-2 text-xs leading-5 text-slate-500">El cálculo suma el tamaño registrado de las fotos de inspección; no incluye otros archivos ni sustituye el medidor oficial de Supabase. Revisa también el egreso y la base de datos en Usage.</p>
     </section>
-    <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4"><h2 className="flex items-center gap-2 font-bold"><ClipboardCheck className="text-[#941b80]"/> Solicitudes recibidas</h2><button onClick={()=>void load()} disabled={loading} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold disabled:opacity-60"><RefreshCw size={15} className={loading?'animate-spin':''}/> Actualizar</button></div>
+    <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4"><div><h2 className="flex items-center gap-2 font-bold"><ClipboardCheck className="text-[#941b80]"/> Solicitudes recibidas</h2><p className="mt-1 text-xs text-slate-500">Selecciona únicamente los registros de prueba que quieras eliminar.</p></div><div className="flex flex-wrap gap-2"><button onClick={()=>void deleteSelected()} disabled={!selectedIds.length||deleting} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-red-700 px-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"><Trash2 size={15}/>{deleting?'Eliminando…':'Limpiar pruebas ('+selectedIds.length+')'}</button><button onClick={()=>void load()} disabled={loading||deleting} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold disabled:opacity-60"><RefreshCw size={15} className={loading?'animate-spin':''}/> Actualizar</button></div></div>
     <div className="grid gap-3 border-b border-slate-100 p-4 sm:grid-cols-[1fr_220px]"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar folio, cliente, placas o modelo" className="min-h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/><select value={filter} onChange={e=>setFilter(e.target.value)} className="min-h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"><option value="todas">Todos los estados</option>{statuses.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div>
-    {error&&<p role="alert" className="m-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-    {loading?<p className="p-8 text-sm text-slate-500">Cargando registros…</p>:filtered.length===0?<p className="p-8 text-sm text-slate-500">No hay inspecciones para mostrar.</p>:<div className="overflow-x-auto"><table className="w-full min-w-[1000px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase text-slate-500"><tr><th className="px-4 py-3">Folio / fecha</th><th className="px-4 py-3">Cliente</th><th className="px-4 py-3">Vehículo</th><th className="px-4 py-3">Evidencia</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Acciones</th></tr></thead><tbody>{filtered.map(item=><tr key={item.id} className="border-t border-slate-100 align-top"><td className="whitespace-nowrap px-4 py-4"><strong className="text-[#941b80]">{item.folio}</strong><span className="mt-1 block text-xs text-slate-500">{new Date(item.creado_en).toLocaleString('es-MX')}</span></td><td className="px-4 py-4"><strong>{item.nombre}</strong><a className="mt-1 block text-[#0096ae] hover:underline" href={'mailto:'+item.correo}>{item.correo}</a><span className="block text-xs text-slate-500">{item.telefono}</span>{item.observaciones_cliente&&<p className="mt-2 max-w-[220px] whitespace-normal text-xs text-slate-600">{item.observaciones_cliente}</p>}</td><td className="px-4 py-4"><span className="flex items-center gap-1 font-semibold">{item.tipo_vehiculo==='Motocicleta'?<Bike size={16}/>:<CarFront size={16}/>} {item.marca} {item.modelo}</span><span className="block text-xs text-slate-500">{item.anio} · {item.placas||'Sin placas registradas'} · {item.color||'Color no indicado'}</span>{item.numero_serie&&<span className="block text-xs text-slate-500">VIN: {item.numero_serie}</span>}</td><td className="px-4 py-4">{item.fotografias?.length?<><span className="block font-semibold">{item.fotografias.length} fotografía(s)</span><div className="mt-2 flex flex-col items-start gap-2">{item.fotografias.map((photo,index)=><a key={photo.path} href={'/api/admin/vehicle-inspections/photos?id='+encodeURIComponent(item.id)+'&path='+encodeURIComponent(photo.path)} className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-[#0096ae] px-2 py-1 text-xs font-semibold text-[#007b8e] hover:bg-[#0096ae]/5"><Download size={14}/> Descargar {index+1}</a>)}</div></>:<span>Sin fotografías</span>}<span className="mt-2 block text-xs text-slate-500">Descargas privadas para personal autorizado.</span></td><td className="px-4 py-4"><select aria-label={'Estado de '+item.folio} value={item.estado} onChange={e=>void updateStatus(item.id,e.target.value)} className="min-h-10 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold">{statuses.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></td><td className="px-4 py-4"><button onClick={()=>whatsapp(item)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#0096ae] px-3 text-xs font-bold text-[#007b8e]"><MessageCircle size={15}/> WhatsApp</button></td></tr>)}</tbody></table></div>}</section>
+    {error&&<p role="alert" className="m-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}{notice&&<p role="status" className="m-4 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">{notice}</p>}
+    {loading?<p className="p-8 text-sm text-slate-500">Cargando registros…</p>:filtered.length===0?<p className="p-8 text-sm text-slate-500">No hay inspecciones para mostrar.</p>:<div className="overflow-x-auto"><table className="w-full min-w-[1000px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase text-slate-500"><tr><th className="px-4 py-3"><input type="checkbox" aria-label="Seleccionar todos los registros visibles" checked={filtered.length>0&&filtered.every(item=>selectedIds.includes(item.id))} onChange={toggleAllVisible} className="h-4 w-4 accent-[#941b80]"/></th><th className="px-4 py-3">Folio / fecha</th><th className="px-4 py-3">Cliente</th><th className="px-4 py-3">Vehículo</th><th className="px-4 py-3">Evidencia</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3">Acciones</th></tr></thead><tbody>{filtered.map(item=><tr key={item.id} className="border-t border-slate-100 align-top"><td className="px-4 py-4"><input type="checkbox" aria-label={"Seleccionar registro "+item.folio} checked={selectedIds.includes(item.id)} onChange={()=>toggleSelected(item.id)} className="h-4 w-4 accent-[#941b80]"/></td><td className="whitespace-nowrap px-4 py-4"><strong className="text-[#941b80]">{item.folio}</strong><span className="mt-1 block text-xs text-slate-500">{new Date(item.creado_en).toLocaleString('es-MX')}</span></td><td className="px-4 py-4"><strong>{item.nombre}</strong><a className="mt-1 block text-[#0096ae] hover:underline" href={'mailto:'+item.correo}>{item.correo}</a><span className="block text-xs text-slate-500">{item.telefono}</span>{item.observaciones_cliente&&<p className="mt-2 max-w-[220px] whitespace-normal text-xs text-slate-600">{item.observaciones_cliente}</p>}</td><td className="px-4 py-4"><span className="flex items-center gap-1 font-semibold">{item.tipo_vehiculo==='Motocicleta'?<Bike size={16}/>:<CarFront size={16}/>} {item.marca} {item.modelo}</span><span className="block text-xs text-slate-500">{item.anio} · {item.placas||'Sin placas registradas'} · {item.color||'Color no indicado'}</span>{item.numero_serie&&<span className="block text-xs text-slate-500">VIN: {item.numero_serie}</span>}</td><td className="px-4 py-4">{item.fotografias?.length?<><span className="block font-semibold">{item.fotografias.length} fotografía(s)</span><div className="mt-2 flex flex-col items-start gap-2">{item.fotografias.map((photo,index)=><a key={photo.path} href={'/api/admin/vehicle-inspections/photos?id='+encodeURIComponent(item.id)+'&path='+encodeURIComponent(photo.path)} className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-[#0096ae] px-2 py-1 text-xs font-semibold text-[#007b8e] hover:bg-[#0096ae]/5"><Download size={14}/> Descargar {index+1}</a>)}</div></>:<span>Sin fotografías</span>}<span className="mt-2 block text-xs text-slate-500">Descargas privadas para personal autorizado.</span></td><td className="px-4 py-4"><select aria-label={'Estado de '+item.folio} value={item.estado} onChange={e=>void updateStatus(item.id,e.target.value)} className="min-h-10 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold">{statuses.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></td><td className="px-4 py-4"><button onClick={()=>whatsapp(item)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#0096ae] px-3 text-xs font-bold text-[#007b8e]"><MessageCircle size={15}/> WhatsApp</button></td></tr>)}</tbody></table></div>}</section>
     <p className="mt-4 text-xs leading-5 text-slate-500">La revisión registrada aquí es seguimiento interno. No representa una aprobación oficial ni sustituye los sistemas de suscripción de Quálitas.</p>
   </div></main>;
 }
