@@ -23,7 +23,8 @@ async function compressPhoto(file: File): Promise<File> {
     if (!context) throw new Error('No se pudo procesar una fotografía.');
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('No se pudo comprimir una fotografía.')), 'image/jpeg', 0.8));
-    return new File([blob], file.name.replace(/\\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+    const baseName = file.name.includes('.') ? file.name.split('.').slice(0, -1).join('.') : file.name;
+    return new File([blob], baseName + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
   } finally { URL.revokeObjectURL(objectUrl); }
 }
 
