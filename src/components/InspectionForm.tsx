@@ -6,6 +6,26 @@ import { siteConfig } from '@/config/site';
 
 const purple = '#941B80';
 const aqua = '#0096AE';
+const MAX_PHOTOS = 5;
+
+async function compressPhoto(file: File): Promise<File> {
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Usa fotografías JPG, PNG o WebP.');
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = objectUrl;
+    await image.decode();
+    const scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('No se pudo procesar una fotografía.');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('No se pudo comprimir una fotografía.')), 'image/jpeg', 0.8));
+    return new File([blob], file.name.replace(/\\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+  } finally { URL.revokeObjectURL(objectUrl); }
+}
 
 export default function InspectionForm() {
   const [busy, setBusy] = useState(false);
@@ -13,6 +33,7 @@ export default function InspectionForm() {
   const [error, setError] = useState('');
   const [vehicleType, setVehicleType] = useState('Automóvil');
   const [files, setFiles] = useState<File[]>([]);
+  const [compressionBusy, setCompressionBusy] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,11 +88,11 @@ export default function InspectionForm() {
           <label className={labelClass}>Número de serie / VIN (opcional)<input className={inputClass} name="numeroSerie" maxLength={40} placeholder="Número de serie si te lo solicitan"/></label>
         </div></section>
         <div className="h-px bg-slate-100"/>
-        <section><h2 className="text-lg font-bold">3. Fotografías de la unidad</h2><p className="mt-1 text-sm leading-6 text-slate-600">Adjunta hasta 8 fotos en JPG, PNG o WebP. Incluye vistas generales y detalles de daños existentes. Evita que aparezcan personas o documentos ajenos a la inspección.</p><label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 px-4 py-7 text-center transition hover:border-[#0096ae] hover:bg-[#0096ae]/[0.03]"><Camera size={28} style={{color:aqua}}/><span className="mt-2 font-bold">Seleccionar fotografías</span><span className="mt-1 text-xs text-slate-500">Máximo 8 archivos · 10 MB cada uno</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(e)=>{const chosen=Array.from(e.target.files||[]);setFiles(chosen.slice(0,8));}}/></label>{files.length>0&&<ul className="mt-3 space-y-2">{files.map((file,index)=><li key={file.name+index} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2 text-sm"><span className="truncate">{file.name}</span><span className="shrink-0 text-slate-500">{(file.size/1024/1024).toFixed(1)} MB</span></li>)}</ul>}</section>
+        <section><h2 className="text-lg font-bold">3. Fotografías de la unidad</h2><p className="mt-1 text-sm leading-6 text-slate-600">Adjunta hasta 5 fotos. Se comprimen automáticamente antes de enviarse. Incluye vistas generales y detalles de daños existentes. Evita que aparezcan personas o documentos ajenos a la inspección.</p><label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 px-4 py-7 text-center transition hover:border-[#0096ae] hover:bg-[#0096ae]/[0.03]"><Camera size={28} style={{color:aqua}}/><span className="mt-2 font-bold">Seleccionar fotografías</span><span className="mt-1 text-xs text-slate-500">Máximo 5 archivos · compresión automática</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={async (e)=>{const input=e.currentTarget;const chosen=Array.from(input.files||[]);if(chosen.length>MAX_PHOTOS){setError('Selecciona máximo 5 fotografías.');input.value='';return;}setError('');setCompressionBusy(true);try{setFiles(await Promise.all(chosen.map(compressPhoto)));}catch(err){setError(err instanceof Error?err.message:'No se pudieron preparar las fotografías.');setFiles([]);}finally{setCompressionBusy(false);input.value='';}}}/></label>{compressionBusy&&<p className="mt-3 text-sm font-semibold text-[#007b8e]">Comprimiendo fotografías…</p>}{files.length>0&&<ul className="mt-3 space-y-2">{files.map((file,index)=><li key={file.name+index} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2 text-sm"><span className="truncate">{file.name}</span><span className="shrink-0 text-slate-500">{(file.size/1024/1024).toFixed(1)} MB</span></li>)}</ul>}</section>
         <label className={labelClass}>Observaciones o daños preexistentes<textarea className={inputClass+' min-h-24 py-3'} name="observaciones" maxLength={1500} placeholder="Describe daños visibles o comentarios relevantes."/></label>
         <label className="flex items-start gap-3 text-sm leading-6 text-slate-600"><input className="mt-1 h-4 w-4 shrink-0 accent-[#941b80]" type="checkbox" name="privacidad" required/><span>Acepto el tratamiento de mis datos para gestionar esta solicitud y declaro haber consultado el <a className="font-semibold underline" style={{color:purple}} href="/aviso-privacidad" target="_blank">aviso de privacidad</a>.</span></label>
         {error&&<p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-        <button type="submit" disabled={busy} className="flex min-h-13 w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 font-bold text-white transition hover:brightness-95 disabled:opacity-60" style={{background:purple}}>{busy?<><LoaderCircle className="animate-spin" size={19}/> Enviando solicitud…</>:<><ShieldCheck size={19}/> Enviar inspección</>}</button>
+        <button type="submit" disabled={busy||compressionBusy} className="flex min-h-13 w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 font-bold text-white transition hover:brightness-95 disabled:opacity-60" style={{background:purple}}>{busy?<><LoaderCircle className="animate-spin" size={19}/> Enviando solicitud…</>:<><ShieldCheck size={19}/> Enviar inspección</>}</button>
         <p className="text-center text-xs leading-5 text-slate-500">Los archivos se almacenan en un espacio privado y solo se consultan por personal autorizado.</p>
       </form>
     </div>
