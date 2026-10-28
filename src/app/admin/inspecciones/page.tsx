@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Bike, CarFront, ClipboardCheck, Download, ExternalLink, MessageCircle, RefreshCw, ShieldCheck } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
+type StorageMetrics = { inspectionCount:number; photoCount:number; photoBytes:number; storageLimitBytes:number; estimatedPercent:number; remainingBytes:number; warning:'normal'|'warning'|'critical' };
 type Inspection = {
   id:string; folio:string; nombre:string; telefono:string; correo:string;
   tipo_vehiculo:string; marca:string; modelo:string; anio:number; placas?:string|null;
@@ -17,6 +18,7 @@ const statuses = [
 ];
 export default function AdminInspectionsPage() {
   const [items,setItems] = useState<Inspection[]>([]);
+  const [storageMetrics,setStorageMetrics] = useState<StorageMetrics|null>(null);
   const [loading,setLoading] = useState(true);
   const [error,setError] = useState('');
   const [filter,setFilter] = useState('todas');
@@ -33,6 +35,7 @@ export default function AdminInspectionsPage() {
       const data=await response.json();
       if(!response.ok) throw new Error(data.error||'No se pudieron cargar las inspecciones.');
       setItems(data.inspections||[]);
+      setStorageMetrics(data.storageMetrics||null);
     } catch(e) {setError(e instanceof Error?e.message:'Error al consultar inspecciones.');}
     finally {setLoading(false);}
   }
@@ -65,6 +68,8 @@ export default function AdminInspectionsPage() {
   }
   const filtered=items.filter(item=>(filter==='todas'||item.estado===filter)&&[item.folio,item.nombre,item.telefono,item.marca,item.modelo,item.placas,item.tipo_vehiculo].some(v=>String(v||'').toLocaleLowerCase('es-MX').includes(query.trim().toLocaleLowerCase('es-MX'))));
   const count=(state:string)=>items.filter(i=>i.estado===state).length;
+  const formatBytes=(bytes:number)=>bytes<1024*1024?(bytes/1024).toFixed(0)+' KB':(bytes/(1024*1024)).toFixed(2)+' MB';
+  const storageColor=storageMetrics?.warning==='critical'?'#b91c1c':storageMetrics?.warning==='warning'?'#b45309':'#007b8e';
   return <main className="min-h-screen bg-[#f7f8fa] px-4 py-7 text-[#25232a] sm:px-6 sm:py-10"><div className="mx-auto max-w-7xl">
     <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#941b80]/10 text-[#941b80]"><ShieldCheck size={25}/></span><div><p className="text-xs font-bold uppercase tracking-widest text-[#0096ae]">{siteConfig.businessName}</p><h1 className="text-2xl font-bold">Inspección vehicular</h1></div></div><div className="flex gap-2"><a href="/admin" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-semibold"><ArrowLeft size={16}/> Panel</a><a href="/inspeccion-vehicular" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#941b80] px-3 text-sm font-bold text-white"><ExternalLink size={16}/> Formulario público</a></div></header>
     <section className="mt-5 rounded-2xl border border-[#0096ae]/30 bg-white p-5">
@@ -74,6 +79,12 @@ export default function AdminInspectionsPage() {
       <p className="mt-2 text-xs text-slate-500">WhatsApp abrirá el mensaje preparado; tú decides cuándo enviarlo. No se crea ningún registro al generar la invitación.</p>
     </section>
     <section className="mt-5 grid gap-3 sm:grid-cols-4"><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Total</p><p className="mt-1 text-3xl font-bold">{loading?'—':items.length}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Recibidas</p><p className="mt-1 text-3xl font-bold text-[#941b80]">{loading?'—':count('recibida')}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">En revisión</p><p className="mt-1 text-3xl font-bold text-[#0096ae]">{loading?'—':count('en_revision')}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Con observaciones</p><p className="mt-1 text-3xl font-bold">{loading?'—':count('observaciones')}</p></article></section>
+    <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="font-bold">Consumo de fotografías</h2><p className="mt-1 text-sm text-slate-500">Estimación de fotos de inspección frente al límite de referencia de 1 GB del plan Free.</p></div><span className="rounded-full px-3 py-1 text-xs font-bold" style={{background:storageMetrics?.warning==='normal'?'#ecfeff':storageMetrics?.warning==='warning'?'#fffbeb':'#fef2f2',color:storageColor}}>{storageMetrics?.warning==='critical'?'Atención: consumo alto':storageMetrics?.warning==='warning'?'Vigilar consumo':'Dentro del objetivo'}</span></div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-4"><article className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">Espacio estimado</p><p className="mt-1 text-xl font-bold">{storageMetrics?formatBytes(storageMetrics.photoBytes):'—'}</p></article><article className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">Uso estimado de 1 GB</p><p className="mt-1 text-xl font-bold">{storageMetrics?storageMetrics.estimatedPercent.toFixed(2)+'%':'—'}</p></article><article className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">Fotografías guardadas</p><p className="mt-1 text-xl font-bold">{storageMetrics?storageMetrics.photoCount:'—'}</p></article><article className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">Espacio restante estimado</p><p className="mt-1 text-xl font-bold">{storageMetrics?formatBytes(storageMetrics.remainingBytes):'—'}</p></article></div>
+      <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full transition-all" style={{width:Math.min(100,storageMetrics?.estimatedPercent||0)+'%',background:storageColor}}/></div>
+      <p className="mt-2 text-xs leading-5 text-slate-500">El cálculo suma el tamaño registrado de las fotos de inspección; no incluye otros archivos ni sustituye el medidor oficial de Supabase. Revisa también el egreso y la base de datos en Usage.</p>
+    </section>
     <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4"><h2 className="flex items-center gap-2 font-bold"><ClipboardCheck className="text-[#941b80]"/> Solicitudes recibidas</h2><button onClick={()=>void load()} disabled={loading} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold disabled:opacity-60"><RefreshCw size={15} className={loading?'animate-spin':''}/> Actualizar</button></div>
     <div className="grid gap-3 border-b border-slate-100 p-4 sm:grid-cols-[1fr_220px]"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar folio, cliente, placas o modelo" className="min-h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/><select value={filter} onChange={e=>setFilter(e.target.value)} className="min-h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"><option value="todas">Todos los estados</option>{statuses.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div>
     {error&&<p role="alert" className="m-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
