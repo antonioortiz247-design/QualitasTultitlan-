@@ -92,7 +92,7 @@ export default function AdminInspectionsPage() {
   }
   async function inviteNewClient() {
     if (inviteSending) return;
-    const digits=invitePhone.replace(/\\D/g,'');
+    const digits=invitePhone.replace(/\D/g,'');
     if(digits.length<10 || digits.length>13) {
       setInviteError('Ingresa un número válido con lada internacional.'); setInviteSent('');
       return;
