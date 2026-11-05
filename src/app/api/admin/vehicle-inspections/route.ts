@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminSession, getAdminCookieName } from '@/lib/admin-auth';
+import { extractJpegGps } from '@/lib/exif-gps';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,6 +26,34 @@ export async function GET(request: NextRequest) {
     const response = await fetch(endpoint, { headers: { apikey: key, Authorization: 'Bearer ' + key }, cache: 'no-store' });
     if (!response.ok) throw new Error('Supabase respondió ' + response.status);
     const inspections = await response.json();
+
+    // Read GPS EXIF from private originals for the latest records. No image is made public.
+    const photoTasks: { photo: Record<string, unknown>; path: string }[] = [];
+    for (const item of inspections) {
+      for (const photo of Array.isArray(item.fotografias) ? item.fotografias : []) {
+        if (photo && typeof photo.path === 'string' && !photo.ubicacion_captura) {
+          photoTasks.push({ photo, path: photo.path });
+        }
+      }
+    }
+    let nextPhoto = 0;
+    const workers = Array.from({ length: Math.min(8, photoTasks.length) }, async () => {
+      while (nextPhoto < photoTasks.length) {
+        const task = photoTasks[nextPhoto++];
+        try {
+          const photoUrl = new URL('/storage/v1/object/inspecciones-vehiculares/' + task.path.split('/').map(encodeURIComponent).join('/'), url);
+          const photoResponse = await fetch(photoUrl, { headers: { apikey: key, Authorization: 'Bearer ' + key }, cache: 'no-store' });
+          if (!photoResponse.ok) continue;
+          const bytes = Buffer.from(await photoResponse.arrayBuffer());
+          const gps = extractJpegGps(bytes);
+          if (gps) task.photo.ubicacion_captura = { ...gps, tipo: 'exif_captura' };
+        } catch {
+          // A missing or unreadable EXIF block does not prevent the record from loading.
+        }
+      }
+    });
+    await Promise.all(workers);
+
     const activityUrl = new URL('/rest/v1/admin_record_activity', url);
     activityUrl.searchParams.set('select', 'source_id,status,note,created_at');
     activityUrl.searchParams.set('source_type', 'eq.inspecciones_vehiculares');
