@@ -73,7 +73,8 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const id = typeof body.id === 'string' ? body.id : '';
-    const estado = typeof body.estado === 'string' ? body.estado : '';\n    const nota = typeof body.nota === 'string' ? body.nota.trim().slice(0, 1000) : '';
+    const estado = typeof body.estado === 'string' ? body.estado : '';
+    const nota = typeof body.nota === 'string' ? body.nota.trim().slice(0, 1000) : '';
     const allowed = ['recibida', 'en_revision', 'observaciones', 'completada', 'cancelada'];
     if (!/^[0-9a-f-]{36}$/i.test(id) || !allowed.includes(estado)) return NextResponse.json({ error: 'Datos de actualización no válidos.' }, { status: 400 });
     const { url, key } = await config();
