@@ -633,7 +633,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-qualitas-purple px-4 py-12 text-white">
+        <section id="protect-auto-cta" className="bg-qualitas-purple px-4 py-12 text-white">
           <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <Car size={48} />
