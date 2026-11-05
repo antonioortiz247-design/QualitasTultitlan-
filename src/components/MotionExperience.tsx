@@ -20,25 +20,25 @@ export function MotionExperience() {
   const selected = hotspots.find((item) => item.id === active) ?? hotspots[0];
 
   return (
-    <section id="motion-experience" className="scroll-reveal overflow-hidden bg-[#17121c] px-4 py-16 text-white sm:py-20 lg:px-8">
+    <section id="motion-experience" className="scroll-reveal overflow-hidden bg-[linear-gradient(125deg,#fbf7fc_0%,#f0e5f3_38%,#e2f4f6_72%,#f8fbfc_100%)] px-4 py-16 text-[#25232a] sm:py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-10 lg:grid-cols-[.9fr_1.1fr] lg:gap-14">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-xs font-bold uppercase tracking-[.18em] text-[#53c5d1]"><Image src="/Q-morado.png" alt="Q de Quálitas" width={22} height={22} className="h-[22px] w-[22px] rounded-sm bg-white p-0.5 object-contain" /><span>Quálitas Motion Experience</span></div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#941B80]/20 bg-white/65 px-3 py-1.5 text-xs font-bold uppercase tracking-[.18em] text-[#007f91]"><Image src="/Q-morado.png" alt="Q de Quálitas" width={22} height={22} className="h-[22px] w-[22px] rounded-sm bg-white p-0.5 object-contain" /><span>Quálitas Motion Experience</span></div>
             <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-5xl">
               Explora tu protección <span className="text-[#53c5d1]">desde otra perspectiva.</span>
             </h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/70">
+            <p className="mt-5 max-w-xl text-base leading-7 text-[#55515c]">
               Selecciona un punto del vehículo para conocer información general sobre algunas coberturas. La protección efectiva depende de lo contratado y de las condiciones de la póliza.
             </p>
             <div className="mt-7 flex flex-wrap gap-2">
               {hotspots.map(({ id, label, Icon }) => (
-                <button key={id} type="button" aria-pressed={active === id} onClick={() => setActive(id)} className={'focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 ' + (active === id ? 'border-[#53c5d1] bg-[#53c5d1] text-[#17121c] shadow-[0_0_24px_rgba(83,197,209,.2)]' : 'border-white/15 bg-white/[0.04] text-white/80 hover:border-white/40 hover:bg-white/[0.09]')}>
+                <button key={id} type="button" aria-pressed={active === id} onClick={() => setActive(id)} className={'focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 ' + (active === id ? 'border-[#53c5d1] bg-[#53c5d1] text-[#17121c] shadow-[0_0_24px_rgba(83,197,209,.2)]' : 'border-white/15 bg-white/[0.04] text-[#514b57] hover:border-[#0096AE]/45 hover:bg-white/90')}>
                   <Icon size={16} aria-hidden="true" />{label}
                 </button>
               ))}
             </div>
-            <div key={selected.id} className="mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-5 motion-info-panel">
+            <div key={selected.id} className="mt-6 rounded-2xl border border-white/80 bg-white/65 p-5 text-[#25232a] shadow-[0_16px_42px_rgba(65,35,75,.10)] backdrop-blur-xl motion-info-panel">
               <p className="text-xs font-bold uppercase tracking-widest text-[#53c5d1]">Explora la cobertura</p>
               <h3 className="mt-2 text-xl font-extrabold">{selected.title}</h3>
               <p className="mt-2 text-sm leading-6 text-white/70">{selected.description}</p>
@@ -50,17 +50,17 @@ export function MotionExperience() {
 
           <div className="relative mx-auto w-full max-w-2xl">
             <div className="motion-grid absolute inset-0 rounded-[2rem]" aria-hidden="true" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#292130] via-[#201925] to-[#101820] p-4 sm:p-7">
-              <div className="absolute -right-16 -top-16 size-56 rounded-full bg-[#941B80]/20 blur-3xl" aria-hidden="true" />
-              <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-[#0096AE]/20 blur-3xl" aria-hidden="true" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/85 bg-[linear-gradient(135deg,rgba(255,255,255,.88)_0%,rgba(239,220,244,.92)_42%,rgba(210,240,243,.94)_100%)] p-4 shadow-[0_22px_60px_rgba(75,38,88,.13)] sm:p-7">
+              <div className="absolute -right-16 -top-16 size-56 rounded-full bg-[#941B80]/25 blur-3xl" aria-hidden="true" />
+              <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-[#0096AE]/25 blur-3xl" aria-hidden="true" />
               <div className="relative flex items-center justify-between gap-3">
-                <span className="text-xs font-bold uppercase tracking-[.16em] text-white/55">Vehículo 3D · gira para explorar</span>
+                <span className="text-xs font-bold uppercase tracking-[.16em] text-[#5f5965]">Vehículo 3D · gira para explorar</span>
                 <span className="rounded-full border border-[#53c5d1]/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#53c5d1]">Giro 360°</span>
               </div>
               <InteractiveSUV active={active} onSelect={setActive} />
-              <div className="relative mt-1 flex items-center justify-between gap-3 border-t border-white/10 pt-4 text-xs text-white/50">
+              <div className="relative mt-1 flex items-center justify-between gap-3 border-t border-[#941B80]/10 pt-4 text-xs text-[#625d68]">
                 <span>Arrastra el vehículo para girarlo</span>
-                <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#53c5d1]" /> Giro táctil y mouse</span>
+                <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#0096AE]" /> Giro táctil y mouse</span>
               </div>
             </div>
           </div>
