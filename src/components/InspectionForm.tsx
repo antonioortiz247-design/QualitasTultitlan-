@@ -9,8 +9,64 @@ const purple = '#941B80';
 const aqua = '#0096AE';
 const MAX_PHOTOS = 5;
 
+function preserveJpegExif(source: Uint8Array, compressed: Uint8Array): Uint8Array {
+  // JPEG EXIF lives in an APP1 segment immediately after the SOI marker.
+  if (source.length < 4 || source[0] !== 0xff || source[1] !== 0xd8) return compressed;
+  let offset = 2;
+  let exifSegment: Uint8Array | null = null;
+  while (offset + 4 < source.length && source[offset] === 0xff) {
+    const marker = source[offset + 1];
+    if (marker === 0xda || marker === 0xd9) break;
+    const length = (source[offset + 2] << 8) | source[offset + 3];
+    if (length < 2 || offset + 2 + length > source.length) break;
+    if (marker === 0xe1 && length >= 8 &&
+        source[offset + 4] === 0x45 && source[offset + 5] === 0x78 &&
+        source[offset + 6] === 0x69 && source[offset + 7] === 0x66 &&
+        source[offset + 8] === 0 && source[offset + 9] === 0) {
+      exifSegment = source.slice(offset, offset + 2 + length);
+      break;
+    }
+    offset += 2 + length;
+  }
+  if (!exifSegment || compressed.length < 2 || compressed[0] !== 0xff || compressed[1] !== 0xd8) return compressed;
+
+  // The canvas output is already physically oriented. Reset EXIF Orientation to 1
+  // to prevent compatible viewers from rotating the compressed image a second time.
+  const tiff = 10;
+  if (exifSegment.length > tiff + 8) {
+    const little = exifSegment[tiff] === 0x49 && exifSegment[tiff + 1] === 0x49;
+    const read16 = (p: number) => little ? exifSegment![p] | (exifSegment![p + 1] << 8) : (exifSegment![p] << 8) | exifSegment![p + 1];
+    const read32 = (p: number) => little
+      ? (exifSegment![p] | (exifSegment![p + 1] << 8) | (exifSegment![p + 2] << 16) | (exifSegment![p + 3] << 24)) >>> 0
+      : ((exifSegment![p] << 24) | (exifSegment![p + 1] << 16) | (exifSegment![p + 2] << 8) | exifSegment![p + 3]) >>> 0;
+    const write16 = (p: number, value: number) => {
+      if (little) { exifSegment![p] = value & 255; exifSegment![p + 1] = value >> 8; }
+      else { exifSegment![p] = value >> 8; exifSegment![p + 1] = value & 255; }
+    };
+    const ifdOffset = read32(tiff + 4);
+    const ifd = tiff + ifdOffset;
+    if (ifd + 2 <= exifSegment.length) {
+      const count = read16(ifd);
+      for (let i = 0; i < count; i++) {
+        const entry = ifd + 2 + i * 12;
+        if (entry + 12 > exifSegment.length) break;
+        if (read16(entry) === 0x0112 && read16(entry + 2) === 3 && read32(entry + 4) >= 1) {
+          write16(entry + 8, 1);
+          break;
+        }
+      }
+    }
+  }
+  const output = new Uint8Array(compressed.length + exifSegment.length);
+  output.set(compressed.subarray(0, 2), 0);
+  output.set(exifSegment, 2);
+  output.set(compressed.subarray(2), 2 + exifSegment.length);
+  return output;
+}
+
 async function compressPhoto(file: File): Promise<File> {
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Usa fotografías JPG, PNG o WebP.');
+  const originalBytes = new Uint8Array(await file.arrayBuffer());
   const objectUrl = URL.createObjectURL(file);
   try {
     const image = new window.Image();
@@ -24,8 +80,10 @@ async function compressPhoto(file: File): Promise<File> {
     if (!context) throw new Error('No se pudo procesar una fotografía.');
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('No se pudo comprimir una fotografía.')), 'image/jpeg', 0.8));
+    const compressed = new Uint8Array(await blob.arrayBuffer());
+    const withExif = preserveJpegExif(originalBytes, compressed);
     const baseName = file.name.includes('.') ? file.name.split('.').slice(0, -1).join('.') : file.name;
-    return new File([blob], baseName + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+    return new File([withExif], baseName + '.jpg', { type: 'image/jpeg', lastModified: file.lastModified || Date.now() });
   } finally { URL.revokeObjectURL(objectUrl); }
 }
 
