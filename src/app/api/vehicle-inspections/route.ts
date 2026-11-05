@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
     const color = text(data.get('color'), 40);
     const numeroSerie = text(data.get('numeroSerie'), 40);
     const observaciones = text(data.get('observaciones'), 1500);
+    const whatsappMarketingConsent = data.get('whatsappMarketingConsent') === 'on';
     let ubicacion: { latitude: number; longitude: number; accuracy?: number } | null = null;
     const rawLocation = text(data.get('ubicacion'), 300);
     if (rawLocation) {
@@ -68,7 +69,11 @@ export async function POST(request: NextRequest) {
         token_hash: tokenHash, nombre, telefono, correo, tipo_vehiculo: tipoVehiculo,
         marca, modelo, anio, placas: placas || null, color: color || null,
         numero_serie: numeroSerie || null, observaciones_cliente: observaciones || null,
-        aviso_privacidad_aceptado: true, estado: 'recibida',
+        aviso_privacidad_aceptado: true,
+        whatsapp_marketing_consent: whatsappMarketingConsent,
+        whatsapp_consent_source: whatsappMarketingConsent ? 'formulario_web' : null,
+        whatsapp_consent_at: whatsappMarketingConsent ? new Date().toISOString() : null,
+        estado: 'recibida',
       }),
       cache: 'no-store',
     });
