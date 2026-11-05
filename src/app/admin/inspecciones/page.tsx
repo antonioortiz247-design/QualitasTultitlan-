@@ -30,6 +30,9 @@ export default function AdminInspectionsPage() {
   const [invitePhone,setInvitePhone] = useState('');
   const [inviteName,setInviteName] = useState('');
   const [inviteError,setInviteError] = useState('');
+  const [inviteSending,setInviteSending] = useState(false);
+  const [inviteSent,setInviteSent] = useState('');
+  const [inviteConsent,setInviteConsent] = useState(false);
   const [selectedPhoto,setSelectedPhoto] = useState<{url:string;name:string}|null>(null);
   const router = useRouter();
   async function load() {
@@ -87,19 +90,34 @@ export default function AdminInspectionsPage() {
     if(!response.ok){setError(data.error||'No se pudo actualizar.');return;}
     setItems(old=>old.map(item=>item.id===id?{...item,estado}:item));
   }
-  function inviteNewClient() {
-    const digits=invitePhone.replace(/\D/g,'');
-    if(digits.length<10 || digits.length>15) {
-      setInviteError('Ingresa un número válido con lada, de al menos 10 dígitos.');
+  async function inviteNewClient() {
+    if (inviteSending) return;
+    const digits=invitePhone.replace(/\\D/g,'');
+    if(digits.length<10 || digits.length>13) {
+      setInviteError('Ingresa un número válido con lada internacional.'); setInviteSent('');
       return;
     }
-    setInviteError('');
-    const number=digits.startsWith('52')?digits:('52'+digits);
-    const inspectionUrl=siteConfig.url+'/inspeccion-vehicular';
-    const name=inviteName.trim();
-    const greeting=name?'Hola '+name+',':'Hola,';
-    const message=greeting+' te contactamos de '+siteConfig.businessName+'. Para iniciar tu solicitud de inspección vehicular, llena este formulario: '+inspectionUrl+'. Registra tus propios datos y los de tu automóvil o motocicleta, y adjunta las fotografías solicitadas. Tu folio se generará al enviar el formulario. No necesitas registrarte previamente con nosotros. La recepción no implica aprobación oficial ni emisión de póliza.';
-    window.open('https://wa.me/'+number+'?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
+    if(!inviteConsent) {
+      setInviteError('Confirma que el cliente autorizó recibir mensajes por WhatsApp.'); setInviteSent('');
+      return;
+    }
+    setInviteSending(true); setInviteError(''); setInviteSent('');
+    try {
+      const response=await fetch('/api/admin/whatsapp/send-invitation',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({phone:digits,name:inviteName,consentConfirmed:true}),
+      });
+      const data=await response.json();
+      if(response.status===401){router.replace('/admin/login');return;}
+      if(!response.ok) throw new Error(data.error||'No se pudo enviar la invitación.');
+      setInviteSent('Meta aceptó el mensaje para envío. ID: '+data.messageId);
+      setInvitePhone(''); setInviteName(''); setInviteConsent(false);
+    } catch(error) {
+      setInviteError(error instanceof Error?error.message:'No se pudo enviar la invitación.');
+    } finally {
+      setInviteSending(false);
+    }
   }
   function whatsapp(item:Inspection) {
     const digits=item.telefono.replace(/\D/g,'');
@@ -115,9 +133,11 @@ export default function AdminInspectionsPage() {
     <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-3"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white p-1"><Image src="/Q-morado.png" alt="Q de Quálitas" width={48} height={48} className="h-full w-full object-contain" priority/></span><div><p className="text-xs font-bold uppercase tracking-widest text-[#0096ae]">{siteConfig.businessName}</p><h1 className="text-2xl font-bold">Inspección vehicular</h1></div></div><div className="flex gap-2"><a href="/admin" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-semibold"><ArrowLeft size={16}/> Panel</a><a href="/inspeccion-vehicular" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#941b80] px-3 text-sm font-bold text-white"><ExternalLink size={16}/> Formulario público</a></div></header>
     <section className="mt-5 rounded-2xl border border-[#0096ae]/30 bg-white p-5">
       <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0096ae]/10 text-[#007b8e]"><MessageCircle size={20}/></span><div><h2 className="font-bold">Invitar a un cliente nuevo</h2><p className="mt-1 max-w-3xl text-sm text-slate-600">Envía el formulario antes de que exista una solicitud. El cliente registrará sus propios datos y, al enviarlo, el sistema creará un único registro con su folio.</p></div></div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]"><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">Nombre del cliente <span className="font-normal text-slate-400">(opcional)</span></span><input value={inviteName} onChange={e=>setInviteName(e.target.value)} maxLength={100} placeholder="Ej. María López" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">WhatsApp del cliente (con lada)</span><input value={invitePhone} onChange={e=>{setInvitePhone(e.target.value);setInviteError('');}} inputMode="tel" placeholder="Ej. 55 1234 5678" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><button type="button" onClick={inviteNewClient} className="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-xl bg-[#0096ae] px-4 py-2 text-sm font-bold text-white hover:bg-[#007b8e]"><MessageCircle size={16}/> Preparar WhatsApp</button></div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]"><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">Nombre del cliente <span className="font-normal text-slate-400">(opcional)</span></span><input value={inviteName} onChange={e=>setInviteName(e.target.value)} maxLength={100} placeholder="Ej. María López" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">WhatsApp del cliente (con lada)</span><input value={invitePhone} onChange={e=>{setInvitePhone(e.target.value);setInviteError('');}} inputMode="tel" placeholder="Ej. 55 1234 5678" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><button type="button" onClick={()=>void inviteNewClient()} disabled={inviteSending||!inviteConsent} className="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-xl bg-[#0096ae] px-4 py-2 text-sm font-bold text-white hover:bg-[#007b8e] disabled:cursor-not-allowed disabled:opacity-50"><MessageCircle size={16}/> {inviteSending?'Enviando…':'Enviar invitación'}</button></div>
+      <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-slate-600"><input type="checkbox" checked={inviteConsent} onChange={e=>{setInviteConsent(e.target.checked);setInviteError('');}} className="mt-0.5 h-4 w-4 accent-[#0096ae]"/><span>Confirmo que el cliente autorizó recibir mensajes de WhatsApp de esta oficina.</span></label>
       {inviteError&&<p role="alert" className="mt-2 text-sm text-red-700">{inviteError}</p>}
-      <p className="mt-2 text-xs text-slate-500">WhatsApp abrirá el mensaje preparado; tú decides cuándo enviarlo. No se crea ningún registro al generar la invitación.</p>
+      {inviteSent&&<p role="status" className="mt-2 text-sm text-emerald-700">{inviteSent}</p>}
+      <p className="mt-2 text-xs text-slate-500">El envío se realizará desde la API de Meta mediante una plantilla aprobada. Se requiere autorización previa del cliente; el botón no abre WhatsApp.</p>
     </section>
     <section className="mt-5 grid gap-3 sm:grid-cols-4"><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Total</p><p className="mt-1 text-3xl font-bold">{loading?'—':items.length}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Recibidas</p><p className="mt-1 text-3xl font-bold text-[#941b80]">{loading?'—':count('recibida')}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">En revisión</p><p className="mt-1 text-3xl font-bold text-[#0096ae]">{loading?'—':count('en_revision')}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-500">Con observaciones</p><p className="mt-1 text-3xl font-bold">{loading?'—':count('observaciones')}</p></article></section>
     <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5">
