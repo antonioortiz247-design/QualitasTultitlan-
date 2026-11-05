@@ -42,6 +42,13 @@ export default function AdminPage() {
     return (typeFilter==='Todas'||lead.tipo===typeFilter)&&(statusFilter==='todos'||lead.status===statusFilter)&&(!term||[lead.folio,lead.nombre,lead.telefono,lead.correo,lead.producto,lead.origen].some(v=>String(v||'').toLocaleLowerCase('es-MX').includes(term)));
   }),[leads,searchTerm,typeFilter,statusFilter]);
   const count=(s:string)=>leads.filter(x=>x.status===s).length;
+  const todayStart=()=>{const d=new Date();d.setHours(0,0,0,0);return d.getTime();};
+  const createdToday=leads.filter(x=>{const t=Date.parse(x.created_at||'');return Number.isFinite(t)&&t>=todayStart();}).length;
+  const activeLeads=leads.filter(x=>!['atendido','no_concretado'].includes(x.status));
+  const lastTouch=(x:Lead)=>{const last=x.history?.[0]?.created_at;return Date.parse(last||x.created_at||'')||0;};
+  const stale24=activeLeads.filter(x=>lastTouch(x)>0&&Date.now()-lastTouch(x)>=24*60*60*1000).length;
+  const stale48=activeLeads.filter(x=>lastTouch(x)>0&&Date.now()-lastTouch(x)>=48*60*60*1000).length;
+  const conversionRate=leads.length?Math.round(count('atendido')/leads.length*100):0;
   function openDetails(lead:Lead){setActive(lead);setDraftStatus(lead.status);setDraftNote('');}
   async function saveTracking(){
     if(!active||saving)return;setSaving(true);setError('');
@@ -68,6 +75,16 @@ export default function AdminPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-9">
       <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-bold sm:text-3xl">Seguimiento de prospectos</h2><p className="mt-1 text-sm text-[#62616a]">Control comercial de contactos y cotizaciones recibidas.</p></div><button onClick={()=>void load()} disabled={loading} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#d8d9df] bg-white px-4 text-sm font-semibold"><RefreshCw size={16} className={loading?'animate-spin':''}/> Actualizar</button></div>
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">{[{label:'Total',value:leads.length,color:'#25232a'},{label:'Nuevos',value:count('nuevo'),color:'#941b80'},{label:'Contactados',value:count('contactado'),color:'#007b8e'},{label:'Seguimiento',value:count('seguimiento'),color:'#946200'},{label:'En proceso',value:count('proceso'),color:'#2563a6'},{label:'Atendidos',value:count('atendido'),color:'#15803d'}].map(x=><article key={x.label} className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-xs text-slate-500">{x.label}</p><p className="mt-1 text-2xl font-bold" style={{color:x.color}}>{loading?'—':x.value}</p></article>)}</div>
+      <section className="mt-4">
+        <div className="mb-3"><h3 className="text-lg font-bold">Productividad comercial</h3><p className="text-xs text-slate-500">Indicadores calculados con los registros disponibles y su historial de seguimiento.</p></div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-xs text-slate-500">Nuevos hoy</p><p className="mt-1 text-2xl font-bold text-[#941b80]">{loading?'—':createdToday}</p></article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-xs text-slate-500">Pendientes 24 h+</p><p className="mt-1 text-2xl font-bold text-amber-600">{loading?'—':stale24}</p></article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-xs text-slate-500">Pendientes 48 h+</p><p className="mt-1 text-2xl font-bold text-red-700">{loading?'—':stale48}</p></article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-xs text-slate-500">Activos por atender</p><p className="mt-1 text-2xl font-bold text-[#007b8e]">{loading?'—':activeLeads.length}</p></article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-xs text-slate-500">Tasa de atención</p><p className="mt-1 text-2xl font-bold text-emerald-700">{loading?'—':conversionRate+'%'}</p><p className="mt-1 text-[11px] text-slate-400">Atendidos / registros totales</p></article>
+        </div>
+      </section>
       <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-4"><ClipboardList size={19} className="text-[#941b80]"/><h3 className="font-bold">Registros recibidos</h3><span className="ml-auto text-xs text-slate-500">{filtered.length} resultados</span></div>
         {error&&<p role="alert" className="m-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}{warnings.map(w=><p key={w} className="m-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">{w}</p>)}
