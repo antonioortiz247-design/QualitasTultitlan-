@@ -29,6 +29,16 @@ export async function POST(request: NextRequest) {
     const color = text(data.get('color'), 40);
     const numeroSerie = text(data.get('numeroSerie'), 40);
     const observaciones = text(data.get('observaciones'), 1500);
+    let ubicacion: { latitude: number; longitude: number; accuracy?: number } | null = null;
+    const rawLocation = text(data.get('ubicacion'), 300);
+    if (rawLocation) {
+      try {
+        const parsed = JSON.parse(rawLocation);
+        if (Number.isFinite(parsed.latitude) && Number.isFinite(parsed.longitude) && Math.abs(parsed.latitude) <= 90 && Math.abs(parsed.longitude) <= 180) {
+          ubicacion = { latitude: parsed.latitude, longitude: parsed.longitude, ...(Number.isFinite(parsed.accuracy) ? { accuracy: Math.round(parsed.accuracy) } : {}) };
+        }
+      } catch { /* Ubicación opcional: se ignora si el dato no es válido. */ }
+    }
     if (!nombre || telefono.replace(/\D/g, '').length < 10 ||
         !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo) ||
         !['Automóvil', 'Motocicleta'].includes(tipoVehiculo) || !marca || !modelo ||
@@ -70,7 +80,7 @@ export async function POST(request: NextRequest) {
     const row = rows?.[0];
     if (!row?.id || !row?.folio) return jsonError('No se pudo confirmar el registro.', 502);
 
-    const uploaded: { path: string; name: string; type: string; size: number }[] = [];
+    const uploaded: { path: string; name: string; type: string; size: number; ubicacion?: { latitude: number; longitude: number; accuracy?: number; tipo: 'ubicacion_al_enviar' } }[] = [];
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
       const extension = photo.type === 'image/jpeg' ? 'jpg' : photo.type === 'image/png' ? 'png' : 'webp';
@@ -85,7 +95,7 @@ export async function POST(request: NextRequest) {
         console.error('[vehicle-inspections] photo upload failed', upload.status, (await upload.text()).slice(0, 300));
         return jsonError('La solicitud se guardó, pero no se pudieron cargar todas las fotografías. Contacta al asesor con tu folio ' + row.folio + '.', 502);
       }
-      uploaded.push({ path, name: photo.name.slice(0, 120), type: photo.type, size: photo.size });
+      uploaded.push({ path, name: photo.name.slice(0, 120), type: photo.type, size: photo.size, ...(ubicacion ? { ubicacion: { ...ubicacion, tipo: 'ubicacion_al_enviar' as const } } : {}) });
     }
 
     if (uploaded.length) {
