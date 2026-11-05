@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
 
   const id = request.nextUrl.searchParams.get('id') || '';
   const path = request.nextUrl.searchParams.get('path') || '';
+  const inline = request.nextUrl.searchParams.get('view') === '1';
   if (!/^[0-9a-f-]{36}$/i.test(id) || !path || path.includes('..') || !path.startsWith(id + '/')) {
     return error('La fotografía solicitada no es válida.', 400);
   }
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
     const safeAsciiName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_') || fallbackName;
     const headers = new Headers({
       'Content-Type': contentType,
-      'Content-Disposition': 'attachment; filename="' + safeAsciiName + '"; filename*=UTF-8\'\'' + encodeURIComponent(originalName),
+      'Content-Disposition': (inline ? 'inline' : 'attachment') + '; filename="' + safeAsciiName + '"; filename*=UTF-8\'\'' + encodeURIComponent(originalName),
       'Cache-Control': 'private, no-store, max-age=0',
       'X-Content-Type-Options': 'nosniff',
     });
