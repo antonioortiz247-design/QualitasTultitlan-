@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   const session = request.cookies.get(getAdminCookieName())?.value;
   if (!await verifyAdminSession(session)) return jsonError('No autorizado.', 401);
 
-  let body: { phone?: unknown; name?: unknown; consentConfirmed?: unknown };
+  let body: { phone?: unknown; name?: unknown; consentConfirmed?: unknown; consentMethod?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -43,6 +43,9 @@ export async function POST(request: NextRequest) {
   if (body.consentConfirmed !== true) {
     return jsonError('Confirma que el cliente autorizó recibir mensajes por WhatsApp antes de enviar.', 400);
   }
+  const consentMethod = typeof body.consentMethod === 'string' && ['verbal', 'written', 'digital'].includes(body.consentMethod)
+    ? body.consentMethod : null;
+  if (!consentMethod) return jsonError('Selecciona cómo otorgó el cliente su consentimiento.', 400);
 
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
@@ -55,6 +58,27 @@ export async function POST(request: NextRequest) {
   }
   if (!/^\d{5,30}$/.test(phoneNumberId) || !/^v\d+\.\d+$/.test(graphVersion) || !/^[a-z0-9_]{1,512}$/.test(templateName)) {
     return jsonError('La configuración de WhatsApp Cloud API no es válida.', 503);
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) return jsonError('No se pudo guardar la evidencia de consentimiento. Verifica la conexión de datos.', 503);
+
+  const consentResponse = await fetch(new URL('/rest/v1/whatsapp_marketing_consents', supabaseUrl), {
+    method: 'POST',
+    headers: { apikey: serviceKey, Authorization: 'Bearer ' + serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      phone: to,
+      name: name || null,
+      consent_source: 'staff_recorded',
+      consent_method: consentMethod,
+      purpose: 'Invitación y seguimiento del proceso de inspección vehicular por WhatsApp',
+    }),
+    cache: 'no-store',
+  });
+  if (!consentResponse.ok) {
+    console.error('[whatsapp-consent] could not save staff consent', consentResponse.status);
+    return jsonError('No se pudo guardar la evidencia del consentimiento; no se envió el mensaje.', 502);
   }
 
   const inspectionUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://qualitas-tultitlan-lemon.vercel.app').replace(/\/+$/, '') + '/inspeccion-vehicular';
