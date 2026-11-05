@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
     }
   }
 
-  return <main className="min-h-screen bg-[#f7f8fa] px-4 py-10 flex items-center justify-center">
+  return <main data-admin-login className="min-h-screen bg-[#f7f8fa] px-4 py-10 flex items-center justify-center">
     <section className="w-full max-w-md rounded-3xl border border-[#e4e5e9] bg-white p-7 shadow-sm sm:p-9">
       <div className="mb-7 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#941b80]/10 text-[#941b80]"><ShieldCheck size={30}/></div>
       <p className="text-sm font-semibold uppercase tracking-[.16em] text-[#0096ae]">Quálitas Cuautitlán Romero Rubio</p>
