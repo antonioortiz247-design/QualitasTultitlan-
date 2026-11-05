@@ -83,3 +83,178 @@ button, input, select, textarea { font: inherit; }
 .motion-3d-hotspot.is-active { color: #17121c; background: #53c5d1; border-color: #53c5d1; box-shadow: 0 0 0 7px rgb(83 197 209 / .2), 0 0 30px rgb(83 197 209 / .55); }
 .motion-3d-hotspot:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) { .motion-3d-hotspot { transition: none; } }
+
+
+/* =========================================================
+   QUÁLITAS · LIQUID GLASS
+   Tratamiento visual premium para el sitio comercial.
+   Mantiene la paleta institucional y prioriza legibilidad.
+   ========================================================= */
+:root {
+  --ql-glass: rgba(255,255,255,.68);
+  --ql-glass-strong: rgba(255,255,255,.84);
+  --ql-glass-border: rgba(255,255,255,.82);
+  --ql-glass-shadow: 0 14px 38px rgba(37,35,42,.075), inset 0 1px 0 rgba(255,255,255,.92);
+  --ql-glass-blur: blur(18px) saturate(165%);
+}
+html { background: #f7f8fb; }
+body {
+  background:
+    radial-gradient(ellipse at 5% 8%, rgba(148,27,128,.075), transparent 34rem),
+    radial-gradient(ellipse at 96% 26%, rgba(0,150,174,.075), transparent 38rem),
+    linear-gradient(145deg,#fbfbfd 0%,#f4f6fa 54%,#faf8fb 100%);
+  background-attachment: fixed;
+}
+::selection { background: rgba(148,27,128,.2); color: #25232a; }
+
+/* Navegación principal: cristal flotante y legible */
+header.sticky {
+  background: rgba(255,255,255,.76) !important;
+  border-color: rgba(255,255,255,.88) !important;
+  box-shadow: 0 8px 28px rgba(37,35,42,.055), inset 0 -1px 0 rgba(255,255,255,.7);
+  -webkit-backdrop-filter: var(--ql-glass-blur);
+  backdrop-filter: var(--ql-glass-blur);
+}
+header.sticky > div { min-height: 72px; }
+header.sticky nav a {
+  border: 1px solid transparent;
+  transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease;
+}
+header.sticky nav a:hover {
+  background: rgba(148,27,128,.075) !important;
+  border-color: rgba(148,27,128,.10);
+  transform: translateY(-1px);
+}
+header.sticky nav + div a {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 5px 16px rgba(37,35,42,.06);
+}
+#mobile-navigation {
+  background: rgba(255,255,255,.9) !important;
+  border-color: rgba(255,255,255,.9) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+}
+
+/* Tarjetas, paneles y módulos: transparencias selectivas */
+:where(article[class*="rounded-"][class*="border"], section [class*="rounded-3xl"][class*="border"], section [class*="rounded-2xl"][class*="border"]) {
+  border-color: rgba(255,255,255,.82);
+  box-shadow: var(--ql-glass-shadow);
+}
+:where(article[class*="bg-white"], article[class*="bg-slate-50"], section [class*="rounded-3xl"][class*="bg-white"], section [class*="rounded-2xl"][class*="bg-white"]) {
+  background-color: var(--ql-glass) !important;
+  -webkit-backdrop-filter: var(--ql-glass-blur);
+  backdrop-filter: var(--ql-glass-blur);
+}
+:where(article[class*="rounded-3xl"], article[class*="rounded-2xl"]) {
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+:where(article[class*="rounded-3xl"], article[class*="rounded-2xl"]):hover {
+  box-shadow: 0 18px 42px rgba(37,35,42,.105), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+/* Contenedor del cotizador y formularios */
+#cotizador > div,
+#contacto > div {
+  border-color: rgba(255,255,255,.9) !important;
+  background: rgba(255,255,255,.76) !important;
+  box-shadow: 0 22px 60px rgba(37,35,42,.09), inset 0 1px 0 rgba(255,255,255,.96) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+}
+#cotizador input:not([type="checkbox"]),
+#cotizador select,
+#cotizador textarea,
+#contacto input:not([type="checkbox"]),
+#contacto select,
+#contacto textarea {
+  background: rgba(255,255,255,.76) !important;
+  border-color: rgba(148,27,128,.15) !important;
+  border-radius: 14px !important;
+  box-shadow: inset 0 1px 2px rgba(37,35,42,.025), 0 3px 12px rgba(37,35,42,.035);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+#cotizador input:focus,
+#cotizador select:focus,
+#cotizador textarea:focus,
+#contacto input:focus,
+#contacto select:focus,
+#contacto textarea:focus {
+  background: #fff !important;
+  border-color: rgba(0,150,174,.62) !important;
+  box-shadow: 0 0 0 4px rgba(0,150,174,.10), 0 6px 18px rgba(0,150,174,.07);
+}
+
+/* Botones: conservan morado/aqua, con reflejo y tactilidad */
+a[class*="bg-qualitas-purple"],
+button[class*="bg-qualitas-purple"],
+a[class*="bg-[#941B80]"],
+button[class*="bg-[#941B80]"] {
+  border: 1px solid rgba(255,255,255,.24);
+  box-shadow: 0 8px 22px rgba(148,27,128,.19), inset 0 1px 0 rgba(255,255,255,.22);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+a[class*="bg-qualitas-aqua"],
+button[class*="bg-qualitas-aqua"],
+a[class*="bg-[#0096AE]"],
+button[class*="bg-[#0096AE]"] {
+  border: 1px solid rgba(255,255,255,.28);
+  box-shadow: 0 8px 22px rgba(0,150,174,.17), inset 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+a[class*="bg-qualitas-purple"]:hover,
+button[class*="bg-qualitas-purple"]:hover,
+a[class*="bg-qualitas-aqua"]:hover,
+button[class*="bg-qualitas-aqua"]:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.045);
+}
+a:active, button:active { -webkit-tap-highlight-color: transparent; }
+
+/* Etiquetas, filtros y elementos auxiliares */
+:where(details, [role="status"]) {
+  border-color: rgba(255,255,255,.85);
+}
+details[open] {
+  background: rgba(255,255,255,.68);
+  border-radius: 16px;
+  box-shadow: var(--ql-glass-shadow);
+  -webkit-backdrop-filter: blur(14px) saturate(155%);
+  backdrop-filter: blur(14px) saturate(155%);
+}
+:where(.motion-info-panel) {
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.12);
+  box-shadow: 0 12px 34px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.18);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+/* Superficies de sección: halo cromático muy discreto */
+section.bg-qualitas-surface,
+section.bg-white {
+  background-color: transparent;
+}
+section.bg-qualitas-surface {
+  background:
+    radial-gradient(ellipse at 8% 20%, rgba(148,27,128,.055), transparent 32rem),
+    radial-gradient(ellipse at 92% 80%, rgba(0,150,174,.055), transparent 34rem),
+    rgba(247,248,250,.72) !important;
+}
+
+/* Accesibilidad, rendimiento y pantallas pequeñas */
+:focus-visible {
+  outline-color: var(--qualitas-aqua);
+  box-shadow: 0 0 0 3px rgba(0,150,174,.12);
+}
+@media (max-width: 767px) {
+  :root { --ql-glass-blur: blur(13px) saturate(155%); }
+  header.sticky > div { min-height: 62px; }
+  #cotizador > div, #contacto > div {
+    border-radius: 22px !important;
+    box-shadow: 0 12px 34px rgba(37,35,42,.075), inset 0 1px 0 rgba(255,255,255,.94) !important;
+  }
+  :where(article[class*="rounded-3xl"], article[class*="rounded-2xl"]):hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  header.sticky nav a, article[class*="rounded-"], a, button { transition: none !important; }
+}
