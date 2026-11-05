@@ -481,15 +481,30 @@ export function QuoteForm() {
                 </div>
               </fieldset>
             </>}
-            {step === 8 && <>
-              {input('name', 'Nombre completo')}
-              {input('phone', 'Teléfono / WhatsApp', 'tel')}
-              {input('email', 'Correo electrónico', 'email')}
-              <div className="md:col-span-2">
-                <label className="flex items-start gap-2 text-sm text-slate-700"><input type="checkbox" checked={data.privacy === 'yes'} onChange={(e) => setData((current) => ({ ...current, privacy: e.target.checked ? 'yes' : '' }))} className="mt-1 size-4 accent-qualitas-purple" />He leído y acepto el <a className="underline" href="/aviso-privacidad">Aviso de Privacidad</a>.</label>
-                {errors.privacy && <p className="mt-1 text-sm text-red-700">{errors.privacy}</p>}
-              </div>
-            </>}
+            {step === 8 && (
+              <section className="quote-contact-panel md:col-span-2" aria-labelledby="quote-contact-title">
+                <div className="quote-contact-heading">
+                  <span className="quote-contact-icon"><ContactRound size={22} aria-hidden="true" /></span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[.16em] text-[#0096AE]">Último paso</p>
+                    <h3 id="quote-contact-title" className="mt-1 text-xl font-extrabold text-[#941B80] sm:text-2xl">¿A dónde te enviamos el seguimiento?</h3>
+                    <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">Comparte tus datos de contacto para que un asesor pueda revisar tu solicitud y comunicarse contigo.</p>
+                  </div>
+                </div>
+                <div className="quote-contact-fields">
+                  {input('name', 'Nombre completo')}
+                  {input('phone', 'Teléfono / WhatsApp', 'tel')}
+                  {input('email', 'Correo electrónico', 'email')}
+                </div>
+                <div className="quote-privacy-card">
+                  <label className="flex cursor-pointer items-start gap-3 text-sm leading-6 text-slate-700">
+                    <input type="checkbox" checked={data.privacy === 'yes'} onChange={(e) => setData((current) => ({ ...current, privacy: e.target.checked ? 'yes' : '' }))} className="mt-1 size-4 shrink-0 accent-qualitas-purple" />
+                    <span>He leído y acepto el <a className="font-bold text-[#941B80] underline underline-offset-2" href="/aviso-privacidad">Aviso de Privacidad</a>.</span>
+                  </label>
+                  {errors.privacy && <p className="mt-2 text-sm font-medium text-red-700">{errors.privacy}</p>}
+                </div>
+              </section>
+            )}
           </div>
           {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
