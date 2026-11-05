@@ -26,22 +26,22 @@ export function MotionExperience() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#941B80]/20 bg-white/65 px-3 py-1.5 text-xs font-bold uppercase tracking-[.18em] text-[#007f91]"><Image src="/Q-morado.png" alt="Q de Quálitas" width={22} height={22} className="h-[22px] w-[22px] rounded-sm bg-white p-0.5 object-contain" /><span>Quálitas Motion Experience</span></div>
             <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight sm:text-4xl lg:text-5xl">
-              Explora tu protección <span className="text-[#53c5d1]">desde otra perspectiva.</span>
+              Explora tu protección <span className="text-[#007f91]">desde otra perspectiva.</span>
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-[#55515c]">
               Selecciona un punto del vehículo para conocer información general sobre algunas coberturas. La protección efectiva depende de lo contratado y de las condiciones de la póliza.
             </p>
             <div className="mt-7 flex flex-wrap gap-2">
               {hotspots.map(({ id, label, Icon }) => (
-                <button key={id} type="button" aria-pressed={active === id} onClick={() => setActive(id)} className={'focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 ' + (active === id ? 'border-[#53c5d1] bg-[#53c5d1] text-[#17121c] shadow-[0_0_24px_rgba(83,197,209,.2)]' : 'border-white/15 bg-white/[0.04] text-[#514b57] hover:border-[#0096AE]/45 hover:bg-white/90')}>
+                <button key={id} type="button" aria-pressed={active === id} onClick={() => setActive(id)} className={'focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 ' + (active === id ? 'border-[#0096AE] bg-[#0096AE] text-[#17121c] shadow-[0_0_24px_rgba(83,197,209,.2)]' : 'border-[#941B80]/20 bg-white/60 text-[#514b57] hover:border-[#0096AE]/45 hover:bg-white/90')}>
                   <Icon size={16} aria-hidden="true" />{label}
                 </button>
               ))}
             </div>
             <div key={selected.id} className="mt-6 rounded-2xl border border-white/80 bg-white/65 p-5 text-[#25232a] shadow-[0_16px_42px_rgba(65,35,75,.10)] backdrop-blur-xl motion-info-panel">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#53c5d1]">Explora la cobertura</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#007f91]">Explora la cobertura</p>
               <h3 className="mt-2 text-xl font-extrabold">{selected.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-white/70">{selected.description}</p>
+              <p className="mt-2 text-sm leading-6 text-[#55515c]">{selected.description}</p>
               <a href="#cotizador" className="focus-ring mt-5 inline-flex items-center gap-2 rounded-lg bg-[#941B80] px-4 py-3 text-sm font-bold text-white transition hover:brightness-110">
                 Ir al cotizador <ArrowDownRight size={17} aria-hidden="true" />
               </a>
@@ -55,7 +55,7 @@ export function MotionExperience() {
               <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-[#0096AE]/25 blur-3xl" aria-hidden="true" />
               <div className="relative flex items-center justify-between gap-3">
                 <span className="text-xs font-bold uppercase tracking-[.16em] text-[#5f5965]">Vehículo 3D · gira para explorar</span>
-                <span className="rounded-full border border-[#53c5d1]/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#53c5d1]">Giro 360°</span>
+                <span className="rounded-full border border-[#0096AE]/35 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#007f91]">Giro 360°</span>
               </div>
               <InteractiveSUV active={active} onSelect={setActive} />
               <div className="relative mt-1 flex items-center justify-between gap-3 border-t border-[#941B80]/10 pt-4 text-xs text-[#625d68]">
