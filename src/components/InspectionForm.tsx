@@ -48,8 +48,12 @@ export default function InspectionForm() {
     files.forEach((file) => data.append('fotos', file));
     try {
       if (shareLocation && 'geolocation' in navigator) {
-        const position = await new Promise<GeolocationPosition>((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }));
-        data.set('ubicacion', JSON.stringify({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy }));
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }));
+          data.set('ubicacion', JSON.stringify({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy }));
+        } catch {
+          // La ubicación es opcional: si se deniega, la solicitud continúa sin coordenadas.
+        }
       }
       const response = await fetch('/api/vehicle-inspections', { method: 'POST', body: data, cache: 'no-store' });
       const result = await response.json();
