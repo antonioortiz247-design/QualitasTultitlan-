@@ -725,6 +725,15 @@ function Footer() {
           <a className="mt-5 block text-white/80" href={siteConfig.officialQualitasUrl}>Sitio oficial Quálitas</a>
         </div>
       </div>
+      <div className="mx-auto mt-8 flex max-w-7xl justify-end border-t border-white/10 pt-4">
+        <a
+          href="/admin"
+          aria-label="Acceso administrativo"
+          className="rounded-sm text-[10px] font-medium tracking-wide text-white/25 transition-colors hover:text-white/60 focus-visible:text-white/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/40"
+        >
+          Acceso administrativo
+        </a>
+      </div>
     </footer>
   );
 }
