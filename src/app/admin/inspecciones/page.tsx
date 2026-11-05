@@ -33,6 +33,7 @@ export default function AdminInspectionsPage() {
   const [inviteSending,setInviteSending] = useState(false);
   const [inviteSent,setInviteSent] = useState('');
   const [inviteConsent,setInviteConsent] = useState(false);
+  const [inviteConsentMethod,setInviteConsentMethod] = useState('verbal');
   const [selectedPhoto,setSelectedPhoto] = useState<{url:string;name:string}|null>(null);
   const router = useRouter();
   async function load() {
@@ -106,13 +107,13 @@ export default function AdminInspectionsPage() {
       const response=await fetch('/api/admin/whatsapp/send-invitation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({phone:digits,name:inviteName,consentConfirmed:true}),
+        body:JSON.stringify({phone:digits,name:inviteName,consentConfirmed:true,consentMethod:inviteConsentMethod}),
       });
       const data=await response.json();
       if(response.status===401){router.replace('/admin/login');return;}
       if(!response.ok) throw new Error(data.error||'No se pudo enviar la invitación.');
       setInviteSent('Meta aceptó el mensaje para envío. ID: '+data.messageId);
-      setInvitePhone(''); setInviteName(''); setInviteConsent(false);
+      setInvitePhone(''); setInviteName(''); setInviteConsent(false); setInviteConsentMethod('verbal');
     } catch(error) {
       setInviteError(error instanceof Error?error.message:'No se pudo enviar la invitación.');
     } finally {
@@ -134,7 +135,14 @@ export default function AdminInspectionsPage() {
     <section className="mt-5 rounded-2xl border border-[#0096ae]/30 bg-white p-5">
       <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0096ae]/10 text-[#007b8e]"><MessageCircle size={20}/></span><div><h2 className="font-bold">Invitar a un cliente nuevo</h2><p className="mt-1 max-w-3xl text-sm text-slate-600">Envía el formulario antes de que exista una solicitud. El cliente registrará sus propios datos y, al enviarlo, el sistema creará un único registro con su folio.</p></div></div>
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]"><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">Nombre del cliente <span className="font-normal text-slate-400">(opcional)</span></span><input value={inviteName} onChange={e=>setInviteName(e.target.value)} maxLength={100} placeholder="Ej. María López" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><label className="block"><span className="mb-1 block text-xs font-semibold text-slate-600">WhatsApp del cliente (con lada)</span><input value={invitePhone} onChange={e=>{setInvitePhone(e.target.value);setInviteError('');}} inputMode="tel" placeholder="Ej. 55 1234 5678" className="min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-[#0096ae]"/></label><button type="button" onClick={()=>void inviteNewClient()} disabled={inviteSending||!inviteConsent} className="inline-flex min-h-11 items-center justify-center gap-2 self-end rounded-xl bg-[#0096ae] px-4 py-2 text-sm font-bold text-white hover:bg-[#007b8e] disabled:cursor-not-allowed disabled:opacity-50"><MessageCircle size={16}/> {inviteSending?'Enviando…':'Enviar invitación'}</button></div>
-      <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-slate-600"><input type="checkbox" checked={inviteConsent} onChange={e=>{setInviteConsent(e.target.checked);setInviteError('');}} className="mt-0.5 h-4 w-4 accent-[#0096ae]"/><span>Confirmo que el cliente autorizó recibir mensajes de WhatsApp de esta oficina.</span></label>
+      <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_240px]">
+        <label className="flex items-start gap-2 text-xs leading-5 text-slate-600"><input type="checkbox" checked={inviteConsent} onChange={e=>{setInviteConsent(e.target.checked);setInviteError('');}} className="mt-0.5 h-4 w-4 accent-[#0096ae]"/><span>Confirmo que el cliente ya otorgó su autorización para recibir este mensaje de WhatsApp. No marcar si aún no existe autorización.</span></label>
+        <label className="block text-xs font-semibold text-slate-600">¿Cómo otorgó el consentimiento?
+          <select value={inviteConsentMethod} onChange={e=>setInviteConsentMethod(e.target.value)} className="mt-1 min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-normal">
+            <option value="verbal">Verbal</option><option value="written">Por escrito</option><option value="digital">Medio digital</option>
+          </select>
+        </label>
+      </div>
       {inviteError&&<p role="alert" className="mt-2 text-sm text-red-700">{inviteError}</p>}
       {inviteSent&&<p role="status" className="mt-2 text-sm text-emerald-700">{inviteSent}</p>}
       <p className="mt-2 text-xs text-slate-500">El envío se realizará desde la API de Meta mediante una plantilla aprobada. Se requiere autorización previa del cliente; el botón no abre WhatsApp.</p>
