@@ -60,7 +60,7 @@ export default function AdminPage() {
     return matchesType && matchesSearch;
   });
 
-  return <main className="min-h-screen bg-[#f7f8fa] text-[#25232a]">
+  return <main data-admin-panel className="min-h-screen bg-[#f7f8fa] text-[#25232a]">
     <header className="border-b border-[#e4e5e9] bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1"><Image src="/Q-morado.png" alt="Q de Quálitas" width={44} height={44} className="h-full w-full object-contain" priority /></div><div><p className="text-xs font-semibold uppercase tracking-wider text-[#0096ae]">Quálitas Cuautitlán Romero Rubio</p><h1 className="text-lg font-bold sm:text-xl">Panel privado</h1></div></div>
