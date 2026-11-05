@@ -17,6 +17,13 @@ export default function PrivacyPage() {
       <p className="mt-3 leading-7 text-slate-700">
         El formulario de solicitud de cotización pide nombre, teléfono, correo electrónico, código postal, edad del conductor, uso del vehículo, marca, modelo, versión, año y, cuando corresponde, tipo y claves de identificación del vehículo. También puede registrar parámetros técnicos de la solicitud, como el origen de la visita.
       </p>
+      <h2 className="mt-8 text-xl font-bold">Ubicación y metadatos de fotografías en inspecciones vehiculares</h2>
+      <p className="mt-3 leading-7 text-slate-700">
+        Al enviar una solicitud de inspección vehicular, el sitio puede solicitar al navegador o dispositivo acceso a la ubicación. Si la persona concede ese permiso, se recopilan las coordenadas aproximadas del dispositivo en ese momento y se asocian a la solicitud para apoyar la identificación y el seguimiento del lugar desde el que fue enviada. Si el permiso se deniega, no está disponible o se produce un error, la solicitud puede enviarse sin esas coordenadas.
+      </p>
+      <p className="mt-3 leading-7 text-slate-700">
+        Las fotografías JPG adjuntas pueden conservar metadatos EXIF que la cámara haya incorporado, incluida información GPS del lugar de captura cuando exista. Estos metadatos pueden ser distintos de la ubicación del dispositivo al momento de enviar la solicitud. Las fotografías y los datos de ubicación se almacenan con el expediente de inspección y su consulta está restringida al personal autorizado que atiende estas solicitudes.
+      </p>
       <h2 className="mt-8 text-xl font-bold">Envío y almacenamiento</h2>
       <p className="mt-3 leading-7 text-slate-700">
         Al enviar el formulario, los datos se transmiten al servidor de este sitio. Cuando el servicio de registro está configurado y disponible, la solicitud se guarda en la base de datos conectada al sitio para seguimiento de la cotización. Si se abre WhatsApp, los datos incluidos en el mensaje se comparten con ese servicio únicamente cuando la persona decide enviarlo.
