@@ -25,6 +25,17 @@ export async function GET(request: NextRequest) {
     const response = await fetch(endpoint, { headers: { apikey: key, Authorization: 'Bearer ' + key }, cache: 'no-store' });
     if (!response.ok) throw new Error('Supabase respondió ' + response.status);
     const inspections = await response.json();
+    const activityUrl = new URL('/rest/v1/admin_record_activity', url);
+    activityUrl.searchParams.set('select', 'source_id,status,note,created_at');
+    activityUrl.searchParams.set('source_type', 'eq.inspecciones_vehiculares');
+    activityUrl.searchParams.set('order', 'created_at.desc');
+    activityUrl.searchParams.set('limit', '1000');
+    const activityResponse = await fetch(activityUrl, { headers: { apikey: key, Authorization: 'Bearer ' + key }, cache: 'no-store' });
+    const activityRows = activityResponse.ok ? await activityResponse.json() : [];
+    for (const item of inspections) {
+      item.historial = activityRows.filter((entry: Record<string, unknown>) => entry.source_id === item.id)
+        .map((entry: Record<string, unknown>) => ({ estado: entry.status, nota: entry.note, fecha: entry.created_at }));
+    }
     let offset = 0;
     let inspectionCount = 0;
     let photoCount = 0;
@@ -62,7 +73,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const id = typeof body.id === 'string' ? body.id : '';
-    const estado = typeof body.estado === 'string' ? body.estado : '';
+    const estado = typeof body.estado === 'string' ? body.estado : '';\n    const nota = typeof body.nota === 'string' ? body.nota.trim().slice(0, 1000) : '';
     const allowed = ['recibida', 'en_revision', 'observaciones', 'completada', 'cancelada'];
     if (!/^[0-9a-f-]{36}$/i.test(id) || !allowed.includes(estado)) return NextResponse.json({ error: 'Datos de actualización no válidos.' }, { status: 400 });
     const { url, key } = await config();
@@ -74,6 +85,13 @@ export async function PATCH(request: NextRequest) {
       cache: 'no-store',
     });
     if (!response.ok) throw new Error('Supabase respondió ' + response.status);
+    const activityResponse = await fetch(new URL('/rest/v1/admin_record_activity', url), {
+      method: 'POST',
+      headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ source_type: 'inspecciones_vehiculares', source_id: id, status: estado, note: nota }),
+      cache: 'no-store',
+    });
+    if (!activityResponse.ok) throw new Error('El estado se guardó, pero no se pudo guardar el historial. Ejecuta el SQL de seguimiento.');
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('[admin-inspections] update failed', error instanceof Error ? error.message : 'unknown');
