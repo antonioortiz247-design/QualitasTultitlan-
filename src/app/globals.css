@@ -794,3 +794,79 @@ main[data-admin-login] form button:not([type]) {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Registro de contacto del cotizador: acabado premium tipo Hub */
+.quote-contact-panel {
+  grid-column: 1 / -1;
+  padding: clamp(18px, 3vw, 30px);
+  border: 1px solid rgba(255,255,255,.92);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(148,27,128,.075), transparent 45%),
+    radial-gradient(ellipse at 100% 100%, rgba(0,150,174,.08), transparent 45%),
+    rgba(255,255,255,.62);
+  box-shadow: 0 18px 46px rgba(50,35,58,.075), inset 0 1px 0 rgba(255,255,255,.96);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+}
+.quote-contact-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.quote-contact-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border: 1px solid rgba(148,27,128,.12);
+  border-radius: 16px;
+  color: #941B80;
+  background: linear-gradient(145deg,rgba(148,27,128,.12),rgba(0,150,174,.12));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 20px rgba(50,35,58,.06);
+}
+.quote-contact-fields {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 18px;
+}
+.quote-contact-fields > div:first-child { grid-column: 1 / -1; }
+.quote-contact-fields label {
+  display: block;
+  margin-bottom: 8px;
+  color: #34313a;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+.quote-contact-fields input {
+  min-height: 54px !important;
+  padding-inline: 16px !important;
+  border: 1px solid rgba(148,27,128,.16) !important;
+  border-radius: 15px !important;
+  background: rgba(255,255,255,.86) !important;
+  box-shadow: inset 0 1px 2px rgba(37,35,42,.025), 0 5px 16px rgba(37,35,42,.035) !important;
+}
+.quote-contact-fields input:focus {
+  border-color: rgba(0,150,174,.72) !important;
+  box-shadow: 0 0 0 4px rgba(0,150,174,.11), 0 8px 22px rgba(0,150,174,.07) !important;
+}
+.quote-privacy-card {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border: 1px solid rgba(0,150,174,.17);
+  border-radius: 16px;
+  background: linear-gradient(110deg,rgba(0,150,174,.065),rgba(148,27,128,.045));
+}
+@media (max-width: 640px) {
+  .quote-contact-fields { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .quote-contact-fields > div:first-child { grid-column: auto; }
+  .quote-contact-heading { gap: 12px; }
+  .quote-contact-icon { width: 42px; height: 42px; flex-basis: 42px; border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quote-contact-fields input { transition: none !important; }
+}
