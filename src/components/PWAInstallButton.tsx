@@ -12,9 +12,7 @@ export function PWAInstallButton() {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch((error) => console.error('No se pudo registrar la app:', error));
-      }, { once: true });
+      navigator.serviceWorker.register('/sw.js').catch((error) => console.error('No se pudo registrar la app:', error));
     }
     const onPrompt = (event: Event) => {
       event.preventDefault();
