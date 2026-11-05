@@ -663,3 +663,36 @@ footer a:hover { color: #8fe0e8; }
     animation: none !important;
   }
 }
+
+
+/* Corrección de contraste: CTA "Protege tu auto hoy" */
+main > section#protect-auto-cta,
+main > section#protect-auto-cta:nth-of-type(odd),
+main > section#protect-auto-cta:nth-of-type(even) {
+  color: #fff !important;
+  background-color: #941B80 !important;
+  background-image:
+    radial-gradient(ellipse at 8% 0%, rgba(255,255,255,.16), transparent 38%),
+    radial-gradient(ellipse at 100% 100%, rgba(0,150,174,.48), transparent 48%),
+    linear-gradient(118deg, #941B80 0%, #76206f 48%, #006f83 100%) !important;
+}
+main > section#protect-auto-cta h2,
+main > section#protect-auto-cta p,
+main > section#protect-auto-cta svg {
+  color: #fff !important;
+}
+main > section#protect-auto-cta a[href="#cotizador"] {
+  color: #941B80 !important;
+  background: #fff !important;
+  border: 1px solid rgba(255,255,255,.95) !important;
+  box-shadow: 0 8px 24px rgba(24,15,30,.16), inset 0 1px 0 rgba(255,255,255,.9);
+}
+main > section#protect-auto-cta a[target="_blank"] {
+  color: #fff !important;
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.72) !important;
+  box-shadow: 0 8px 24px rgba(24,15,30,.12), inset 0 1px 0 rgba(255,255,255,.2);
+}
+main > section#protect-auto-cta a:hover {
+  filter: brightness(1.08);
+}
