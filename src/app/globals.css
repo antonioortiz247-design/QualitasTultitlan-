@@ -566,3 +566,100 @@ footer a:hover { color: #8fe0e8; }
 @media (prefers-reduced-motion: reduce) {
   main article, main [data-card="true"], footer a { transition: none !important; }
 }
+
+
+/* =========================================================
+   PERFORMANCE PASS · scroll fluido en móviles y tablets
+   Conserva el lenguaje visual reduciendo filtros costosos durante el scroll.
+   ========================================================= */
+@media (max-width: 1024px) {
+  /* Evita fondos fijos y capas de blur grandes mientras se desplaza la página. */
+  html, body {
+    background-attachment: scroll !important;
+    scroll-behavior: auto;
+  }
+  body {
+    background:
+      linear-gradient(145deg, #fbf8fc 0%, #f4f6fa 54%, #f3f9fa 100%) !important;
+  }
+
+  header.sticky,
+  #mobile-navigation,
+  #cotizador > div,
+  #contacto > div,
+  .ql-desktop-more,
+  main article[class*="bg-white"],
+  main article[class*="bg-slate"],
+  main [class*="rounded-2xl"][class*="bg-white"],
+  main [class*="rounded-3xl"][class*="bg-white"],
+  main [class*="rounded-xl"][class*="bg-white"],
+  [data-card="true"],
+  .glass-card,
+  form input,
+  form select,
+  form textarea,
+  details[open] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  header.sticky { background: rgba(255,255,255,.96) !important; }
+  #mobile-navigation { background: rgba(255,255,255,.98) !important; }
+  #cotizador > div,
+  #contacto > div {
+    background: rgba(255,255,255,.96) !important;
+  }
+  main article[class*="bg-white"],
+  main article[class*="bg-slate"],
+  main [class*="rounded-2xl"][class*="bg-white"],
+  main [class*="rounded-3xl"][class*="bg-white"],
+  main [class*="rounded-xl"][class*="bg-white"],
+  [data-card="true"],
+  .glass-card {
+    background-color: rgba(255,255,255,.94) !important;
+  }
+
+  /* Las animaciones ligadas al viewport pueden recalcularse continuamente al hacer scroll. */
+  .scroll-reveal,
+  .scroll-reveal-soft {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  main article,
+  main [data-card="true"],
+  :where(article[class*="rounded-3xl"], article[class*="rounded-2xl"]),
+  button,
+  a {
+    transition-duration: .12s !important;
+  }
+  main article:hover,
+  main [data-card="true"]:hover {
+    transform: none !important;
+    box-shadow: 0 10px 24px rgba(62,37,70,.07) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Sombras más ligeras y fondos simples en pantallas pequeñas. */
+  :root {
+    --ql-glass-shadow: 0 7px 20px rgba(37,35,42,.055), inset 0 1px 0 rgba(255,255,255,.9);
+    --ql-glass-blur: none;
+  }
+  main > section:not(#motion-experience) {
+    background-image:
+      linear-gradient(135deg, #fbf8fc 0%, #f4edf6 48%, #edf7f8 100%) !important;
+  }
+  main > section:first-of-type {
+    background-image:
+      linear-gradient(125deg, #fbf7fc 0%, #f0e5f3 42%, #e2f4f6 100%) !important;
+  }
+  footer {
+    background-image: linear-gradient(125deg, #28212d 0%, #25232f 58%, #17323a 100%) !important;
+  }
+  .motion-car-aura,
+  .motion-orbit {
+    animation: none !important;
+  }
+}
