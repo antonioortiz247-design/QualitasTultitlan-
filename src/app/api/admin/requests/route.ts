@@ -68,7 +68,7 @@ export async function PATCH(request:NextRequest){
     const headers={apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'};
     const save=await fetch(new URL('/rest/v1/admin_record_tracking?on_conflict=source_type,source_id',url),{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({source_type:sourceType,source_id:sourceId,status,updated_at:new Date().toISOString()}),cache:'no-store'});
     if(!save.ok)throw new Error('No se pudo guardar el estatus. Verifica el SQL de seguimiento.');
-    if(note){const activity=await fetch(new URL('/rest/v1/admin_record_activity',url),{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({source_type:sourceType,source_id:sourceId,status,note}),cache:'no-store'});if(!activity.ok)throw new Error('El estatus se guardó, pero no se pudo guardar la nota.');}
+    const activity=await fetch(new URL('/rest/v1/admin_record_activity',url),{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({source_type:sourceType,source_id:sourceId,status,note}),cache:'no-store'});if(!activity.ok)throw new Error('El estatus se guardó, pero no se pudo guardar el historial.');
     const [tracking,history]=await Promise.all([
       fetch(new URL('/rest/v1/admin_record_tracking?select=notes&source_type=eq.'+encodeURIComponent(sourceType)+'&source_id=eq.'+encodeURIComponent(sourceId),url),{headers,cache:'no-store'}).then(x=>x.json()),
       fetch(new URL('/rest/v1/admin_record_activity?select=status,note,created_at&source_type=eq.'+encodeURIComponent(sourceType)+'&source_id=eq.'+encodeURIComponent(sourceId)+'&order=created_at.desc&limit=100',url),{headers,cache:'no-store'}).then(x=>x.json()),
