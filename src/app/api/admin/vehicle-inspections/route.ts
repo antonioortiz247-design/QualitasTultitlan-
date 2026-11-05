@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   try {
     const { url, key } = await config();
     const endpoint = new URL('/rest/v1/inspecciones_vehiculares', url);
-    endpoint.searchParams.set('select', 'id,folio,nombre,telefono,correo,tipo_vehiculo,marca,modelo,anio,placas,color,numero_serie,observaciones_cliente,fotografias,estado,creado_en,actualizado_en');
+    endpoint.searchParams.set('select', 'id,folio,nombre,telefono,correo,tipo_vehiculo,marca,modelo,anio,placas,color,numero_serie,observaciones_cliente,fotografias,estado,creado_en,actualizado_en,whatsapp_marketing_consent,whatsapp_consent_source,whatsapp_consent_at');
     endpoint.searchParams.set('order', 'creado_en.desc');
     endpoint.searchParams.set('limit', '200');
     const response = await fetch(endpoint, { headers: { apikey: key, Authorization: 'Bearer ' + key }, cache: 'no-store' });
