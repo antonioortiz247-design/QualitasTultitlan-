@@ -13,10 +13,10 @@ function jsonError(message: string, status: number) {
 
 function normalizePhone(value: unknown): string | null {
   if (typeof value !== 'string') return null;
-  let digits = value.replace(/\\D/g, '');
+  let digits = value.replace(/\D/g, '');
   if (digits.length === 10) digits = '52' + digits;
   if (digits.startsWith('521') && digits.length === 13) digits = '52' + digits.slice(3);
-  if (!/^52\\d{10}$/.test(digits)) return null;
+  if (!/^52\d{10}$/.test(digits)) return null;
   return digits;
 }
 
@@ -53,11 +53,11 @@ export async function POST(request: NextRequest) {
   if (!accessToken || !phoneNumberId || !templateName) {
     return jsonError('El envío por WhatsApp aún no está habilitado. Falta configurar el token, el número emisor y la plantilla aprobada de Meta.', 503);
   }
-  if (!/^\\d{5,30}$/.test(phoneNumberId) || !/^v\\d+\\.\\d+$/.test(graphVersion) || !/^[a-z0-9_]{1,512}$/.test(templateName)) {
+  if (!/^\d{5,30}$/.test(phoneNumberId) || !/^v\d+\.\d+$/.test(graphVersion) || !/^[a-z0-9_]{1,512}$/.test(templateName)) {
     return jsonError('La configuración de WhatsApp Cloud API no es válida.', 503);
   }
 
-  const inspectionUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://qualitas-tultitlan-lemon.vercel.app').replace(/\\/+$/, '') + '/inspeccion-vehicular';
+  const inspectionUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://qualitas-tultitlan-lemon.vercel.app').replace(/\/+$/, '') + '/inspeccion-vehicular';
   const templateBody = {
     messaging_product: 'whatsapp',
     recipient_type: 'individual',
