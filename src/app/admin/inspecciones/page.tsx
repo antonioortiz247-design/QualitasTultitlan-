@@ -80,8 +80,8 @@ export default function AdminInspectionsPage() {
       setDeleting(false);
     }
   }
-  async function updateStatus(id:string,estado:string) {
-    const response=await fetch('/api/admin/vehicle-inspections',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,estado})});
+  async function updateStatus(id:string,estado:string,nota='') {
+    const response=await fetch('/api/admin/vehicle-inspections',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,estado,nota})});
     const data=await response.json();
     if(!response.ok){setError(data.error||'No se pudo actualizar.');return;}
     setItems(old=>old.map(item=>item.id===id?{...item,estado}:item));
