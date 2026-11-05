@@ -347,3 +347,98 @@ section.bg-qualitas-surface {
   #cotizador form > div button:not([type="submit"]):hover { transform: none; }
   #cotizador form button { max-width: 100%; }
 }
+
+
+/* Liquid Glass global: botones, formularios y tarjetas */
+:where(button, a[role="button"], input[type="submit"], input[type="button"]) {
+  position: relative;
+  isolation: isolate;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease, filter .2s ease;
+}
+:where(button:not(:disabled), a[role="button"], input[type="submit"]:not(:disabled), input[type="button"]:not(:disabled)):hover {
+  filter: brightness(1.025);
+}
+:where(button:not(:disabled), a[role="button"], input[type="submit"]:not(:disabled), input[type="button"]:not(:disabled)):active {
+  transform: translateY(1px) scale(.99);
+}
+:where(button:disabled, input:disabled) {
+  cursor: not-allowed;
+  filter: saturate(.65);
+}
+:where(button[class*="border"], a[role="button"][class*="border"]) {
+  border-color: rgba(255,255,255,.88);
+  box-shadow: 0 7px 20px rgba(37,35,42,.055), inset 0 1px 0 rgba(255,255,255,.94);
+}
+:where(button[class*="bg-white"], button[class*="bg-slate"], button[class*="bg-gray"], a[role="button"][class*="bg-white"]) {
+  background-color: rgba(255,255,255,.72) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+}
+:where(button[class*="bg-qualitas-purple"], button[class*="bg-[#941B80]"], button[class*="bg-qualitas-aqua"], button[class*="bg-[#0096AE]"]) {
+  -webkit-backdrop-filter: blur(10px) saturate(145%);
+  backdrop-filter: blur(10px) saturate(145%);
+}
+:where(button[class*="bg-qualitas-purple"], button[class*="bg-[#941B80]"]):hover {
+  box-shadow: 0 12px 28px rgba(148,27,128,.25), inset 0 1px 0 rgba(255,255,255,.3);
+}
+:where(button[class*="bg-qualitas-aqua"], button[class*="bg-[#0096AE]"]):hover {
+  box-shadow: 0 12px 28px rgba(0,150,174,.23), inset 0 1px 0 rgba(255,255,255,.32);
+}
+
+/* Controles de formulario coherentes en todas las secciones */
+:where(form input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]), form select, form textarea) {
+  border: 1px solid rgba(148,27,128,.15) !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.74) !important;
+  box-shadow: inset 0 1px 2px rgba(37,35,42,.025), 0 4px 14px rgba(37,35,42,.035);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+:where(form input:not([type="checkbox"]):not([type="radio"]), form select, form textarea):focus {
+  background: rgba(255,255,255,.96) !important;
+  border-color: rgba(0,150,174,.68) !important;
+  box-shadow: 0 0 0 4px rgba(0,150,174,.11), 0 7px 20px rgba(0,150,174,.065);
+  outline: none;
+}
+:where(form input[type="checkbox"], form input[type="radio"]) {
+  accent-color: var(--qualitas-purple);
+}
+:where(form label) { color: inherit; }
+:where(form fieldset) {
+  border-color: rgba(255,255,255,.9);
+  border-radius: 18px;
+  background: rgba(255,255,255,.35);
+}
+
+/* Tarjetas globales: vidrio translúcido sin alterar paneles oscuros */
+:where(article, [data-card="true"], .glass-card) {
+  border-color: rgba(255,255,255,.84);
+  box-shadow: 0 12px 34px rgba(37,35,42,.065), inset 0 1px 0 rgba(255,255,255,.92);
+  -webkit-backdrop-filter: blur(16px) saturate(155%);
+  backdrop-filter: blur(16px) saturate(155%);
+}
+:where(article[class*="bg-white"], article[class*="bg-slate-50"], [data-card="true"], .glass-card) {
+  background-color: rgba(255,255,255,.7) !important;
+}
+:where(article, [data-card="true"], .glass-card):hover {
+  box-shadow: 0 17px 40px rgba(37,35,42,.09), inset 0 1px 0 rgba(255,255,255,.96);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  :where(article, [data-card="true"], .glass-card) {
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  :where(article, [data-card="true"], .glass-card):hover { transform: translateY(-2px); }
+}
+@media (max-width: 767px) {
+  :where(form input:not([type="checkbox"]):not([type="radio"]), form select, form textarea) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  :where(article, [data-card="true"], .glass-card):hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(button, a[role="button"], article, [data-card="true"], .glass-card, form input, form select, form textarea) {
+    transition: none !important;
+  }
+}
