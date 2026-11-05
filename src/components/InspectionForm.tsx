@@ -83,7 +83,9 @@ async function compressPhoto(file: File): Promise<File> {
     const compressed = new Uint8Array(await blob.arrayBuffer());
     const withExif = preserveJpegExif(originalBytes, compressed);
     const baseName = file.name.includes('.') ? file.name.split('.').slice(0, -1).join('.') : file.name;
-    return new File([withExif], baseName + '.jpg', { type: 'image/jpeg', lastModified: file.lastModified || Date.now() });
+    const fileBuffer = new ArrayBuffer(withExif.byteLength);
+    new Uint8Array(fileBuffer).set(withExif);
+    return new File([fileBuffer], baseName + '.jpg', { type: 'image/jpeg', lastModified: file.lastModified || Date.now() });
   } finally { URL.revokeObjectURL(objectUrl); }
 }
 
