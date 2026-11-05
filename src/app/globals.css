@@ -696,3 +696,101 @@ main > section#protect-auto-cta a[target="_blank"] {
 main > section#protect-auto-cta a:hover {
   filter: brightness(1.08);
 }
+
+
+/* =========================================================
+   ADMINISTRACIÓN · QUÁLITAS
+   Capa visual Liquid Glass, aislada de las páginas públicas.
+   ========================================================= */
+:where(main[data-admin-panel], main[data-admin-inspections], main[data-admin-login]) {
+  background:
+    radial-gradient(ellipse at 4% 0%, rgba(148,27,128,.12), transparent 34rem),
+    radial-gradient(ellipse at 100% 92%, rgba(0,150,174,.13), transparent 38rem),
+    linear-gradient(135deg, #fbf8fc 0%, #f1edf5 48%, #edf7f8 100%) !important;
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) header {
+  border-color: rgba(255,255,255,.9) !important;
+  background: rgba(255,255,255,.78) !important;
+  box-shadow: 0 16px 42px rgba(53,35,61,.08), inset 0 1px 0 rgba(255,255,255,.96);
+  -webkit-backdrop-filter: blur(18px) saturate(155%);
+  backdrop-filter: blur(18px) saturate(155%);
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) article,
+:where(main[data-admin-panel], main[data-admin-inspections]) section {
+  border-color: rgba(255,255,255,.9) !important;
+  box-shadow: 0 12px 34px rgba(53,35,61,.065), inset 0 1px 0 rgba(255,255,255,.94);
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) article {
+  background: rgba(255,255,255,.76) !important;
+  border-radius: 20px;
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) section {
+  background: rgba(255,255,255,.78);
+  border-radius: 22px;
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+  backdrop-filter: blur(14px) saturate(145%);
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) section > div[class*="border-b"] {
+  border-color: rgba(148,27,128,.10) !important;
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) input:not([type="checkbox"]),
+:where(main[data-admin-panel], main[data-admin-inspections]) select {
+  border-color: rgba(148,27,128,.17) !important;
+  border-radius: 12px;
+  background-color: rgba(255,255,255,.9);
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) input:focus,
+:where(main[data-admin-panel], main[data-admin-inspections]) select:focus {
+  outline: none;
+  border-color: rgba(0,150,174,.72) !important;
+  box-shadow: 0 0 0 4px rgba(0,150,174,.11);
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) table thead {
+  background: linear-gradient(100deg, rgba(148,27,128,.07), rgba(0,150,174,.07)) !important;
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) table tbody tr {
+  transition: background-color .16s ease;
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) table tbody tr:hover {
+  background: rgba(0,150,174,.045);
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) button,
+:where(main[data-admin-panel], main[data-admin-inspections]) a {
+  transition: box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+}
+:where(main[data-admin-panel], main[data-admin-inspections]) button:focus-visible,
+:where(main[data-admin-panel], main[data-admin-inspections]) a:focus-visible {
+  outline: 3px solid rgba(0,150,174,.35);
+  outline-offset: 2px;
+}
+main[data-admin-login] section {
+  border: 1px solid rgba(255,255,255,.92) !important;
+  background: rgba(255,255,255,.78) !important;
+  box-shadow: 0 24px 70px rgba(53,35,61,.12), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%);
+  backdrop-filter: blur(20px) saturate(155%);
+}
+main[data-admin-login] section > div:first-child {
+  background: linear-gradient(135deg, rgba(148,27,128,.14), rgba(0,150,174,.12)) !important;
+}
+main[data-admin-login] form button[type="submit"],
+main[data-admin-login] form button:not([type]) {
+  background: linear-gradient(110deg, #941B80, #76206f 58%, #007f91) !important;
+  box-shadow: 0 10px 24px rgba(148,27,128,.22), inset 0 1px 0 rgba(255,255,255,.22);
+}
+@media (max-width: 767px) {
+  :where(main[data-admin-panel], main[data-admin-inspections], main[data-admin-login]) {
+    background: linear-gradient(145deg, #fbf8fc 0%, #f3eff6 54%, #edf7f8 100%) !important;
+  }
+  :where(main[data-admin-panel], main[data-admin-inspections]) section,
+  :where(main[data-admin-panel], main[data-admin-inspections]) article {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: 0 8px 22px rgba(53,35,61,.055), inset 0 1px 0 rgba(255,255,255,.94);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(main[data-admin-panel], main[data-admin-inspections], main[data-admin-login]) * {
+    transition-duration: .01ms !important;
+  }
+}
