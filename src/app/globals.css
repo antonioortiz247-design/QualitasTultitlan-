@@ -442,3 +442,127 @@ section.bg-qualitas-surface {
     transition: none !important;
   }
 }
+
+
+/* =========================================================
+   QUÁLITAS · EXPERIENCIA VISUAL GLOBAL
+   Extiende el lenguaje cromático y Liquid Glass a toda la página.
+   ========================================================= */
+:root {
+  --ql-lilac-wash: #f4eaf5;
+  --ql-aqua-wash: #e6f5f7;
+  --ql-paper: #fbfafc;
+}
+
+/* Todas las secciones principales comparten una atmósfera clara de marca. */
+main > section:not(#motion-experience) {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+main > section:not(#motion-experience):nth-of-type(odd) {
+  background-image:
+    radial-gradient(ellipse at 4% 12%, rgba(148,27,128,.075), transparent 34rem),
+    radial-gradient(ellipse at 96% 88%, rgba(0,150,174,.075), transparent 36rem),
+    linear-gradient(128deg, #fbf8fc 0%, #f4edf6 43%, #edf7f8 100%) !important;
+}
+main > section:not(#motion-experience):nth-of-type(even) {
+  background-image:
+    radial-gradient(ellipse at 92% 8%, rgba(0,150,174,.065), transparent 32rem),
+    radial-gradient(ellipse at 8% 92%, rgba(148,27,128,.055), transparent 34rem),
+    linear-gradient(135deg, #ffffff 0%, #f7f4f9 52%, #eff8f9 100%) !important;
+}
+
+/* Hero y secciones informativas: degradado más visible, sin competir con el contenido. */
+main > section:first-of-type {
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(148,27,128,.12), transparent 42rem),
+    radial-gradient(ellipse at 100% 100%, rgba(0,150,174,.12), transparent 42rem),
+    linear-gradient(125deg, #fbf7fc 0%, #f0e5f3 40%, #e2f4f6 76%, #f8fbfc 100%) !important;
+}
+
+/* CTA principal: degradado institucional saturado para conservar jerarquía y contraste. */
+main > section.bg-qualitas-purple,
+main > section[class*="bg-qualitas-purple"] {
+  color: #fff;
+  background-image:
+    radial-gradient(ellipse at 8% 0%, rgba(255,255,255,.18), transparent 38%),
+    radial-gradient(ellipse at 100% 100%, rgba(0,150,174,.42), transparent 48%),
+    linear-gradient(118deg, #941B80 0%, #76206f 48%, #006f83 100%) !important;
+}
+main > section.bg-qualitas-purple a,
+main > section[class*="bg-qualitas-purple"] a {
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* Superficies tipo cristal para módulos, tarjetas y bloques informativos. */
+main article,
+main [class*="rounded-2xl"][class*="border"],
+main [class*="rounded-3xl"][class*="border"],
+main [class*="rounded-xl"][class*="border"] {
+  border-color: rgba(255,255,255,.86);
+  box-shadow: 0 12px 34px rgba(62,37,70,.065), inset 0 1px 0 rgba(255,255,255,.94);
+}
+main article[class*="bg-white"],
+main article[class*="bg-slate"],
+main [class*="rounded-2xl"][class*="bg-white"],
+main [class*="rounded-3xl"][class*="bg-white"],
+main [class*="rounded-xl"][class*="bg-white"] {
+  background-color: rgba(255,255,255,.66) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(155%);
+  backdrop-filter: blur(16px) saturate(155%);
+}
+main article,
+main [data-card="true"] {
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  main article:hover,
+  main [data-card="true"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(62,37,70,.10), inset 0 1px 0 rgba(255,255,255,.98);
+  }
+}
+
+/* Botones secundarios: cristal blanco; primarios mantienen los tonos de marca. */
+main button:not([class*="bg-[#941B80]"]):not([class*="bg-[#0096AE]"]):not([class*="bg-qualitas-purple"]):not([class*="bg-qualitas-aqua"]),
+main a[role="button"]:not([class*="bg-[#941B80]"]):not([class*="bg-[#0096AE]"]) {
+  -webkit-backdrop-filter: blur(12px) saturate(155%);
+  backdrop-filter: blur(12px) saturate(155%);
+}
+main button[class*="bg-[#941B80]"],
+main button[class*="bg-qualitas-purple"],
+main a[class*="bg-[#941B80]"],
+main a[class*="bg-qualitas-purple"] {
+  box-shadow: 0 9px 24px rgba(148,27,128,.2), inset 0 1px 0 rgba(255,255,255,.25);
+}
+main button[class*="bg-[#0096AE]"],
+main button[class*="bg-qualitas-aqua"],
+main a[class*="bg-[#0096AE]"],
+main a[class*="bg-qualitas-aqua"] {
+  box-shadow: 0 9px 24px rgba(0,150,174,.18), inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+/* Pie de página: cierre oscuro con transición de color institucional. */
+footer {
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(148,27,128,.34), transparent 45%),
+    radial-gradient(ellipse at 100% 100%, rgba(0,150,174,.28), transparent 48%),
+    linear-gradient(125deg, #28212d 0%, #25232f 52%, #17323a 100%) !important;
+}
+footer a {
+  transition: color .2s ease, opacity .2s ease;
+}
+footer a:hover { color: #8fe0e8; }
+
+@media (max-width: 767px) {
+  main > section:not(#motion-experience) {
+    background-attachment: scroll;
+  }
+  main article:hover,
+  main [data-card="true"]:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  main article, main [data-card="true"], footer a { transition: none !important; }
+}
